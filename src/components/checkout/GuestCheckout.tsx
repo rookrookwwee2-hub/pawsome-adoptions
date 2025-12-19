@@ -24,7 +24,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const WALLET_ADDRESS = "TYourTRC20WalletAddressHere"; // Replace with actual TRC20 wallet
+const WALLET_ADDRESS = "TTFYmtMsmNiWtTToGsQPPsmmdRPj5V5qxD";
 
 const guestSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
@@ -232,27 +232,35 @@ const GuestCheckout = ({
                 <p className="font-display text-3xl font-bold text-primary">
                   ${amount} USDT
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  TRC20 Network (Tron)
-                </p>
               </div>
 
               <div className="space-y-3">
-                <p className="text-sm font-medium">Send USDT to this address:</p>
-                <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
-                  <code className="flex-1 text-xs break-all">
+                <p className="text-sm font-medium text-center">
+                  To pay, please transfer funds to the following USDT address:
+                </p>
+                <div className="p-3 bg-primary/10 rounded-lg text-center">
+                  <span className="inline-block px-3 py-1 bg-primary text-primary-foreground text-sm font-bold rounded-full mb-2">
+                    Network: TRC20 (Tron)
+                  </span>
+                </div>
+                <div className="flex flex-col items-center gap-2 p-3 bg-muted rounded-lg">
+                  <code className="text-xs break-all text-center font-mono">
                     {WALLET_ADDRESS}
                   </code>
                   <Button
                     type="button"
-                    variant="ghost"
-                    size="icon"
+                    variant="default"
+                    size="sm"
                     onClick={copyWallet}
-                    className="shrink-0"
+                    className="mt-2"
                   >
-                    <Copy className="w-4 h-4" />
+                    <Copy className="w-4 h-4 mr-2" />
+                    Copy Address
                   </Button>
                 </div>
+                <p className="text-xs text-muted-foreground text-center">
+                  Your payment will be confirmed after we verify the transaction.
+                </p>
               </div>
 
               <div className="flex justify-center">
