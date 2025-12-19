@@ -14,16 +14,190 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      adoptions: {
+        Row: {
+          address: string | null
+          created_at: string | null
+          id: string
+          message: string | null
+          pet_id: string
+          phone: string | null
+          status: Database["public"]["Enums"]["adoption_status"] | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          pet_id: string
+          phone?: string | null
+          status?: Database["public"]["Enums"]["adoption_status"] | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          pet_id?: string
+          phone?: string | null
+          status?: Database["public"]["Enums"]["adoption_status"] | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "adoptions_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pets: {
+        Row: {
+          adoption_fee: number | null
+          age: string | null
+          breed: string | null
+          created_at: string | null
+          description: string | null
+          gender: string | null
+          good_with_kids: boolean | null
+          good_with_pets: boolean | null
+          house_trained: boolean | null
+          id: string
+          image_url: string | null
+          images: string[] | null
+          location: string | null
+          microchipped: boolean | null
+          name: string
+          neutered: boolean | null
+          size: string | null
+          status: Database["public"]["Enums"]["pet_status"] | null
+          type: string
+          updated_at: string | null
+          vaccinated: boolean | null
+        }
+        Insert: {
+          adoption_fee?: number | null
+          age?: string | null
+          breed?: string | null
+          created_at?: string | null
+          description?: string | null
+          gender?: string | null
+          good_with_kids?: boolean | null
+          good_with_pets?: boolean | null
+          house_trained?: boolean | null
+          id?: string
+          image_url?: string | null
+          images?: string[] | null
+          location?: string | null
+          microchipped?: boolean | null
+          name: string
+          neutered?: boolean | null
+          size?: string | null
+          status?: Database["public"]["Enums"]["pet_status"] | null
+          type: string
+          updated_at?: string | null
+          vaccinated?: boolean | null
+        }
+        Update: {
+          adoption_fee?: number | null
+          age?: string | null
+          breed?: string | null
+          created_at?: string | null
+          description?: string | null
+          gender?: string | null
+          good_with_kids?: boolean | null
+          good_with_pets?: boolean | null
+          house_trained?: boolean | null
+          id?: string
+          image_url?: string | null
+          images?: string[] | null
+          location?: string | null
+          microchipped?: boolean | null
+          name?: string
+          neutered?: boolean | null
+          size?: string | null
+          status?: Database["public"]["Enums"]["pet_status"] | null
+          type?: string
+          updated_at?: string | null
+          vaccinated?: boolean | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email: string
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      adoption_status: "pending" | "approved" | "rejected"
+      app_role: "admin" | "user"
+      pet_status: "available" | "pending" | "adopted"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +324,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      adoption_status: ["pending", "approved", "rejected"],
+      app_role: ["admin", "user"],
+      pet_status: ["available", "pending", "adopted"],
+    },
   },
 } as const
