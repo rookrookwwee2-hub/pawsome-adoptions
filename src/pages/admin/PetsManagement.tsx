@@ -30,6 +30,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
+import ImageUpload from "@/components/admin/ImageUpload";
 import type { Database } from "@/integrations/supabase/types";
 
 type Pet = Database['public']['Tables']['pets']['Row'];
@@ -356,15 +357,10 @@ const PetsManagement = () => {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="image_url">Image URL</Label>
-                  <Input
-                    id="image_url"
-                    value={formData.image_url || ""}
-                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                    placeholder="https://..."
-                  />
-                </div>
+                <ImageUpload
+                  value={formData.image_url || null}
+                  onChange={(url) => setFormData({ ...formData, image_url: url || "" })}
+                />
 
                 <div className="space-y-2">
                   <Label htmlFor="description">Description</Label>
