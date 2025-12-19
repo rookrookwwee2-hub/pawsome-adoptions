@@ -1,0 +1,196 @@
+export interface Pet {
+  id: string;
+  name: string;
+  type: "Dog" | "Cat" | "Bird" | "Other";
+  breed: string;
+  age: string;
+  gender: "Male" | "Female";
+  size: "Small" | "Medium" | "Large";
+  location: string;
+  image: string;
+  images: string[];
+  fee: number;
+  description: string;
+  personality: string[];
+  vaccinated: boolean;
+  neutered: boolean;
+  goodWith: string[];
+  status: "Available" | "Pending" | "Adopted";
+}
+
+export const pets: Pet[] = [
+  {
+    id: "1",
+    name: "Luna",
+    type: "Dog",
+    breed: "Golden Retriever",
+    age: "2 years",
+    gender: "Female",
+    size: "Large",
+    location: "New York, NY",
+    image: "https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&h=600&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1552053831-71594a27632d?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1612774412771-005ed8e861d2?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1625316708582-7c38734be31d?w=800&h=800&fit=crop",
+    ],
+    fee: 250,
+    description: "Luna is a gentle and loving Golden Retriever who adores people of all ages. She's been trained, loves to play fetch, and is great with children. Luna would thrive in a home with a backyard where she can run and play.",
+    personality: ["Friendly", "Playful", "Loyal", "Gentle"],
+    vaccinated: true,
+    neutered: true,
+    goodWith: ["Children", "Dogs", "Cats"],
+    status: "Available",
+  },
+  {
+    id: "2",
+    name: "Whiskers",
+    type: "Cat",
+    breed: "British Shorthair",
+    age: "1 year",
+    gender: "Male",
+    size: "Medium",
+    location: "Los Angeles, CA",
+    image: "https://images.unsplash.com/photo-1495360010541-f48722b34f7d?w=600&h=600&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1495360010541-f48722b34f7d?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=800&h=800&fit=crop",
+    ],
+    fee: 150,
+    description: "Whiskers is a charming British Shorthair with a calm and affectionate personality. He loves to curl up on laps and watch the world go by. Perfect for apartment living!",
+    personality: ["Calm", "Affectionate", "Independent", "Curious"],
+    vaccinated: true,
+    neutered: true,
+    goodWith: ["Adults", "Seniors"],
+    status: "Available",
+  },
+  {
+    id: "3",
+    name: "Max",
+    type: "Dog",
+    breed: "German Shepherd",
+    age: "3 years",
+    gender: "Male",
+    size: "Large",
+    location: "Chicago, IL",
+    image: "https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?w=600&h=600&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1568572933382-74d440642117?w=800&h=800&fit=crop",
+    ],
+    fee: 300,
+    description: "Max is an intelligent and loyal German Shepherd. He's well-trained, protective, and would make an excellent companion for an active family. He loves hiking and outdoor adventures.",
+    personality: ["Intelligent", "Loyal", "Protective", "Active"],
+    vaccinated: true,
+    neutered: true,
+    goodWith: ["Children", "Dogs"],
+    status: "Available",
+  },
+  {
+    id: "4",
+    name: "Milo",
+    type: "Cat",
+    breed: "Maine Coon",
+    age: "6 months",
+    gender: "Male",
+    size: "Large",
+    location: "Houston, TX",
+    image: "https://images.unsplash.com/photo-1592194996308-7b43878e84a6?w=600&h=600&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1592194996308-7b43878e84a6?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?w=800&h=800&fit=crop",
+    ],
+    fee: 200,
+    description: "Milo is a playful Maine Coon kitten with a big personality. He's curious, loves to explore, and enjoys interactive play. He'll grow into a majestic, fluffy companion!",
+    personality: ["Playful", "Curious", "Social", "Energetic"],
+    vaccinated: true,
+    neutered: false,
+    goodWith: ["Children", "Dogs", "Cats"],
+    status: "Available",
+  },
+  {
+    id: "5",
+    name: "Bella",
+    type: "Dog",
+    breed: "Labrador Retriever",
+    age: "1 year",
+    gender: "Female",
+    size: "Large",
+    location: "Phoenix, AZ",
+    image: "https://images.unsplash.com/photo-1591160690555-5debfba289f0?w=600&h=600&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1591160690555-5debfba289f0?w=800&h=800&fit=crop",
+    ],
+    fee: 275,
+    description: "Bella is an energetic and friendly Labrador who loves swimming and playing fetch. She's great with kids and would be perfect for an active family.",
+    personality: ["Energetic", "Friendly", "Playful", "Sweet"],
+    vaccinated: true,
+    neutered: true,
+    goodWith: ["Children", "Dogs"],
+    status: "Available",
+  },
+  {
+    id: "6",
+    name: "Oliver",
+    type: "Cat",
+    breed: "Siamese",
+    age: "2 years",
+    gender: "Male",
+    size: "Medium",
+    location: "Philadelphia, PA",
+    image: "https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?w=600&h=600&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?w=800&h=800&fit=crop",
+    ],
+    fee: 175,
+    description: "Oliver is a vocal and affectionate Siamese who loves to chat with his humans. He's incredibly smart and enjoys puzzle toys and interactive play.",
+    personality: ["Vocal", "Smart", "Affectionate", "Social"],
+    vaccinated: true,
+    neutered: true,
+    goodWith: ["Adults", "Cats"],
+    status: "Available",
+  },
+  {
+    id: "7",
+    name: "Charlie",
+    type: "Dog",
+    breed: "Beagle",
+    age: "4 years",
+    gender: "Male",
+    size: "Medium",
+    location: "San Antonio, TX",
+    image: "https://images.unsplash.com/photo-1505628346881-b72b27e84530?w=600&h=600&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1505628346881-b72b27e84530?w=800&h=800&fit=crop",
+    ],
+    fee: 200,
+    description: "Charlie is a friendly Beagle with an excellent nose and an even better personality. He's house-trained, loves walks, and gets along with everyone.",
+    personality: ["Friendly", "Curious", "Gentle", "Happy"],
+    vaccinated: true,
+    neutered: true,
+    goodWith: ["Children", "Dogs", "Cats"],
+    status: "Available",
+  },
+  {
+    id: "8",
+    name: "Daisy",
+    type: "Dog",
+    breed: "French Bulldog",
+    age: "2 years",
+    gender: "Female",
+    size: "Small",
+    location: "San Diego, CA",
+    image: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600&h=600&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=800&h=800&fit=crop",
+    ],
+    fee: 350,
+    description: "Daisy is a charming French Bulldog who loves cuddles and short walks. She's perfect for apartment living and makes a wonderful lap dog.",
+    personality: ["Affectionate", "Calm", "Playful", "Loyal"],
+    vaccinated: true,
+    neutered: true,
+    goodWith: ["Children", "Dogs", "Seniors"],
+    status: "Available",
+  },
+];
