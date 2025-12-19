@@ -12,6 +12,7 @@ import PetDetails from "./pages/PetDetails";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
+import Account from "./pages/Account";
 import Dashboard from "./pages/admin/Dashboard";
 import PetsManagement from "./pages/admin/PetsManagement";
 import AdoptionsManagement from "./pages/admin/AdoptionsManagement";
@@ -36,6 +37,7 @@ const App = () => (
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute requireAdmin><Dashboard /></ProtectedRoute>} />
               <Route path="/admin/pets" element={<ProtectedRoute requireAdmin><PetsManagement /></ProtectedRoute>} />
               <Route path="/admin/adoptions" element={<ProtectedRoute requireAdmin><AdoptionsManagement /></ProtectedRoute>} />

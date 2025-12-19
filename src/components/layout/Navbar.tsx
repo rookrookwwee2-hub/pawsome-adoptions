@@ -64,6 +64,9 @@ const Navbar = () => {
                     <Link to="/admin"><Settings className="w-4 h-4 mr-2" />Admin</Link>
                   </Button>
                 )}
+                <Button variant="ghost" size="icon" asChild className="rounded-full">
+                  <Link to="/account"><User className="w-5 h-5" /></Link>
+                </Button>
                 <Button variant="ghost" size="icon" onClick={handleSignOut} className="rounded-full">
                   <LogOut className="w-5 h-5" />
                 </Button>
@@ -106,6 +109,9 @@ const Navbar = () => {
               ))}
               {user ? (
                 <>
+                  <Link to="/account" onClick={() => setIsOpen(false)} className="font-body font-medium py-2 text-muted-foreground">
+                    Account Settings
+                  </Link>
                   {isAdmin && (
                     <Link to="/admin" onClick={() => setIsOpen(false)} className="font-body font-medium py-2 text-muted-foreground">
                       Admin Dashboard
