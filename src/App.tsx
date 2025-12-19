@@ -16,6 +16,7 @@ import Dashboard from "./pages/admin/Dashboard";
 import PetsManagement from "./pages/admin/PetsManagement";
 import AdoptionsManagement from "./pages/admin/AdoptionsManagement";
 import UsersManagement from "./pages/admin/UsersManagement";
+import GuestPaymentsManagement from "./pages/admin/GuestPaymentsManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="/admin/pets" element={<ProtectedRoute requireAdmin><PetsManagement /></ProtectedRoute>} />
               <Route path="/admin/adoptions" element={<ProtectedRoute requireAdmin><AdoptionsManagement /></ProtectedRoute>} />
               <Route path="/admin/users" element={<ProtectedRoute requireAdmin><UsersManagement /></ProtectedRoute>} />
+              <Route path="/admin/payments" element={<ProtectedRoute requireAdmin><GuestPaymentsManagement /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
