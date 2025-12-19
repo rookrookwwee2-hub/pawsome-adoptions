@@ -15,7 +15,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -92,29 +91,74 @@ const PetsManagement = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (editingPet) {
-      const { error } = await supabase
-        .from('pets')
-        .update(formData)
-        .eq('id', editingPet.id);
+    try {
+      if (editingPet) {
+        const { error } = await supabase
+          .from('pets')
+          .update({
+            name: formData.name,
+            type: formData.type,
+            breed: formData.breed || null,
+            age: formData.age || null,
+            size: formData.size || null,
+            gender: formData.gender || null,
+            location: formData.location || null,
+            description: formData.description || null,
+            adoption_fee: formData.adoption_fee || 0,
+            status: formData.status || "available",
+            image_url: formData.image_url || null,
+            vaccinated: formData.vaccinated || false,
+            neutered: formData.neutered || false,
+            microchipped: formData.microchipped || false,
+            house_trained: formData.house_trained || false,
+            good_with_kids: formData.good_with_kids || false,
+            good_with_pets: formData.good_with_pets || false,
+          })
+          .eq('id', editingPet.id);
 
-      if (error) {
-        toast({ title: "Error", description: error.message, variant: "destructive" });
+        if (error) {
+          console.error('Update error:', error);
+          toast({ title: "Error", description: error.message, variant: "destructive" });
+        } else {
+          toast({ title: "Success", description: "Pet updated successfully" });
+          fetchPets();
+          setDialogOpen(false);
+          setFormData(defaultPet);
+        }
       } else {
-        toast({ title: "Success", description: "Pet updated successfully" });
-        fetchPets();
-        setDialogOpen(false);
-      }
-    } else {
-      const { error } = await supabase.from('pets').insert(formData);
+        const { error } = await supabase.from('pets').insert({
+          name: formData.name,
+          type: formData.type,
+          breed: formData.breed || null,
+          age: formData.age || null,
+          size: formData.size || null,
+          gender: formData.gender || null,
+          location: formData.location || null,
+          description: formData.description || null,
+          adoption_fee: formData.adoption_fee || 0,
+          status: formData.status || "available",
+          image_url: formData.image_url || null,
+          vaccinated: formData.vaccinated || false,
+          neutered: formData.neutered || false,
+          microchipped: formData.microchipped || false,
+          house_trained: formData.house_trained || false,
+          good_with_kids: formData.good_with_kids || false,
+          good_with_pets: formData.good_with_pets || false,
+        });
 
-      if (error) {
-        toast({ title: "Error", description: error.message, variant: "destructive" });
-      } else {
-        toast({ title: "Success", description: "Pet added successfully" });
-        fetchPets();
-        setDialogOpen(false);
+        if (error) {
+          console.error('Insert error:', error);
+          toast({ title: "Error", description: error.message, variant: "destructive" });
+        } else {
+          toast({ title: "Success", description: "Pet added successfully" });
+          fetchPets();
+          setDialogOpen(false);
+          setFormData(defaultPet);
+        }
       }
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      toast({ title: "Error", description: "An unexpected error occurred", variant: "destructive" });
     }
   };
 
@@ -174,13 +218,11 @@ const PetsManagement = () => {
               Add, edit, and manage pets available for adoption
             </p>
           </div>
+          <Button onClick={openAddDialog} className="rounded-full">
+            <Plus className="w-4 h-4 mr-2" />
+            Add Pet
+          </Button>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={openAddDialog} className="rounded-full">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Pet
-              </Button>
-            </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
