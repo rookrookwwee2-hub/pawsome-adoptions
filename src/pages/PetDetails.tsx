@@ -1,29 +1,48 @@
-import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
   ArrowLeft,
-  Heart,
-  MapPin,
   Calendar,
   Check,
-  X,
+  Heart,
+  MapPin,
   Share2,
   Wallet,
+  X,
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
-import { pets } from "@/data/pets";
 import { toast } from "sonner";
 import GuestCheckout from "@/components/checkout/GuestCheckout";
+import {
+  formatPetStatusLabel,
+  mapDbPetToPetDetails,
+  usePublicPet,
+} from "@/lib/pets";
 
 const PetDetails = () => {
   const { id } = useParams();
-  const pet = pets.find((p) => p.id === id);
+  const { data: petRow, isLoading } = usePublicPet(id);
+
+  const pet = useMemo(() => (petRow ? mapDbPetToPetDetails(petRow) : null), [petRow]);
+
   const [selectedImage, setSelectedImage] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showGuestCheckout, setShowGuestCheckout] = useState(false);
+
+  useEffect(() => {
+    setSelectedImage(0);
+  }, [pet?.id]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading pet…</p>
+      </div>
+    );
+  }
 
   if (!pet) {
     return (
@@ -63,7 +82,8 @@ const PetDetails = () => {
           content={`Meet ${pet.name}, a ${pet.age} old ${pet.breed}. ${pet.description.slice(0, 150)}...`}
         />
         <meta property="og:title" content={`Adopt ${pet.name} | PawHaven`} />
-        <meta property="og:image" content={pet.image} />
+        <meta property="og:image" content={pet.images[0]} />
+        <link rel="canonical" href={window.location.href} />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -109,6 +129,7 @@ const PetDetails = () => {
                           src={image}
                           alt={`${pet.name} ${index + 1}`}
                           className="w-full h-full object-cover"
+                          loading="lazy"
                         />
                       </button>
                     ))}
@@ -123,7 +144,7 @@ const PetDetails = () => {
                   <div className="flex items-start justify-between">
                     <div>
                       <span className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-2">
-                        {pet.status}
+                        {formatPetStatusLabel(pet.status)}
                       </span>
                       <h1 className="font-display text-4xl md:text-5xl font-bold">
                         {pet.name}
@@ -154,7 +175,9 @@ const PetDetails = () => {
                   </div>
 
                   <p className="text-xl text-muted-foreground">
-                    {pet.breed} • {pet.gender} • {pet.size}
+                    {pet.breed}
+                    {pet.gender ? ` • ${pet.gender}` : ""}
+                    {pet.size ? ` • ${pet.size}` : ""}
                   </p>
 
                   <div className="flex flex-wrap gap-4 text-muted-foreground">
@@ -162,10 +185,12 @@ const PetDetails = () => {
                       <Calendar className="w-5 h-5 text-primary" />
                       {pet.age}
                     </span>
-                    <span className="flex items-center gap-2">
-                      <MapPin className="w-5 h-5 text-primary" />
-                      {pet.location}
-                    </span>
+                    {pet.location ? (
+                      <span className="flex items-center gap-2">
+                        <MapPin className="w-5 h-5 text-primary" />
+                        {pet.location}
+                      </span>
+                    ) : null}
                   </div>
                 </div>
 
@@ -173,9 +198,7 @@ const PetDetails = () => {
                 <div className="p-6 bg-muted rounded-2xl space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">
-                        Adoption Fee
-                      </p>
+                      <p className="text-sm text-muted-foreground">Adoption Fee</p>
                       <p className="font-display text-3xl font-bold text-primary">
                         ${pet.fee}
                       </p>
@@ -202,38 +225,40 @@ const PetDetails = () => {
                 </div>
 
                 {/* About */}
-                <div className="space-y-4">
-                  <h2 className="font-display text-2xl font-semibold">
-                    About {pet.name}
-                  </h2>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {pet.description}
-                  </p>
-                </div>
-
-                {/* Personality */}
-                <div className="space-y-4">
-                  <h2 className="font-display text-2xl font-semibold">
-                    Personality
-                  </h2>
-                  <div className="flex flex-wrap gap-2">
-                    {pet.personality.map((trait) => (
-                      <span
-                        key={trait}
-                        className="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium"
-                      >
-                        {trait}
-                      </span>
-                    ))}
+                {pet.description ? (
+                  <div className="space-y-4">
+                    <h2 className="font-display text-2xl font-semibold">
+                      About {pet.name}
+                    </h2>
+                    <p className="text-muted-foreground leading-relaxed">
+                      {pet.description}
+                    </p>
                   </div>
-                </div>
+                ) : null}
+
+                {/* Personality (optional) */}
+                {pet.personality.length > 0 ? (
+                  <div className="space-y-4">
+                    <h2 className="font-display text-2xl font-semibold">
+                      Personality
+                    </h2>
+                    <div className="flex flex-wrap gap-2">
+                      {pet.personality.map((trait) => (
+                        <span
+                          key={trait}
+                          className="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium"
+                        >
+                          {trait}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
 
                 {/* Health & Good With */}
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <h3 className="font-display text-lg font-semibold">
-                      Health
-                    </h3>
+                    <h3 className="font-display text-lg font-semibold">Health</h3>
                     <ul className="space-y-2">
                       <li className="flex items-center gap-2">
                         {pet.vaccinated ? (
@@ -254,19 +279,21 @@ const PetDetails = () => {
                     </ul>
                   </div>
 
-                  <div className="space-y-4">
-                    <h3 className="font-display text-lg font-semibold">
-                      Good With
-                    </h3>
-                    <ul className="space-y-2">
-                      {pet.goodWith.map((item) => (
-                        <li key={item} className="flex items-center gap-2">
-                          <Check className="w-5 h-5 text-primary" />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {pet.goodWith.length > 0 ? (
+                    <div className="space-y-4">
+                      <h3 className="font-display text-lg font-semibold">
+                        Good With
+                      </h3>
+                      <ul className="space-y-2">
+                        {pet.goodWith.map((item) => (
+                          <li key={item} className="flex items-center gap-2">
+                            <Check className="w-5 h-5 text-primary" />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </div>
