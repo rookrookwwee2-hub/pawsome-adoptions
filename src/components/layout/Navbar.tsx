@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Heart, User } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, X, Heart, User, LogOut, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isAdmin, signOut } = useAuth();
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -15,6 +18,11 @@ const Navbar = () => {
   ];
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
@@ -49,11 +57,24 @@ const Navbar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <User className="w-5 h-5" />
-            </Button>
-            <Button className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
-              Start Adopting
+            {user ? (
+              <>
+                {isAdmin && (
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/admin"><Settings className="w-4 h-4 mr-2" />Admin</Link>
+                  </Button>
+                )}
+                <Button variant="ghost" size="icon" onClick={handleSignOut} className="rounded-full">
+                  <LogOut className="w-5 h-5" />
+                </Button>
+              </>
+            ) : (
+              <Button variant="ghost" size="icon" asChild className="rounded-full">
+                <Link to="/auth"><User className="w-5 h-5" /></Link>
+              </Button>
+            )}
+            <Button asChild className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+              <Link to="/pets">Start Adopting</Link>
             </Button>
           </div>
 
@@ -66,7 +87,6 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* Mobile Menu */}
         {isOpen && (
           <div className="md:hidden py-4 border-t border-border animate-fade-in">
             <div className="flex flex-col gap-4">
@@ -84,8 +104,24 @@ const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
-              <Button className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 mt-4">
-                Start Adopting
+              {user ? (
+                <>
+                  {isAdmin && (
+                    <Link to="/admin" onClick={() => setIsOpen(false)} className="font-body font-medium py-2 text-muted-foreground">
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  <Button variant="outline" onClick={handleSignOut} className="w-full mt-2">
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <Button asChild variant="outline" className="w-full mt-2">
+                  <Link to="/auth" onClick={() => setIsOpen(false)}>Sign In</Link>
+                </Button>
+              )}
+              <Button asChild className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+                <Link to="/pets" onClick={() => setIsOpen(false)}>Start Adopting</Link>
               </Button>
             </div>
           </div>
