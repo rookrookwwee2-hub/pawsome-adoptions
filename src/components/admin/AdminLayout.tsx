@@ -8,7 +8,8 @@ import {
   Menu, 
   X,
   LogOut,
-  Heart
+  Heart,
+  Wallet
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -28,6 +29,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     { name: "Dashboard", path: "/admin", icon: LayoutDashboard },
     { name: "Pets", path: "/admin/pets", icon: PawPrint },
     { name: "Adoptions", path: "/admin/adoptions", icon: FileText },
+    { name: "Payments", path: "/admin/payments", icon: Wallet },
     { name: "Users", path: "/admin/users", icon: Users },
   ];
 

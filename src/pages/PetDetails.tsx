@@ -9,18 +9,21 @@ import {
   Check,
   X,
   Share2,
+  Wallet,
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { pets } from "@/data/pets";
 import { toast } from "sonner";
+import GuestCheckout from "@/components/checkout/GuestCheckout";
 
 const PetDetails = () => {
   const { id } = useParams();
   const pet = pets.find((p) => p.id === id);
   const [selectedImage, setSelectedImage] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [showGuestCheckout, setShowGuestCheckout] = useState(false);
 
   if (!pet) {
     return (
@@ -167,7 +170,7 @@ const PetDetails = () => {
                 </div>
 
                 {/* Adoption Fee */}
-                <div className="p-6 bg-muted rounded-2xl">
+                <div className="p-6 bg-muted rounded-2xl space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">
@@ -183,6 +186,17 @@ const PetDetails = () => {
                       onClick={handleAdopt}
                     >
                       Start Adoption
+                    </Button>
+                  </div>
+                  <div className="pt-4 border-t border-border">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="w-full rounded-full gap-2"
+                      onClick={() => setShowGuestCheckout(true)}
+                    >
+                      <Wallet className="w-4 h-4" />
+                      Pay with USDT (Guest)
                     </Button>
                   </div>
                 </div>
@@ -260,6 +274,14 @@ const PetDetails = () => {
         </main>
 
         <Footer />
+
+        <GuestCheckout
+          open={showGuestCheckout}
+          onOpenChange={setShowGuestCheckout}
+          petId={pet.id}
+          petName={pet.name}
+          amount={pet.fee}
+        />
       </div>
     </>
   );

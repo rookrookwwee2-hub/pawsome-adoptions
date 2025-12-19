@@ -58,6 +58,62 @@ export type Database = {
           },
         ]
       }
+      guest_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          guest_address: string | null
+          guest_email: string
+          guest_name: string
+          guest_phone: string | null
+          id: string
+          message: string | null
+          pet_id: string
+          status: string
+          transaction_hash: string | null
+          updated_at: string
+          wallet_address: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          guest_address?: string | null
+          guest_email: string
+          guest_name: string
+          guest_phone?: string | null
+          id?: string
+          message?: string | null
+          pet_id: string
+          status?: string
+          transaction_hash?: string | null
+          updated_at?: string
+          wallet_address: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          guest_address?: string | null
+          guest_email?: string
+          guest_name?: string
+          guest_phone?: string | null
+          id?: string
+          message?: string | null
+          pet_id?: string
+          status?: string
+          transaction_hash?: string | null
+          updated_at?: string
+          wallet_address?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_payments_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pets: {
         Row: {
           adoption_fee: number | null
