@@ -1,16 +1,15 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Search, Filter, X } from "lucide-react";
+import { Filter, Search, X } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PetCard from "@/components/pets/PetCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { pets } from "@/data/pets";
+import { mapDbPetToPetCard, usePublicPets } from "@/lib/pets";
 
 const petTypes = ["All", "Dog", "Cat", "Bird", "Other"];
 const sizes = ["All", "Small", "Medium", "Large"];
-const ages = ["All", "Puppy/Kitten", "Young", "Adult", "Senior"];
 
 const Pets = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,19 +17,25 @@ const Pets = () => {
   const [selectedSize, setSelectedSize] = useState("All");
   const [showFilters, setShowFilters] = useState(false);
 
+  const { data: pets = [], isLoading } = usePublicPets();
+
   const filteredPets = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
     return pets.filter((pet) => {
+      const name = (pet.name ?? "").toLowerCase();
+      const breed = (pet.breed ?? "").toLowerCase();
+      const location = (pet.location ?? "").toLowerCase();
+
       const matchesSearch =
-        pet.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        pet.breed.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        pet.location.toLowerCase().includes(searchQuery.toLowerCase());
+        !query || name.includes(query) || breed.includes(query) || location.includes(query);
 
       const matchesType = selectedType === "All" || pet.type === selectedType;
-      const matchesSize = selectedSize === "All" || pet.size === selectedSize;
+      const matchesSize = selectedSize === "All" || (pet.size ?? "") === selectedSize;
 
       return matchesSearch && matchesType && matchesSize;
     });
-  }, [searchQuery, selectedType, selectedSize]);
+  }, [pets, searchQuery, selectedType, selectedSize]);
 
   const clearFilters = () => {
     setSearchQuery("");
@@ -165,7 +170,11 @@ const Pets = () => {
             </div>
 
             {/* Pet Grid */}
-            {filteredPets.length > 0 ? (
+            {isLoading ? (
+              <div className="text-center py-16">
+                <p className="text-xl text-muted-foreground">Loading pets…</p>
+              </div>
+            ) : filteredPets.length > 0 ? (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredPets.map((pet, index) => (
                   <div
@@ -173,7 +182,7 @@ const Pets = () => {
                     className="opacity-0 animate-fade-up"
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
-                    <PetCard pet={pet} />
+                    <PetCard pet={mapDbPetToPetCard(pet)} />
                   </div>
                 ))}
               </div>

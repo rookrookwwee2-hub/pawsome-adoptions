@@ -13,6 +13,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -228,6 +229,9 @@ const PetsManagement = () => {
                 <DialogTitle>
                   {editingPet ? "Edit Pet" : "Add New Pet"}
                 </DialogTitle>
+                <DialogDescription>
+                  Public pages show pets that are not marked as “Adopted”.
+                </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4 mt-4">
                 <div className="grid grid-cols-2 gap-4">
