@@ -375,9 +375,11 @@ const GuestCheckout = ({
               <Button
                 type="button"
                 className="w-full rounded-full"
-                onClick={handleClose}
+                asChild
               >
-                Close
+                <Link to="/payment-methods" onClick={handleClose}>
+                  Upload Proof of Payment
+                </Link>
               </Button>
             </div>
           )}
