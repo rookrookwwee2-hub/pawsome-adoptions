@@ -54,6 +54,8 @@ const defaultPet: PetInsert = {
   house_trained: false,
   good_with_kids: false,
   good_with_pets: false,
+  delivery_type: "pickup_or_delivery",
+  delivery_notes: "",
 };
 
 const PetsManagement = () => {
@@ -115,6 +117,8 @@ const PetsManagement = () => {
             house_trained: formData.house_trained || false,
             good_with_kids: formData.good_with_kids || false,
             good_with_pets: formData.good_with_pets || false,
+            delivery_type: formData.delivery_type || "pickup_or_delivery",
+            delivery_notes: formData.delivery_notes || null,
           })
           .eq('id', editingPet.id);
 
@@ -146,6 +150,8 @@ const PetsManagement = () => {
           house_trained: formData.house_trained || false,
           good_with_kids: formData.good_with_kids || false,
           good_with_pets: formData.good_with_pets || false,
+          delivery_type: formData.delivery_type || "pickup_or_delivery",
+          delivery_notes: formData.delivery_notes || null,
         });
 
         if (error) {
@@ -197,6 +203,8 @@ const PetsManagement = () => {
       house_trained: pet.house_trained || false,
       good_with_kids: pet.good_with_kids || false,
       good_with_pets: pet.good_with_pets || false,
+      delivery_type: pet.delivery_type || "pickup_or_delivery",
+      delivery_notes: pet.delivery_notes || "",
     });
     setDialogOpen(true);
   };
@@ -392,6 +400,37 @@ const PetsManagement = () => {
                       <Label htmlFor={item.key} className="text-sm">{item.label}</Label>
                     </div>
                   ))}
+                </div>
+
+                {/* Delivery & Pickup Options */}
+                <div className="space-y-4 p-4 bg-muted/50 rounded-lg border border-border">
+                  <h3 className="font-medium text-sm">Delivery & Pickup Options</h3>
+                  <div className="space-y-2">
+                    <Label htmlFor="delivery_type">Delivery Type</Label>
+                    <Select
+                      value={formData.delivery_type || "pickup_or_delivery"}
+                      onValueChange={(value) => setFormData({ ...formData, delivery_type: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pickup_only">Local Pickup Only</SelectItem>
+                        <SelectItem value="delivery_only">Delivery Available</SelectItem>
+                        <SelectItem value="pickup_or_delivery">Pickup or Delivery</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="delivery_notes">Delivery Notes (optional)</Label>
+                    <Textarea
+                      id="delivery_notes"
+                      value={formData.delivery_notes || ""}
+                      onChange={(e) => setFormData({ ...formData, delivery_notes: e.target.value })}
+                      rows={2}
+                      placeholder="e.g., Additional delivery fees may apply for distances over 50 miles..."
+                    />
+                  </div>
                 </div>
 
                 <div className="flex justify-end gap-3 pt-4">
