@@ -299,10 +299,10 @@ const ProofOfPaymentUpload = ({ open, onOpenChange, petId, petName }: ProofOfPay
                 <div className="space-y-2">
                   <Label>Proof Document</Label>
                   {file ? (
-                    <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                      <FileText className="h-5 w-5 text-primary" />
-                      <span className="flex-1 text-sm truncate">{file.name}</span>
-                      <Button type="button" variant="ghost" size="icon" onClick={removeFile}>
+                    <div className="flex items-center gap-3 p-3 bg-muted rounded-lg min-w-0">
+                      <FileText className="h-5 w-5 text-primary shrink-0" />
+                      <span className="flex-1 text-sm truncate min-w-0 max-w-[200px]">{file.name}</span>
+                      <Button type="button" variant="ghost" size="icon" onClick={removeFile} className="shrink-0">
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
