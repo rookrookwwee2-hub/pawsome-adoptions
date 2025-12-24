@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { Helmet } from "react-helmet-async";
 import {
   ArrowLeft,
@@ -25,6 +26,8 @@ import {
 
 const PetDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const { data: petRow, isLoading } = usePublicPet(id);
 
   const pet = useMemo(() => (petRow ? mapDbPetToPetDetails(petRow) : null), [petRow]);
@@ -62,6 +65,15 @@ const PetDetails = () => {
   }
 
   const handleAdopt = () => {
+    if (!user) {
+      // Redirect to auth page with return URL
+      navigate(`/auth?redirect=/pets/${id}`);
+      toast.info("Please log in to start adoption", {
+        description: "Create an account or sign in to continue.",
+      });
+      return;
+    }
+    // TODO: Implement adoption form for logged-in users
     toast.success("Application started!", {
       description: "You'll be redirected to the adoption form.",
     });
