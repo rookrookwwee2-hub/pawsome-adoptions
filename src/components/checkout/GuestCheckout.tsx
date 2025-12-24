@@ -377,7 +377,7 @@ const GuestCheckout = ({
                 className="w-full rounded-full"
                 asChild
               >
-                <Link to="/payment-methods" onClick={handleClose}>
+                <Link to={`/payment-methods?bank=${encodeURIComponent(selectedMethod)}`} onClick={handleClose}>
                   Upload Proof of Payment
                 </Link>
               </Button>
