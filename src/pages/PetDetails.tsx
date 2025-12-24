@@ -220,7 +220,7 @@ const PetDetails = () => {
                       onClick={() => setShowGuestCheckout(true)}
                     >
                       <Wallet className="w-4 h-4" />
-                      Pay with USDT (Guest)
+                      Pay via Bank Transfer
                     </Button>
                   </div>
                 </div>
