@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, Heart, User, LogOut, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -56,7 +57,8 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-2">
+            <ThemeToggle />
             {user ? (
               <>
                 {isAdmin && (
@@ -107,6 +109,10 @@ const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
+              <div className="flex items-center justify-between py-2">
+                <span className="font-body font-medium text-muted-foreground">Theme</span>
+                <ThemeToggle />
+              </div>
               {user ? (
                 <>
                   <Link to="/account" onClick={() => setIsOpen(false)} className="font-body font-medium py-2 text-muted-foreground">

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/hooks/useAuth";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Pets from "./pages/Pets";
@@ -26,33 +27,35 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <HelmetProvider>
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/pets" element={<Pets />} />
-              <Route path="/pets/:id" element={<PetDetails />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/payment-methods" element={<PaymentMethods />} />
-              <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
-              <Route path="/admin" element={<ProtectedRoute requireAdmin><Dashboard /></ProtectedRoute>} />
-              <Route path="/admin/pets" element={<ProtectedRoute requireAdmin><PetsManagement /></ProtectedRoute>} />
-              <Route path="/admin/adoptions" element={<ProtectedRoute requireAdmin><AdoptionsManagement /></ProtectedRoute>} />
-              <Route path="/admin/users" element={<ProtectedRoute requireAdmin><UsersManagement /></ProtectedRoute>} />
-              <Route path="/admin/payments" element={<ProtectedRoute requireAdmin><GuestPaymentsManagement /></ProtectedRoute>} />
-              <Route path="/admin/payment-proofs" element={<ProtectedRoute requireAdmin><PaymentProofsManagement /></ProtectedRoute>} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/pets" element={<Pets />} />
+                <Route path="/pets/:id" element={<PetDetails />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/payment-methods" element={<PaymentMethods />} />
+                <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+                <Route path="/admin" element={<ProtectedRoute requireAdmin><Dashboard /></ProtectedRoute>} />
+                <Route path="/admin/pets" element={<ProtectedRoute requireAdmin><PetsManagement /></ProtectedRoute>} />
+                <Route path="/admin/adoptions" element={<ProtectedRoute requireAdmin><AdoptionsManagement /></ProtectedRoute>} />
+                <Route path="/admin/users" element={<ProtectedRoute requireAdmin><UsersManagement /></ProtectedRoute>} />
+                <Route path="/admin/payments" element={<ProtectedRoute requireAdmin><GuestPaymentsManagement /></ProtectedRoute>} />
+                <Route path="/admin/payment-proofs" element={<ProtectedRoute requireAdmin><PaymentProofsManagement /></ProtectedRoute>} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   </HelmetProvider>
 );
 
