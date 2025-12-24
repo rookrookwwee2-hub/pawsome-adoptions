@@ -16,6 +16,7 @@ const PaymentMethods = () => {
   const selectedBank = searchParams.get("bank");
   const bankDetails = [
     {
+      id: "uk",
       region: "UK Local Bank Transfer",
       subtitle: "BACS / Faster Payments",
       currency: "GBP",
@@ -27,6 +28,7 @@ const PaymentMethods = () => {
       ],
     },
     {
+      id: "usa",
       region: "USA Local Bank Transfer",
       subtitle: "ACH / Wire",
       currency: "USD",
@@ -40,6 +42,7 @@ const PaymentMethods = () => {
       ],
     },
     {
+      id: "eu",
       region: "Eurozone SEPA Bank Transfer",
       subtitle: "SEPA",
       currency: "EUR",
@@ -56,7 +59,7 @@ const PaymentMethods = () => {
   // Filter to show only the selected bank if provided via URL param
   const displayedBanks = useMemo(() => {
     if (!selectedBank) return bankDetails;
-    return bankDetails.filter(bank => bank.region === selectedBank);
+    return bankDetails.filter(bank => bank.id === selectedBank);
   }, [selectedBank]);
 
   return (
