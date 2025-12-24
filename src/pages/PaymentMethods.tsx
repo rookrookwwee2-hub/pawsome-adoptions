@@ -1,17 +1,19 @@
 import { Helmet } from "react-helmet-async";
 import { Building2, Clock, AlertTriangle, Upload } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import ProofOfPaymentUpload from "@/components/payment/ProofOfPaymentUpload";
 
 const PaymentMethods = () => {
   const [showProofUpload, setShowProofUpload] = useState(false);
-
+  const [searchParams] = useSearchParams();
+  const selectedBank = searchParams.get("bank");
   const bankDetails = [
     {
       region: "UK Local Bank Transfer",
@@ -51,6 +53,12 @@ const PaymentMethods = () => {
     },
   ];
 
+  // Filter to show only the selected bank if provided via URL param
+  const displayedBanks = useMemo(() => {
+    if (!selectedBank) return bankDetails;
+    return bankDetails.filter(bank => bank.region === selectedBank);
+  }, [selectedBank]);
+
   return (
     <>
       <Helmet>
@@ -83,7 +91,7 @@ const PaymentMethods = () => {
             </Alert>
 
             <div className="space-y-6 animate-fade-up opacity-0 stagger-2">
-              {bankDetails.map((bank, index) => (
+              {displayedBanks.map((bank, index) => (
                 <Card key={index} className="overflow-hidden">
                   <CardHeader className="bg-muted/50">
                     <div className="flex items-center gap-3">
