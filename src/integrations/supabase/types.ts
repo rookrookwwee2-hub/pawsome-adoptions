@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          reference_id: string | null
+          reference_type: string | null
+          title: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          reference_id?: string | null
+          reference_type?: string | null
+          title: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          reference_id?: string | null
+          reference_type?: string | null
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
       adoptions: {
         Row: {
           address: string | null
@@ -114,12 +147,79 @@ export type Database = {
           },
         ]
       }
+      payment_proofs: {
+        Row: {
+          admin_notes: string | null
+          amount_sent: number
+          created_at: string
+          currency: string
+          file_name: string | null
+          file_url: string
+          guest_email: string | null
+          guest_name: string | null
+          id: string
+          payment_method: string
+          pet_id: string | null
+          status: string
+          transaction_reference: string
+          transfer_date: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount_sent: number
+          created_at?: string
+          currency?: string
+          file_name?: string | null
+          file_url: string
+          guest_email?: string | null
+          guest_name?: string | null
+          id?: string
+          payment_method: string
+          pet_id?: string | null
+          status?: string
+          transaction_reference: string
+          transfer_date: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          amount_sent?: number
+          created_at?: string
+          currency?: string
+          file_name?: string | null
+          file_url?: string
+          guest_email?: string | null
+          guest_name?: string | null
+          id?: string
+          payment_method?: string
+          pet_id?: string | null
+          status?: string
+          transaction_reference?: string
+          transfer_date?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_proofs_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pets: {
         Row: {
           adoption_fee: number | null
           age: string | null
           breed: string | null
           created_at: string | null
+          delivery_notes: string | null
+          delivery_type: string | null
           description: string | null
           gender: string | null
           good_with_kids: boolean | null
@@ -143,6 +243,8 @@ export type Database = {
           age?: string | null
           breed?: string | null
           created_at?: string | null
+          delivery_notes?: string | null
+          delivery_type?: string | null
           description?: string | null
           gender?: string | null
           good_with_kids?: boolean | null
@@ -166,6 +268,8 @@ export type Database = {
           age?: string | null
           breed?: string | null
           created_at?: string | null
+          delivery_notes?: string | null
+          delivery_type?: string | null
           description?: string | null
           gender?: string | null
           good_with_kids?: boolean | null

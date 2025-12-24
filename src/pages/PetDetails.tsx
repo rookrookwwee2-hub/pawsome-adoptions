@@ -16,6 +16,7 @@ import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import GuestCheckout from "@/components/checkout/GuestCheckout";
+import DeliveryInfo from "@/components/pets/DeliveryInfo";
 import {
   formatPetStatusLabel,
   mapDbPetToPetDetails,
@@ -295,6 +296,13 @@ const PetDetails = () => {
                     </div>
                   ) : null}
                 </div>
+
+                {/* Delivery & Pickup Information */}
+                <DeliveryInfo
+                  deliveryType={petRow?.delivery_type}
+                  deliveryNotes={petRow?.delivery_notes}
+                  location={pet.location}
+                />
               </div>
             </div>
           </div>
