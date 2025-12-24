@@ -9,11 +9,13 @@ import {
   X,
   LogOut,
   Heart,
-  Wallet
+  Wallet,
+  Receipt
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import AdminNotifications from "./AdminNotifications";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -29,7 +31,8 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     { name: "Dashboard", path: "/admin", icon: LayoutDashboard },
     { name: "Pets", path: "/admin/pets", icon: PawPrint },
     { name: "Adoptions", path: "/admin/adoptions", icon: FileText },
-    { name: "Payments", path: "/admin/payments", icon: Wallet },
+    { name: "Crypto Payments", path: "/admin/payments", icon: Wallet },
+    { name: "Bank Proofs", path: "/admin/payment-proofs", icon: Receipt },
     { name: "Users", path: "/admin/users", icon: Users },
   ];
 
@@ -61,12 +64,15 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
               </span>
             )}
           </Link>
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-lg hover:bg-muted transition-colors"
-          >
-            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          <div className="flex items-center gap-2">
+            <AdminNotifications />
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 rounded-lg hover:bg-muted transition-colors"
+            >
+              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
 
         {/* Navigation */}
