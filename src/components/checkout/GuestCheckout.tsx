@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Copy, QrCode, CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,17 +21,65 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
-const WALLET_ADDRESS = "TTFYmtMsmNiWtTToGsQPPsmmdRPj5V5qxD";
+const bankDetails = [
+  {
+    id: "uk",
+    region: "UK Local Bank Transfer",
+    subtitle: "BACS / Faster Payments",
+    currency: "GBP",
+    details: [
+      { label: "Bank Name", value: "Barclays" },
+      { label: "Sort Code", value: "23-14-86" },
+      { label: "Account Number", value: "15870922" },
+      { label: "Beneficiary Name", value: "Kenneth Roberts" },
+    ],
+  },
+  {
+    id: "usa",
+    region: "USA Local Bank Transfer",
+    subtitle: "ACH / Wire",
+    currency: "USD",
+    details: [
+      { label: "Bank Name", value: "Citibank" },
+      { label: "Bank Address", value: "111 Wall Street, New York, NY 10043, USA" },
+      { label: "Routing (ABA)", value: "031100209" },
+      { label: "Account Number", value: "70589140002133813" },
+      { label: "Account Type", value: "Checking" },
+      { label: "Beneficiary Name", value: "Kenneth Roberts" },
+    ],
+  },
+  {
+    id: "eu",
+    region: "Eurozone SEPA Bank Transfer",
+    subtitle: "SEPA",
+    currency: "EUR",
+    details: [
+      { label: "Bank Name", value: "Banking Circle S.A." },
+      { label: "Bank Address", value: "2, Boulevard de la Foire, L-1528 Luxembourg" },
+      { label: "IBAN", value: "LU63 4080 0000 5965 4770" },
+      { label: "BIC (SWIFT)", value: "BCIRLULL" },
+      { label: "Beneficiary Name", value: "Kenneth Roberts" },
+    ],
+  },
+];
 
 const guestSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
   email: z.string().email("Please enter a valid email").max(255),
   phone: z.string().optional(),
   address: z.string().optional(),
-  transactionHash: z.string().optional(),
+  paymentMethod: z.string().min(1, "Please select a payment method"),
   message: z.string().max(500).optional(),
 });
 
@@ -62,15 +110,13 @@ const GuestCheckout = ({
       email: "",
       phone: "",
       address: "",
-      transactionHash: "",
+      paymentMethod: "",
       message: "",
     },
   });
 
-  const copyWallet = () => {
-    navigator.clipboard.writeText(WALLET_ADDRESS);
-    toast.success("Wallet address copied!");
-  };
+  const selectedMethod = form.watch("paymentMethod");
+  const selectedBank = bankDetails.find((b) => b.id === selectedMethod);
 
   const handleInfoSubmit = (data: GuestFormData) => {
     setStep("payment");
@@ -88,8 +134,8 @@ const GuestCheckout = ({
         guest_phone: values.phone || null,
         guest_address: values.address || null,
         amount: amount,
-        transaction_hash: values.transactionHash || null,
-        wallet_address: WALLET_ADDRESS,
+        transaction_hash: null,
+        wallet_address: selectedBank?.region || "Bank Transfer",
         message: values.message || null,
         status: "pending",
       });
@@ -97,12 +143,12 @@ const GuestCheckout = ({
       if (error) throw error;
 
       setStep("confirmation");
-      toast.success("Payment submitted!", {
-        description: "We'll verify your payment and contact you soon.",
+      toast.success("Adoption request submitted!", {
+        description: "Please complete your bank transfer and upload proof of payment.",
       });
     } catch (error) {
-      console.error("Error submitting payment:", error);
-      toast.error("Failed to submit payment. Please try again.");
+      console.error("Error submitting adoption request:", error);
+      toast.error("Failed to submit request. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -118,18 +164,18 @@ const GuestCheckout = ({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display text-2xl">
             {step === "confirmation"
-              ? "Payment Submitted!"
+              ? "Request Submitted!"
               : `Adopt ${petName}`}
           </DialogTitle>
           <DialogDescription>
-            {step === "info" && "Enter your details to proceed with adoption."}
-            {step === "payment" && "Send USDT to complete your adoption."}
+            {step === "info" && "Enter your details and select a payment method."}
+            {step === "payment" && "Review bank details and complete your transfer."}
             {step === "confirmation" &&
-              "Your payment is being reviewed by our team."}
+              "Complete your bank transfer and upload proof of payment."}
           </DialogDescription>
         </DialogHeader>
 
@@ -201,6 +247,31 @@ const GuestCheckout = ({
 
               <FormField
                 control={form.control}
+                name="paymentMethod"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Payment Method *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your payment region" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {bankDetails.map((bank) => (
+                          <SelectItem key={bank.id} value={bank.id}>
+                            {bank.region} ({bank.currency})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="message"
                 render={({ field }) => (
                   <FormItem>
@@ -218,76 +289,40 @@ const GuestCheckout = ({
               />
 
               <Button type="submit" className="w-full rounded-full">
-                Continue to Payment
+                Continue to Payment Details
               </Button>
             </form>
           )}
 
-          {step === "payment" && (
+          {step === "payment" && selectedBank && (
             <div className="space-y-6">
               <div className="p-4 bg-muted rounded-xl text-center">
                 <p className="text-sm text-muted-foreground mb-1">
                   Amount to Pay
                 </p>
                 <p className="font-display text-3xl font-bold text-primary">
-                  ${amount} USDT
+                  ${amount} {selectedBank.currency}
                 </p>
               </div>
 
-              <div className="space-y-3">
-                <p className="text-sm font-medium text-center">
-                  To pay, please transfer funds to the following USDT address:
-                </p>
-                <div className="p-3 bg-primary/10 rounded-lg text-center">
-                  <span className="inline-block px-3 py-1 bg-primary text-primary-foreground text-sm font-bold rounded-full mb-2">
-                    Network: TRC20 (Tron)
-                  </span>
+              <div className="p-4 border rounded-lg space-y-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <Building2 className="h-5 w-5 text-primary" />
+                  <span className="font-medium">{selectedBank.region}</span>
                 </div>
-                <div className="flex flex-col items-center gap-2 p-3 bg-muted rounded-lg">
-                  <code className="text-xs break-all text-center font-mono">
-                    {WALLET_ADDRESS}
-                  </code>
-                  <Button
-                    type="button"
-                    variant="default"
-                    size="sm"
-                    onClick={copyWallet}
-                    className="mt-2"
-                  >
-                    <Copy className="w-4 h-4 mr-2" />
-                    Copy Address
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground text-center">
-                  Your payment will be confirmed after we verify the transaction.
-                </p>
+                {selectedBank.details.map((detail, idx) => (
+                  <div key={idx} className="flex flex-col sm:flex-row sm:justify-between gap-1 text-sm">
+                    <span className="text-muted-foreground">{detail.label}</span>
+                    <span className="font-mono font-medium">{detail.value}</span>
+                  </div>
+                ))}
               </div>
 
-              <div className="flex justify-center">
-                <div className="p-4 bg-background border rounded-xl">
-                  <QrCode className="w-32 h-32 text-foreground" />
-                  <p className="text-xs text-center text-muted-foreground mt-2">
-                    Scan QR Code
-                  </p>
-                </div>
+              <div className="p-3 bg-primary/10 rounded-lg">
+                <p className="text-sm text-center">
+                  <strong>Important:</strong> Payments are manually reviewed and typically confirmed within 24–48 business hours.
+                </p>
               </div>
-
-              <FormField
-                control={form.control}
-                name="transactionHash"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Transaction Hash (Optional)</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter your transaction hash for faster verification"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
               <div className="flex gap-3">
                 <Button
@@ -310,7 +345,7 @@ const GuestCheckout = ({
                       Submitting...
                     </>
                   ) : (
-                    "I've Sent Payment"
+                    "Submit Request"
                   )}
                 </Button>
               </div>
@@ -324,9 +359,17 @@ const GuestCheckout = ({
               </div>
               <div className="space-y-2">
                 <p className="text-muted-foreground">
-                  Thank you for your adoption request! We'll verify your USDT
-                  payment and contact you at{" "}
-                  <strong>{form.getValues("email")}</strong> within 24-48 hours.
+                  Thank you for your adoption request! Please complete your bank transfer using the details provided.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  After making the transfer, please{" "}
+                  <Link to="/payment-methods" className="text-primary underline" onClick={handleClose}>
+                    upload your proof of payment
+                  </Link>{" "}
+                  to expedite verification.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  We'll contact you at <strong>{form.getValues("email")}</strong> within 24-48 hours.
                 </p>
               </div>
               <Button
