@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CheckCircle2, Loader2, Building2 } from "lucide-react";
+import { CheckCircle2, Loader2, Building2, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -73,6 +73,37 @@ const bankDetails = [
     ],
   },
 ];
+
+const CopyableDetail = ({ label, value }: { label: string; value: string }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="flex items-center justify-between gap-2 text-sm group">
+      <span className="text-muted-foreground">{label}</span>
+      <div className="flex items-center gap-2">
+        <span className="font-mono font-medium">{value}</span>
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="p-1 rounded hover:bg-muted transition-colors"
+          title={`Copy ${label}`}
+        >
+          {copied ? (
+            <Check className="h-4 w-4 text-green-500" />
+          ) : (
+            <Copy className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+          )}
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const guestSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
@@ -311,10 +342,7 @@ const GuestCheckout = ({
                   <span className="font-medium">{selectedBank.region}</span>
                 </div>
                 {selectedBank.details.map((detail, idx) => (
-                  <div key={idx} className="flex flex-col sm:flex-row sm:justify-between gap-1 text-sm">
-                    <span className="text-muted-foreground">{detail.label}</span>
-                    <span className="font-mono font-medium">{detail.value}</span>
-                  </div>
+                  <CopyableDetail key={idx} label={detail.label} value={detail.value} />
                 ))}
               </div>
 
