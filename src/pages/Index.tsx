@@ -6,6 +6,7 @@ import FeaturedPets from "@/components/home/FeaturedPets";
 import HowItWorks from "@/components/home/HowItWorks";
 import Testimonials from "@/components/home/Testimonials";
 import CallToAction from "@/components/home/CallToAction";
+import NewsletterSignup from "@/components/home/NewsletterSignup";
 
 const Index = () => {
   return (
@@ -30,6 +31,7 @@ const Index = () => {
           <FeaturedPets />
           <HowItWorks />
           <Testimonials />
+          <NewsletterSignup />
           <CallToAction />
         </main>
         <Footer />
