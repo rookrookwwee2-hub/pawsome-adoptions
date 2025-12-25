@@ -21,6 +21,10 @@ import AdoptionsManagement from "./pages/admin/AdoptionsManagement";
 import UsersManagement from "./pages/admin/UsersManagement";
 import GuestPaymentsManagement from "./pages/admin/GuestPaymentsManagement";
 import PaymentProofsManagement from "./pages/admin/PaymentProofsManagement";
+import Donate from "./pages/Donate";
+import Foster from "./pages/Foster";
+import DonationsManagement from "./pages/admin/DonationsManagement";
+import FosterManagement from "./pages/admin/FosterManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +46,8 @@ const App = () => (
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/payment-methods" element={<PaymentMethods />} />
+                <Route path="/donate" element={<Donate />} />
+                <Route path="/foster" element={<Foster />} />
                 <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
                 <Route path="/admin" element={<ProtectedRoute requireAdmin><Dashboard /></ProtectedRoute>} />
                 <Route path="/admin/pets" element={<ProtectedRoute requireAdmin><PetsManagement /></ProtectedRoute>} />
@@ -49,6 +55,8 @@ const App = () => (
                 <Route path="/admin/users" element={<ProtectedRoute requireAdmin><UsersManagement /></ProtectedRoute>} />
                 <Route path="/admin/payments" element={<ProtectedRoute requireAdmin><GuestPaymentsManagement /></ProtectedRoute>} />
                 <Route path="/admin/payment-proofs" element={<ProtectedRoute requireAdmin><PaymentProofsManagement /></ProtectedRoute>} />
+                <Route path="/admin/donations" element={<ProtectedRoute requireAdmin><DonationsManagement /></ProtectedRoute>} />
+                <Route path="/admin/foster" element={<ProtectedRoute requireAdmin><FosterManagement /></ProtectedRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

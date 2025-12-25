@@ -91,6 +91,177 @@ export type Database = {
           },
         ]
       }
+      donations: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          created_at: string
+          currency: string
+          donation_type: string
+          donor_email: string
+          donor_name: string
+          donor_phone: string | null
+          id: string
+          message: string | null
+          proof_file_name: string | null
+          proof_file_url: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount: number
+          created_at?: string
+          currency?: string
+          donation_type?: string
+          donor_email: string
+          donor_name: string
+          donor_phone?: string | null
+          id?: string
+          message?: string | null
+          proof_file_name?: string | null
+          proof_file_url?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          created_at?: string
+          currency?: string
+          donation_type?: string
+          donor_email?: string
+          donor_name?: string
+          donor_phone?: string | null
+          id?: string
+          message?: string | null
+          proof_file_name?: string | null
+          proof_file_url?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      foster_applications: {
+        Row: {
+          address: string
+          admin_notes: string | null
+          applicant_email: string
+          applicant_name: string
+          applicant_phone: string
+          availability: string | null
+          children_ages: string | null
+          created_at: string
+          experience: string | null
+          has_children: boolean | null
+          has_other_pets: boolean | null
+          has_yard: boolean | null
+          housing_type: string | null
+          id: string
+          other_pets_details: string | null
+          preferred_pet_types: string[] | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          address: string
+          admin_notes?: string | null
+          applicant_email: string
+          applicant_name: string
+          applicant_phone: string
+          availability?: string | null
+          children_ages?: string | null
+          created_at?: string
+          experience?: string | null
+          has_children?: boolean | null
+          has_other_pets?: boolean | null
+          has_yard?: boolean | null
+          housing_type?: string | null
+          id?: string
+          other_pets_details?: string | null
+          preferred_pet_types?: string[] | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          address?: string
+          admin_notes?: string | null
+          applicant_email?: string
+          applicant_name?: string
+          applicant_phone?: string
+          availability?: string | null
+          children_ages?: string | null
+          created_at?: string
+          experience?: string | null
+          has_children?: boolean | null
+          has_other_pets?: boolean | null
+          has_yard?: boolean | null
+          housing_type?: string | null
+          id?: string
+          other_pets_details?: string | null
+          preferred_pet_types?: string[] | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      foster_assignments: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          foster_application_id: string
+          id: string
+          notes: string | null
+          pet_id: string
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          foster_application_id: string
+          id?: string
+          notes?: string | null
+          pet_id: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          foster_application_id?: string
+          id?: string
+          notes?: string | null
+          pet_id?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "foster_assignments_foster_application_id_fkey"
+            columns: ["foster_application_id"]
+            isOneToOne: false
+            referencedRelation: "foster_applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "foster_assignments_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guest_payments: {
         Row: {
           amount: number
