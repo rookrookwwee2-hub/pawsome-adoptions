@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Heart, Upload, Loader2, CheckCircle, Building2, CreditCard, Copy } from "lucide-react";
+import { Heart, Upload, Loader2, CheckCircle, Building2, CreditCard, Copy, Globe } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,13 +23,47 @@ const donationSchema = z.object({
   message: z.string().max(500).optional(),
 });
 
-const BANK_DETAILS = {
-  bankName: "First National Bank",
-  accountName: "PawHaven Pet Rescue",
-  accountNumber: "1234567890",
-  routingNumber: "021000021",
-  swiftCode: "FNBAUS33",
-};
+const bankDetails = [
+  {
+    id: "uk",
+    region: "UK Local Bank Transfer",
+    subtitle: "BACS / Faster Payments",
+    currency: "GBP",
+    details: [
+      { label: "Bank Name", value: "Barclays" },
+      { label: "Sort Code", value: "23-14-86" },
+      { label: "Account Number", value: "15870922" },
+      { label: "Beneficiary Name", value: "Kenneth Roberts" },
+    ],
+  },
+  {
+    id: "usa",
+    region: "USA Local Bank Transfer",
+    subtitle: "ACH / Wire",
+    currency: "USD",
+    details: [
+      { label: "Bank Name", value: "Citibank" },
+      { label: "Bank Address", value: "111 Wall Street, New York, NY 10043, USA" },
+      { label: "Routing (ABA)", value: "031100209" },
+      { label: "Account Number", value: "70589140002133813" },
+      { label: "Account Type", value: "Checking" },
+      { label: "Beneficiary Name", value: "Kenneth Roberts" },
+    ],
+  },
+  {
+    id: "eu",
+    region: "Eurozone SEPA Bank Transfer",
+    subtitle: "SEPA",
+    currency: "EUR",
+    details: [
+      { label: "Bank Name", value: "Banking Circle S.A." },
+      { label: "Bank Address", value: "2, Boulevard de la Foire, L-1528 Luxembourg" },
+      { label: "IBAN", value: "LU63 4080 0000 5965 4770" },
+      { label: "BIC (SWIFT)", value: "BCIRLULL" },
+      { label: "Beneficiary Name", value: "Kenneth Roberts" },
+    ],
+  },
+];
 
 const Donate = () => {
   const { user } = useAuth();
@@ -37,6 +71,8 @@ const Donate = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [proofFile, setProofFile] = useState<File | null>(null);
+  const [selectedBankId, setSelectedBankId] = useState<string>("uk");
+  const selectedBank = bankDetails.find((b) => b.id === selectedBankId) || bankDetails[0];
   const [formData, setFormData] = useState({
     donor_name: "",
     donor_email: "",
@@ -181,27 +217,62 @@ const Donate = () => {
                     Bank Transfer Details
                   </CardTitle>
                   <CardDescription>
-                    Transfer your donation to the account below
+                    Select your region and transfer your donation
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {Object.entries({
-                    "Bank Name": BANK_DETAILS.bankName,
-                    "Account Name": BANK_DETAILS.accountName,
-                    "Account Number": BANK_DETAILS.accountNumber,
-                    "Routing Number": BANK_DETAILS.routingNumber,
-                    "SWIFT Code": BANK_DETAILS.swiftCode,
-                  }).map(([label, value]) => (
-                    <div key={label} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                      <div>
-                        <p className="text-xs text-muted-foreground">{label}</p>
-                        <p className="font-medium">{value}</p>
-                      </div>
-                      <Button variant="ghost" size="icon" onClick={() => copyToClipboard(value, label)}>
-                        <Copy className="h-4 w-4" />
-                      </Button>
+                  {/* Region Selection */}
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <Globe className="h-4 w-4" />
+                      Select Your Region
+                    </Label>
+                    <div className="grid gap-2">
+                      {bankDetails.map((bank) => (
+                        <button
+                          key={bank.id}
+                          type="button"
+                          onClick={() => setSelectedBankId(bank.id)}
+                          className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                            selectedBankId === bank.id
+                              ? "border-primary bg-primary/10"
+                              : "border-border hover:border-primary/50"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-medium">{bank.region}</p>
+                              <p className="text-xs text-muted-foreground">{bank.subtitle}</p>
+                            </div>
+                            <span className="text-sm font-medium text-muted-foreground">{bank.currency}</span>
+                          </div>
+                        </button>
+                      ))}
                     </div>
-                  ))}
+                  </div>
+
+                  {/* Bank Details for Selected Region */}
+                  <div className="pt-4 border-t space-y-3">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Transfer to ({selectedBank.currency}):
+                    </p>
+                    {selectedBank.details.map((detail) => (
+                      <div key={detail.label} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-muted-foreground">{detail.label}</p>
+                          <p className="font-medium truncate">{detail.value}</p>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => copyToClipboard(detail.value, detail.label)}
+                          className="shrink-0"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
 
