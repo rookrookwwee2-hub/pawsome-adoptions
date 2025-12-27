@@ -17,7 +17,8 @@ const supportLinks = [
   { name: "Health Guarantee", path: "/health-guarantee" },
   { name: "Delivery Options", path: "/delivery-options" },
   { name: "Emotional Support", path: "/emotional-support" },
-  { name: "Privacy Policy", path: "/about" },
+  { name: "Privacy Policy", path: "/privacy" },
+  { name: "Terms & Conditions", path: "/terms" },
 ];
 
 const Footer = () => {
