@@ -34,6 +34,7 @@ import DogBreeds from "./pages/DogBreeds";
 import DeliveryOptions from "./pages/DeliveryOptions";
 import EmotionalSupport from "./pages/EmotionalSupport";
 import HealthGuarantee from "./pages/HealthGuarantee";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,7 @@ const App = () => (
                   <Route path="/delivery-options" element={<DeliveryOptions />} />
                   <Route path="/emotional-support" element={<EmotionalSupport />} />
                   <Route path="/health-guarantee" element={<HealthGuarantee />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
                   <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
                   <Route path="/orders" element={<ProtectedRoute><OrderHistory /></ProtectedRoute>} />
                   <Route path="/admin" element={<ProtectedRoute requireAdmin><Dashboard /></ProtectedRoute>} />
