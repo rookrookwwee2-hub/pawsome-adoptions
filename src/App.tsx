@@ -17,6 +17,7 @@ import Auth from "./pages/Auth";
 import Account from "./pages/Account";
 import PaymentMethods from "./pages/PaymentMethods";
 import Checkout from "./pages/Checkout";
+import OrderHistory from "./pages/OrderHistory";
 import Dashboard from "./pages/admin/Dashboard";
 import PetsManagement from "./pages/admin/PetsManagement";
 import AdoptionsManagement from "./pages/admin/AdoptionsManagement";
@@ -63,6 +64,7 @@ const App = () => (
                   <Route path="/emotional-support" element={<EmotionalSupport />} />
                   <Route path="/health-guarantee" element={<HealthGuarantee />} />
                   <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+                  <Route path="/orders" element={<ProtectedRoute><OrderHistory /></ProtectedRoute>} />
                   <Route path="/admin" element={<ProtectedRoute requireAdmin><Dashboard /></ProtectedRoute>} />
                   <Route path="/admin/pets" element={<ProtectedRoute requireAdmin><PetsManagement /></ProtectedRoute>} />
                   <Route path="/admin/adoptions" element={<ProtectedRoute requireAdmin><AdoptionsManagement /></ProtectedRoute>} />

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, Heart, User, LogOut, Settings, ChevronDown, Cat, Dog } from "lucide-react";
+import { Menu, X, Heart, User, LogOut, Settings, ChevronDown, Cat, Dog, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -118,6 +118,9 @@ const Navbar = () => {
                     <Link to="/admin"><Settings className="w-4 h-4 mr-2" />Admin</Link>
                   </Button>
                 )}
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/orders"><Package className="w-4 h-4 mr-2" />Orders</Link>
+                </Button>
                 <Button variant="ghost" size="icon" asChild className="rounded-full">
                   <Link to="/account"><User className="w-5 h-5" /></Link>
                 </Button>
@@ -203,6 +206,10 @@ const Navbar = () => {
                 <>
                   <Link to="/account" onClick={() => setIsOpen(false)} className="font-body font-medium py-2 text-muted-foreground">
                     Account Settings
+                  </Link>
+                  <Link to="/orders" onClick={() => setIsOpen(false)} className="font-body font-medium py-2 text-muted-foreground flex items-center gap-2">
+                    <Package className="w-4 h-4" />
+                    Order History
                   </Link>
                   {isAdmin && (
                     <Link to="/admin" onClick={() => setIsOpen(false)} className="font-body font-medium py-2 text-muted-foreground">
