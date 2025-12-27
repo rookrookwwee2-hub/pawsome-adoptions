@@ -27,6 +27,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -129,6 +130,9 @@ const checkoutSchema = z.object({
     required_error: "Please select a payment method",
   }),
   message: z.string().max(500).optional(),
+  acceptTerms: z.boolean().refine((val) => val === true, {
+    message: "You must accept the terms and conditions",
+  }),
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
@@ -149,6 +153,7 @@ const Checkout = () => {
       address: "",
       paymentMethod: undefined,
       message: "",
+      acceptTerms: false,
     },
   });
 
@@ -507,6 +512,42 @@ const Checkout = () => {
                                   />
                                 </FormControl>
                                 <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="acceptTerms"
+                            render={({ field }) => (
+                              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border p-4 bg-muted/30">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                  />
+                                </FormControl>
+                                <div className="space-y-1 leading-none">
+                                  <FormLabel className="text-sm font-normal cursor-pointer">
+                                    I agree to the{" "}
+                                    <Link
+                                      to="/terms"
+                                      className="text-primary underline hover:text-primary/80"
+                                      target="_blank"
+                                    >
+                                      Terms & Conditions
+                                    </Link>{" "}
+                                    and{" "}
+                                    <Link
+                                      to="/privacy"
+                                      className="text-primary underline hover:text-primary/80"
+                                      target="_blank"
+                                    >
+                                      Privacy Policy
+                                    </Link>
+                                  </FormLabel>
+                                  <FormMessage />
+                                </div>
                               </FormItem>
                             )}
                           />
