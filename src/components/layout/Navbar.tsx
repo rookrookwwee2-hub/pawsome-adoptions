@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, Heart, User, LogOut, Settings, ChevronDown, Cat, Dog, Package } from "lucide-react";
+import { Menu, X, Heart, User, LogOut, Settings, ChevronDown, Cat, Dog, Package, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/contexts/CartContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import CurrencySelector from "@/components/cart/CurrencySelector";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +19,9 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
+  const { items } = useCart();
+  
+  const cartItemCount = items.length;
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -111,6 +116,19 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center gap-2">
             <CurrencySelector />
             <ThemeToggle />
+            
+            {/* Cart Icon */}
+            <Button variant="ghost" size="icon" asChild className="rounded-full relative">
+              <Link to="/checkout">
+                <ShoppingCart className="w-5 h-5" />
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs font-bold rounded-full flex items-center justify-center">
+                    {cartItemCount > 9 ? "9+" : cartItemCount}
+                  </span>
+                )}
+              </Link>
+            </Button>
+            
             {user ? (
               <>
                 {isAdmin && (
@@ -193,6 +211,23 @@ const Navbar = () => {
                   </Link>
                 ))}
               </div>
+
+              {/* Mobile Cart Link */}
+              <Link 
+                to="/checkout" 
+                onClick={() => setIsOpen(false)} 
+                className="flex items-center justify-between py-2 border-t border-border mt-2 pt-4"
+              >
+                <span className="font-body font-medium text-muted-foreground flex items-center gap-2">
+                  <ShoppingCart className="w-4 h-4" />
+                  Cart
+                </span>
+                {cartItemCount > 0 && (
+                  <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
+                    {cartItemCount}
+                  </span>
+                )}
+              </Link>
 
               <div className="flex items-center justify-between py-2 border-t border-border mt-2 pt-4">
                 <span className="font-body font-medium text-muted-foreground">Currency</span>
