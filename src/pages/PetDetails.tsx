@@ -32,7 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import GuestCheckout from "@/components/checkout/GuestCheckout";
+
 import AddOnsSelection from "@/components/cart/AddOnsSelection";
 import { useCart, CartAddOn } from "@/contexts/CartContext";
 import {
@@ -52,7 +52,6 @@ const PetDetails = () => {
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [showGuestCheckout, setShowGuestCheckout] = useState(false);
   const [selectedShipping, setSelectedShipping] = useState<string>("ground");
   const [selectedAddOns, setSelectedAddOns] = useState<CartAddOn[]>([]);
   const [paymentType, setPaymentType] = useState<"full" | "deposit">("full");
@@ -552,7 +551,10 @@ const PetDetails = () => {
                       <Button
                         size="lg"
                         className="w-full rounded-full"
-                        onClick={handleReserve}
+                        onClick={() => {
+                          handleReserve();
+                          navigate("/checkout");
+                        }}
                       >
                         {paymentType === "deposit" ? "Reserve Now" : "Adopt Now"}
                       </Button>
@@ -560,10 +562,13 @@ const PetDetails = () => {
                         variant="outline"
                         size="lg"
                         className="w-full rounded-full gap-2"
-                        onClick={() => setShowGuestCheckout(true)}
+                        onClick={() => {
+                          handleReserve();
+                          navigate("/checkout");
+                        }}
                       >
                         <Wallet className="w-4 h-4" />
-                        Pay via Bank Transfer / USDT
+                        Proceed to Checkout
                       </Button>
                     </div>
                   </CardContent>
@@ -590,15 +595,8 @@ const PetDetails = () => {
           </div>
         </main>
 
-        <Footer />
 
-        <GuestCheckout
-          open={showGuestCheckout}
-          onOpenChange={setShowGuestCheckout}
-          petId={pet.id}
-          petName={pet.name}
-          amount={totalPrice}
-        />
+        <Footer />
       </div>
     </>
   );

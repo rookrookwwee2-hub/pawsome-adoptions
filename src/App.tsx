@@ -16,6 +16,7 @@ import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import Account from "./pages/Account";
 import PaymentMethods from "./pages/PaymentMethods";
+import Checkout from "./pages/Checkout";
 import Dashboard from "./pages/admin/Dashboard";
 import PetsManagement from "./pages/admin/PetsManagement";
 import AdoptionsManagement from "./pages/admin/AdoptionsManagement";
@@ -53,6 +54,7 @@ const App = () => (
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/payment-methods" element={<PaymentMethods />} />
+                  <Route path="/checkout" element={<Checkout />} />
                   <Route path="/donate" element={<Donate />} />
                   <Route path="/foster" element={<Foster />} />
                   <Route path="/cat-breeds" element={<CatBreeds />} />
