@@ -685,7 +685,7 @@ const Checkout = () => {
 
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
                       <Button asChild className="rounded-full">
-                        <Link to="/payment-methods">Upload Proof of Payment</Link>
+                        <Link to={`/payment-methods${selectedBank ? `?bank=${selectedBank.id}` : selectedPaymentMethod === "usdt" ? "?bank=usdt" : ""}`}>Upload Proof of Payment</Link>
                       </Button>
                       <Button
                         variant="outline"

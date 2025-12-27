@@ -56,13 +56,11 @@ const PaymentMethods = () => {
     },
   ];
 
-  // Filter to show only the selected bank if provided via URL param
-  const displayedBanks = useMemo(() => {
-    if (!selectedBank) return bankDetails;
-    return bankDetails.filter(bank => bank.id === selectedBank);
+  // Only show the selected bank from URL param - require a selection
+  const displayedBank = useMemo(() => {
+    if (!selectedBank) return null;
+    return bankDetails.find(bank => bank.id === selectedBank) || null;
   }, [selectedBank]);
-
-  const hasSelectedBank = selectedBank && displayedBanks.length > 0;
 
   return (
     <>
@@ -81,12 +79,12 @@ const PaymentMethods = () => {
           <div className="container-custom max-w-4xl">
             <div className="text-center mb-12 animate-fade-up opacity-0">
               <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">
-                {hasSelectedBank ? "Complete Your Payment" : "Payment Methods"}
+                {displayedBank ? "Complete Your Payment" : "Payment Methods"}
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                {hasSelectedBank 
+                {displayedBank 
                   ? "Use the bank details below to complete your adoption payment securely."
-                  : "Complete your adoption payment securely via bank transfer. Choose the payment method that works best for your location."}
+                  : "Please select a payment method during checkout to view the bank details."}
               </p>
             </div>
 
@@ -97,23 +95,23 @@ const PaymentMethods = () => {
               </AlertDescription>
             </Alert>
 
-            <div className="space-y-6 animate-fade-up opacity-0 stagger-2">
-              {displayedBanks.map((bank, index) => (
-                <Card key={index} className="overflow-hidden">
+            {displayedBank && (
+              <div className="space-y-6 animate-fade-up opacity-0 stagger-2">
+                <Card className="overflow-hidden">
                   <CardHeader className="bg-muted/50">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-primary/10 rounded-lg">
                         <Building2 className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <CardTitle className="text-xl">{bank.region}</CardTitle>
-                        <CardDescription>{bank.subtitle} • {bank.currency}</CardDescription>
+                        <CardTitle className="text-xl">{displayedBank.region}</CardTitle>
+                        <CardDescription>{displayedBank.subtitle} • {displayedBank.currency}</CardDescription>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="pt-6">
                     <div className="space-y-3">
-                      {bank.details.map((detail, detailIndex) => (
+                      {displayedBank.details.map((detail, detailIndex) => (
                         <div key={detailIndex} className="flex flex-col sm:flex-row sm:justify-between gap-1">
                           <span className="text-muted-foreground text-sm">{detail.label}</span>
                           <span className="font-medium font-mono text-sm sm:text-right">{detail.value}</span>
@@ -122,8 +120,8 @@ const PaymentMethods = () => {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
+              </div>
+            )}
 
             <Separator className="my-12" />
 
