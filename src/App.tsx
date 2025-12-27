@@ -36,6 +36,7 @@ import EmotionalSupport from "./pages/EmotionalSupport";
 import HealthGuarantee from "./pages/HealthGuarantee";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
+import CookieConsent from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
 
@@ -79,6 +80,7 @@ const App = () => (
                   <Route path="/admin/foster" element={<ProtectedRoute requireAdmin><FosterManagement /></ProtectedRoute>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
+                <CookieConsent />
               </BrowserRouter>
             </TooltipProvider>
           </CartProvider>
