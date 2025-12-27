@@ -211,15 +211,7 @@ const PetDetails = () => {
   }
 
   const handleReserve = () => {
-    if (!user) {
-      navigate(`/auth?redirect=/pets/${id}`);
-      toast.info("Please log in to reserve", {
-        description: "Create an account or sign in to continue.",
-      });
-      return;
-    }
-    
-    // Add to cart
+    // Add to cart (no login required - guests can checkout)
     addToCart({
       petId: pet.id,
       petName: pet.name,
