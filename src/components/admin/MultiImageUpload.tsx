@@ -42,8 +42,8 @@ export default function MultiImageUpload({
         setError("Please select only image files.");
         return;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        setError("Each image must be smaller than 5 MB.");
+      if (file.size > 50 * 1024 * 1024) {
+        setError("Each image must be smaller than 50 MB.");
         return;
       }
     }
@@ -156,7 +156,7 @@ export default function MultiImageUpload({
             <ImagePlus className="w-8 h-8 text-muted-foreground" />
           )}
           <span className="text-sm text-muted-foreground text-center">
-            {uploading ? "Uploading…" : "Click to upload images (max 5 MB each)"}
+            {uploading ? "Uploading…" : "Click to upload images (max 50 MB each)"}
           </span>
         </div>
       )}
