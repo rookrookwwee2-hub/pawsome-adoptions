@@ -62,6 +62,8 @@ const PaymentMethods = () => {
     return bankDetails.filter(bank => bank.id === selectedBank);
   }, [selectedBank]);
 
+  const hasSelectedBank = selectedBank && displayedBanks.length > 0;
+
   return (
     <>
       <Helmet>
@@ -79,10 +81,12 @@ const PaymentMethods = () => {
           <div className="container-custom max-w-4xl">
             <div className="text-center mb-12 animate-fade-up opacity-0">
               <h1 className="font-display text-4xl md:text-5xl font-bold mb-4">
-                Payment Methods
+                {hasSelectedBank ? "Complete Your Payment" : "Payment Methods"}
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Complete your adoption payment securely via bank transfer. Choose the payment method that works best for your location.
+                {hasSelectedBank 
+                  ? "Use the bank details below to complete your adoption payment securely."
+                  : "Complete your adoption payment securely via bank transfer. Choose the payment method that works best for your location."}
               </p>
             </div>
 
