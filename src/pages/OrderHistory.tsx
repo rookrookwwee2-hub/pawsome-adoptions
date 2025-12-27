@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { format } from "date-fns";
@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Order {
   id: string;
@@ -66,50 +67,91 @@ const OrderHistory = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const fetchOrders = useCallback(async () => {
+    if (!user?.email) return;
+
+    try {
+      const { data: payments, error } = await supabase
+        .from("guest_payments")
+        .select(`
+          id,
+          pet_id,
+          amount,
+          status,
+          created_at,
+          wallet_address,
+          message,
+          pets!inner(name, image_url)
+        `)
+        .eq("guest_email", user.email)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      const formattedOrders: Order[] = (payments || []).map((p: any) => ({
+        id: p.id,
+        pet_id: p.pet_id,
+        pet_name: p.pets?.name || "Unknown Pet",
+        pet_image: p.pets?.image_url,
+        amount: p.amount,
+        status: p.status,
+        created_at: p.created_at,
+        wallet_address: p.wallet_address,
+        message: p.message,
+      }));
+
+      setOrders(formattedOrders);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user?.email]);
+
+  // Initial fetch
   useEffect(() => {
-    const fetchOrders = async () => {
-      if (!user?.email) return;
-
-      try {
-        // Fetch guest payments with pet info
-        const { data: payments, error } = await supabase
-          .from("guest_payments")
-          .select(`
-            id,
-            pet_id,
-            amount,
-            status,
-            created_at,
-            wallet_address,
-            message,
-            pets!inner(name, image_url)
-          `)
-          .eq("guest_email", user.email)
-          .order("created_at", { ascending: false });
-
-        if (error) throw error;
-
-        const formattedOrders: Order[] = (payments || []).map((p: any) => ({
-          id: p.id,
-          pet_id: p.pet_id,
-          pet_name: p.pets?.name || "Unknown Pet",
-          pet_image: p.pets?.image_url,
-          amount: p.amount,
-          status: p.status,
-          created_at: p.created_at,
-          wallet_address: p.wallet_address,
-          message: p.message,
-        }));
-
-        setOrders(formattedOrders);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchOrders();
+  }, [fetchOrders]);
+
+  // Real-time subscription for order status updates
+  useEffect(() => {
+    if (!user?.email) return;
+
+    const channel = supabase
+      .channel("order-status-updates")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "guest_payments",
+        },
+        (payload) => {
+          const updatedPayment = payload.new as any;
+          
+          // Check if this update is for the current user's order
+          if (updatedPayment.guest_email === user.email) {
+            setOrders((prevOrders) =>
+              prevOrders.map((order) =>
+                order.id === updatedPayment.id
+                  ? { ...order, status: updatedPayment.status }
+                  : order
+              )
+            );
+
+            // Show toast notification for status change
+            const statusInfo = statusConfig[updatedPayment.status] || statusConfig.pending;
+            toast.success(`Order status updated!`, {
+              description: `Your order is now: ${statusInfo.label}`,
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user?.email]);
 
   const getStatusInfo = (status: string) => {
