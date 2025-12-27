@@ -1,27 +1,34 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, Heart, User, LogOut, Settings, ChevronDown, Cat, Dog, Package, ShoppingCart } from "lucide-react";
+import { Menu, X, Heart, User, LogOut, Settings, ChevronDown, Cat, Dog, Package, ShoppingCart, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/contexts/CartContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import CurrencySelector from "@/components/cart/CurrencySelector";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
-  const { items } = useCart();
+  const { items, removeFromCart, getTotal, formatPrice } = useCart();
   
   const cartItemCount = items.length;
+  const cartTotal = getTotal();
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -117,17 +124,94 @@ const Navbar = () => {
             <CurrencySelector />
             <ThemeToggle />
             
-            {/* Cart Icon */}
-            <Button variant="ghost" size="icon" asChild className="rounded-full relative">
-              <Link to="/checkout">
-                <ShoppingCart className="w-5 h-5" />
-                {cartItemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs font-bold rounded-full flex items-center justify-center">
-                    {cartItemCount > 9 ? "9+" : cartItemCount}
-                  </span>
-                )}
-              </Link>
-            </Button>
+            {/* Cart Icon with Hover Preview */}
+            <HoverCard openDelay={100} closeDelay={200}>
+              <HoverCardTrigger asChild>
+                <Button variant="ghost" size="icon" asChild className="rounded-full relative">
+                  <Link to="/checkout">
+                    <ShoppingCart className="w-5 h-5" />
+                    {cartItemCount > 0 && (
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs font-bold rounded-full flex items-center justify-center">
+                        {cartItemCount > 9 ? "9+" : cartItemCount}
+                      </span>
+                    )}
+                  </Link>
+                </Button>
+              </HoverCardTrigger>
+              <HoverCardContent align="end" className="w-80 p-0 bg-background border shadow-lg z-50">
+                <div className="p-4">
+                  <h4 className="font-semibold text-sm mb-3">
+                    Shopping Cart ({cartItemCount} {cartItemCount === 1 ? "item" : "items"})
+                  </h4>
+                  
+                  {cartItemCount === 0 ? (
+                    <div className="text-center py-6">
+                      <ShoppingCart className="w-10 h-10 mx-auto text-muted-foreground mb-2" />
+                      <p className="text-sm text-muted-foreground">Your cart is empty</p>
+                      <Button asChild size="sm" className="mt-3 rounded-full">
+                        <Link to="/pets">Browse Pets</Link>
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="space-y-3 max-h-64 overflow-y-auto">
+                        {items.slice(0, 3).map((item) => (
+                          <div key={item.petId} className="flex gap-3 items-start">
+                            {item.petImage && (
+                              <img
+                                src={item.petImage}
+                                alt={item.petName}
+                                className="w-12 h-12 rounded-lg object-cover shrink-0"
+                              />
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm truncate">{item.petName}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {item.isReservation ? "30% Deposit" : "Full Adoption"}
+                              </p>
+                              <p className="text-sm font-semibold text-primary">
+                                {formatPrice(
+                                  item.isReservation && item.reservationDeposit
+                                    ? item.reservationDeposit
+                                    : item.basePrice
+                                )}
+                              </p>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-destructive shrink-0"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                removeFromCart(item.petId);
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                        {items.length > 3 && (
+                          <p className="text-xs text-muted-foreground text-center py-1">
+                            +{items.length - 3} more item{items.length - 3 > 1 ? "s" : ""}
+                          </p>
+                        )}
+                      </div>
+                      
+                      <Separator className="my-3" />
+                      
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-sm text-muted-foreground">Subtotal</span>
+                        <span className="font-bold text-primary">{formatPrice(cartTotal)}</span>
+                      </div>
+                      
+                      <Button asChild className="w-full rounded-full" size="sm">
+                        <Link to="/checkout">Proceed to Checkout</Link>
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </HoverCardContent>
+            </HoverCard>
             
             {user ? (
               <>
