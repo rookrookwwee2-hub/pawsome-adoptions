@@ -3,7 +3,8 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Hero from "@/components/home/Hero";
 import FeaturedPets from "@/components/home/FeaturedPets";
-import HowItWorks from "@/components/home/HowItWorks";
+import AdoptionJourney from "@/components/home/AdoptionJourney";
+import TrustSection from "@/components/home/TrustSection";
 import Testimonials from "@/components/home/Testimonials";
 import CallToAction from "@/components/home/CallToAction";
 import NewsletterSignup from "@/components/home/NewsletterSignup";
@@ -29,7 +30,8 @@ const Index = () => {
         <main>
           <Hero />
           <FeaturedPets />
-          <HowItWorks />
+          <TrustSection />
+          <AdoptionJourney />
           <Testimonials />
           <NewsletterSignup />
           <CallToAction />
