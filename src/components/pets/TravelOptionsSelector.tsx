@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Car, Plane, UserCheck, Globe, Clock, MapPin, Info, Copy, Check } from "lucide-react";
+import { Car, Plane, UserCheck, Globe, Clock, MapPin } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -11,15 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCart } from "@/contexts/CartContext";
-import { toast } from "sonner";
 
 interface TravelOption {
   type: "ground" | "air";
@@ -69,37 +61,6 @@ const AIR_CARGO_COUNTRIES = [
   { id: "argentina", label: "Argentina", price: 4250 },
 ];
 
-// Domestic ground transport prices (within same country)
-const DOMESTIC_GROUND_PRICES = [
-  { country: "United States", price: 800 },
-  { country: "Canada", price: 550 },
-  { country: "United Kingdom", price: 375 },
-  { country: "Germany", price: 440 },
-  { country: "France", price: 385 },
-  { country: "Italy", price: 410 },
-  { country: "Spain", price: 410 },
-  { country: "Netherlands", price: 385 },
-  { country: "Belgium", price: 385 },
-  { country: "Switzerland", price: 410 },
-  { country: "Sweden", price: 440 },
-  { country: "Norway", price: 450 },
-  { country: "Finland", price: 450 },
-  { country: "Denmark", price: 440 },
-  { country: "Poland", price: 385 },
-  { country: "Romania", price: 410 },
-  { country: "Czech Republic", price: 385 },
-  { country: "Hungary", price: 385 },
-  { country: "Slovenia", price: 410 },
-  { country: "Australia", price: 395 },
-  { country: "New Zealand", price: 395 },
-  { country: "Japan", price: 500 },
-  { country: "South Korea", price: 500 },
-  { country: "China", price: 550 },
-  { country: "Russia", price: 725 },
-  { country: "Brazil", price: 500 },
-  { country: "Argentina", price: 500 },
-];
-
 const TravelOptionsSelector = ({
   onSelectionChange,
   flightNannyBasePrice = 500,
@@ -108,23 +69,6 @@ const TravelOptionsSelector = ({
   const [travelType, setTravelType] = useState<"ground" | "air" | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [flightNannyEnabled, setFlightNannyEnabled] = useState(false);
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-
-  const handleCopyPrice = (country: string, price: number, index: number) => {
-    const text = `${country}: $${price}`;
-    navigator.clipboard.writeText(text);
-    setCopiedIndex(index);
-    toast.success("Copied to clipboard!");
-    setTimeout(() => setCopiedIndex(null), 2000);
-  };
-
-  const handleCopyAllPrices = () => {
-    const allPrices = DOMESTIC_GROUND_PRICES.map(
-      (item) => `${item.country}: $${item.price}`
-    ).join("\n");
-    navigator.clipboard.writeText(allPrices);
-    toast.success("All prices copied to clipboard!");
-  };
 
   const currentCountries = useMemo(() => {
     if (travelType === "ground") return GROUND_TRANSPORT_COUNTRIES;
@@ -250,74 +194,6 @@ const TravelOptionsSelector = ({
               </div>
             </div>
           </RadioGroup>
-
-          {/* Domestic Ground Transport Prices Info */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-xs gap-1.5 h-auto py-1.5 px-2 text-muted-foreground hover:text-foreground"
-              >
-                <Info className="w-3.5 h-3.5" />
-                If the pet is located in the same country, view Ground Transport prices
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent 
-              className="w-80 p-0 bg-background border shadow-lg z-50" 
-              align="start"
-              sideOffset={8}
-            >
-              <div className="p-3 border-b bg-muted/50">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold text-sm">Domestic Ground Transport</h4>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Average prices within the same country
-                    </p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 text-xs gap-1"
-                    onClick={handleCopyAllPrices}
-                  >
-                    <Copy className="w-3 h-3" />
-                    Copy All
-                  </Button>
-                </div>
-              </div>
-              <ScrollArea className="h-64">
-                <div className="p-2">
-                  {DOMESTIC_GROUND_PRICES.map((item, index) => (
-                    <div
-                      key={item.country}
-                      className="flex items-center justify-between py-2 px-2 rounded hover:bg-muted/50 group transition-colors"
-                    >
-                      <span className="text-sm">{item.country}</span>
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-primary text-sm">
-                          ${item.price}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => handleCopyPrice(item.country, item.price, index)}
-                        >
-                          {copiedIndex === index ? (
-                            <Check className="w-3 h-3 text-green-500" />
-                          ) : (
-                            <Copy className="w-3 h-3" />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </PopoverContent>
-          </Popover>
         </div>
 
         {/* Country Selection */}
