@@ -411,14 +411,25 @@ export type Database = {
         Row: {
           adoption_fee: number | null
           age: string | null
+          air_cargo_canada_price: number | null
+          air_cargo_usa_price: number | null
+          birth_date: string | null
           breed: string | null
           created_at: string | null
           delivery_notes: string | null
           delivery_type: string | null
           description: string | null
+          dewormed: boolean | null
+          fiv_felv_negative: boolean | null
+          flight_nanny_price: number | null
+          fvrcp_vaccine: boolean | null
           gender: string | null
+          genetic_health_guarantee: boolean | null
+          genetic_health_years: number | null
           good_with_kids: boolean | null
           good_with_pets: boolean | null
+          ground_transport_price: number | null
+          health_certificate: boolean | null
           house_trained: boolean | null
           id: string
           image_url: string | null
@@ -427,23 +438,38 @@ export type Database = {
           microchipped: boolean | null
           name: string
           neutered: boolean | null
+          pet_passport: boolean | null
+          rabies_vaccine: boolean | null
           size: string | null
           status: Database["public"]["Enums"]["pet_status"] | null
           type: string
           updated_at: string | null
           vaccinated: boolean | null
+          video_url: string | null
+          weight: number | null
         }
         Insert: {
           adoption_fee?: number | null
           age?: string | null
+          air_cargo_canada_price?: number | null
+          air_cargo_usa_price?: number | null
+          birth_date?: string | null
           breed?: string | null
           created_at?: string | null
           delivery_notes?: string | null
           delivery_type?: string | null
           description?: string | null
+          dewormed?: boolean | null
+          fiv_felv_negative?: boolean | null
+          flight_nanny_price?: number | null
+          fvrcp_vaccine?: boolean | null
           gender?: string | null
+          genetic_health_guarantee?: boolean | null
+          genetic_health_years?: number | null
           good_with_kids?: boolean | null
           good_with_pets?: boolean | null
+          ground_transport_price?: number | null
+          health_certificate?: boolean | null
           house_trained?: boolean | null
           id?: string
           image_url?: string | null
@@ -452,23 +478,38 @@ export type Database = {
           microchipped?: boolean | null
           name: string
           neutered?: boolean | null
+          pet_passport?: boolean | null
+          rabies_vaccine?: boolean | null
           size?: string | null
           status?: Database["public"]["Enums"]["pet_status"] | null
           type: string
           updated_at?: string | null
           vaccinated?: boolean | null
+          video_url?: string | null
+          weight?: number | null
         }
         Update: {
           adoption_fee?: number | null
           age?: string | null
+          air_cargo_canada_price?: number | null
+          air_cargo_usa_price?: number | null
+          birth_date?: string | null
           breed?: string | null
           created_at?: string | null
           delivery_notes?: string | null
           delivery_type?: string | null
           description?: string | null
+          dewormed?: boolean | null
+          fiv_felv_negative?: boolean | null
+          flight_nanny_price?: number | null
+          fvrcp_vaccine?: boolean | null
           gender?: string | null
+          genetic_health_guarantee?: boolean | null
+          genetic_health_years?: number | null
           good_with_kids?: boolean | null
           good_with_pets?: boolean | null
+          ground_transport_price?: number | null
+          health_certificate?: boolean | null
           house_trained?: boolean | null
           id?: string
           image_url?: string | null
@@ -477,11 +518,15 @@ export type Database = {
           microchipped?: boolean | null
           name?: string
           neutered?: boolean | null
+          pet_passport?: boolean | null
+          rabies_vaccine?: boolean | null
           size?: string | null
           status?: Database["public"]["Enums"]["pet_status"] | null
           type?: string
           updated_at?: string | null
           vaccinated?: boolean | null
+          video_url?: string | null
+          weight?: number | null
         }
         Relationships: []
       }
