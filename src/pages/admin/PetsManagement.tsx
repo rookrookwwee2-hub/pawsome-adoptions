@@ -37,7 +37,8 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
-import ImageUpload from "@/components/admin/ImageUpload";
+import MultiImageUpload from "@/components/admin/MultiImageUpload";
+import VideoUpload from "@/components/admin/VideoUpload";
 import { cn } from "@/lib/utils";
 import type { Database } from "@/integrations/supabase/types";
 import { catBreeds, dogBreeds } from "@/data/breeds";
@@ -93,6 +94,8 @@ const PetsManagement = () => {
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
   const [formData, setFormData] = useState<PetInsert>(defaultPet);
   const [birthDate, setBirthDate] = useState<Date | undefined>(undefined);
+  const [petImages, setPetImages] = useState<string[]>([]);
+  const [petVideoUrl, setPetVideoUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
   const fetchPets = async () => {
@@ -144,7 +147,8 @@ const PetsManagement = () => {
       description: formData.description || null,
       adoption_fee: formData.adoption_fee || 0,
       status: formData.status || "available",
-      image_url: formData.image_url || null,
+      image_url: petImages.length > 0 ? petImages[0] : null,
+      images: petImages.length > 0 ? petImages : null,
       vaccinated: formData.vaccinated || false,
       neutered: formData.neutered || false,
       microchipped: formData.microchipped || false,
@@ -162,7 +166,7 @@ const PetsManagement = () => {
       dewormed: formData.dewormed || false,
       genetic_health_guarantee: formData.genetic_health_guarantee ?? true,
       genetic_health_years: formData.genetic_health_years || 1,
-      video_url: formData.video_url || null,
+      video_url: petVideoUrl || null,
       birth_date: birthDate ? format(birthDate, 'yyyy-MM-dd') : null,
       weight: formData.weight || null,
       flight_nanny_price: formData.flight_nanny_price || 1500,
@@ -187,6 +191,8 @@ const PetsManagement = () => {
           setDialogOpen(false);
           setFormData(defaultPet);
           setBirthDate(undefined);
+          setPetImages([]);
+          setPetVideoUrl(null);
         }
       } else {
         const { error } = await supabase.from('pets').insert(petData);
@@ -200,6 +206,8 @@ const PetsManagement = () => {
           setDialogOpen(false);
           setFormData(defaultPet);
           setBirthDate(undefined);
+          setPetImages([]);
+          setPetVideoUrl(null);
         }
       }
     } catch (err) {
@@ -261,6 +269,12 @@ const PetsManagement = () => {
       ground_transport_price: pet.ground_transport_price || 50,
     });
     setBirthDate(pet.birth_date ? new Date(pet.birth_date) : undefined);
+    // Set images - use images array if available, otherwise fall back to image_url
+    const existingImages = pet.images && pet.images.length > 0 
+      ? pet.images 
+      : pet.image_url ? [pet.image_url] : [];
+    setPetImages(existingImages);
+    setPetVideoUrl(pet.video_url || null);
     setDialogOpen(true);
   };
 
@@ -268,6 +282,8 @@ const PetsManagement = () => {
     setEditingPet(null);
     setFormData(defaultPet);
     setBirthDate(undefined);
+    setPetImages([]);
+    setPetVideoUrl(null);
     setDialogOpen(true);
   };
 
@@ -483,19 +499,14 @@ const PetsManagement = () => {
                 {/* Media Section */}
                 <div className="space-y-4 p-4 bg-muted/50 rounded-lg border border-border">
                   <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Media</h3>
-                  <ImageUpload
-                    value={formData.image_url || null}
-                    onChange={(url) => setFormData({ ...formData, image_url: url || "" })}
+                  <MultiImageUpload
+                    values={petImages}
+                    onChange={setPetImages}
                   />
-                  <div className="space-y-2">
-                    <Label htmlFor="video_url">Video URL (YouTube, Vimeo, etc.)</Label>
-                    <Input
-                      id="video_url"
-                      value={formData.video_url || ""}
-                      onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
-                      placeholder="https://www.youtube.com/watch?v=..."
-                    />
-                  </div>
+                  <VideoUpload
+                    value={petVideoUrl}
+                    onChange={setPetVideoUrl}
+                  />
                 </div>
 
                 <div className="space-y-2">
