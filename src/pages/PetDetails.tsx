@@ -3,23 +3,17 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Helmet } from "react-helmet-async";
 import {
-  ArrowLeft,
   Calendar,
   Check,
   Heart,
   MapPin,
   Share2,
   Wallet,
-  X,
   Shield,
   Syringe,
   Dna,
   FileCheck,
-  Plane,
-  Car,
-  UserCheck,
   Globe,
-  Clock,
   Play,
   Scale,
 } from "lucide-react";
@@ -29,11 +23,10 @@ import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 import AddOnsSelection from "@/components/cart/AddOnsSelection";
+import TravelOptionsSelector from "@/components/pets/TravelOptionsSelector";
 import { useCart, CartAddOn } from "@/contexts/CartContext";
 import {
   formatPetStatusLabel,
@@ -52,47 +45,20 @@ const PetDetails = () => {
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [selectedShipping, setSelectedShipping] = useState<string>("ground");
   const [selectedAddOns, setSelectedAddOns] = useState<CartAddOn[]>([]);
+  const [travelSelection, setTravelSelection] = useState<{
+    type: "ground" | "air";
+    country: string;
+    countryLabel: string;
+    price: number;
+    flightNanny: boolean;
+    flightNannyPrice: number;
+  } | null>(null);
   const [paymentType, setPaymentType] = useState<"full" | "deposit">("full");
 
-  // Get shipping options from pet data
-  const shippingOptions = useMemo(() => {
-    if (!petRow) return [];
-    return [
-      { 
-        id: "ground", 
-        name: "Ground Transport", 
-        price: petRow.ground_transport_price || 50,
-        description: "Max 500 miles / 12 hours",
-        icon: Car,
-      },
-      { 
-        id: "air_usa", 
-        name: "Air Cargo (USA)", 
-        price: petRow.air_cargo_usa_price || 600,
-        description: "Climate-controlled cabin",
-        icon: Plane,
-      },
-      { 
-        id: "air_canada", 
-        name: "Air Cargo (Canada)", 
-        price: petRow.air_cargo_canada_price || 950,
-        description: "International shipping",
-        icon: Plane,
-      },
-      { 
-        id: "flight_nanny", 
-        name: "Flight Nanny", 
-        price: petRow.flight_nanny_price || 1500,
-        description: "In-cabin with personal escort",
-        icon: UserCheck,
-      },
-    ];
-  }, [petRow]);
-
-  const selectedShippingOption = shippingOptions.find(s => s.id === selectedShipping);
-  const shippingPrice = selectedShippingOption?.price || 0;
+  // Get flight nanny price from pet data
+  const flightNannyBasePrice = petRow?.flight_nanny_price || 500;
+  const shippingPrice = travelSelection ? travelSelection.price + travelSelection.flightNannyPrice : 0;
   const addOnsTotal = selectedAddOns.reduce((sum, a) => sum + a.price, 0);
   const reservationDeposit = pet ? Math.round(pet.fee * 0.3) : 0; // 30% deposit
   const baseAmount = paymentType === "deposit" ? reservationDeposit : (pet?.fee || 0);
@@ -218,10 +184,10 @@ const PetDetails = () => {
       petImage: pet.images[0],
       basePrice: pet.fee,
       addOns: selectedAddOns,
-      shippingMethod: selectedShippingOption ? {
-        id: selectedShippingOption.id,
-        name: selectedShippingOption.name,
-        price: selectedShippingOption.price,
+      shippingMethod: travelSelection ? {
+        id: `${travelSelection.type}_${travelSelection.country}`,
+        name: `${travelSelection.type === "ground" ? "Ground Transport" : "Air Cargo"} to ${travelSelection.countryLabel}${travelSelection.flightNanny ? " + Flight Nanny" : ""}`,
+        price: travelSelection.price + travelSelection.flightNannyPrice,
       } : undefined,
       isReservation: paymentType === "deposit",
       reservationDeposit: reservationDeposit,
@@ -432,49 +398,10 @@ const PetDetails = () => {
                 ) : null}
 
                 {/* Travel Options */}
-                <Card className="border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg flex items-center gap-2 text-blue-700 dark:text-blue-400">
-                      <Plane className="w-5 h-5" />
-                      Travel Options
-                    </CardTitle>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Globe className="w-4 h-4" />
-                      Worldwide shipping available
-                      <span className="flex items-center gap-1 ml-2">
-                        <Clock className="w-4 h-4" />
-                        1-4 weeks
-                      </span>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <RadioGroup value={selectedShipping} onValueChange={setSelectedShipping} className="space-y-2">
-                      {shippingOptions.map((option) => (
-                        <div
-                          key={option.id}
-                          className={`flex items-center justify-between p-3 rounded-lg border transition-colors cursor-pointer ${
-                            selectedShipping === option.id 
-                              ? "border-primary bg-primary/5" 
-                              : "border-border hover:bg-muted/50"
-                          }`}
-                          onClick={() => setSelectedShipping(option.id)}
-                        >
-                          <div className="flex items-center gap-3">
-                            <RadioGroupItem value={option.id} id={option.id} />
-                            <option.icon className="w-5 h-5 text-blue-600" />
-                            <div>
-                              <Label htmlFor={option.id} className="font-medium cursor-pointer">
-                                {option.name}
-                              </Label>
-                              <p className="text-xs text-muted-foreground">{option.description}</p>
-                            </div>
-                          </div>
-                          <span className="font-semibold">{formatPrice(option.price)}</span>
-                        </div>
-                      ))}
-                    </RadioGroup>
-                  </CardContent>
-                </Card>
+                <TravelOptionsSelector
+                  onSelectionChange={setTravelSelection}
+                  flightNannyBasePrice={flightNannyBasePrice}
+                />
 
                 {/* Add-Ons */}
                 {pet && (
@@ -524,8 +451,9 @@ const PetDetails = () => {
                         </div>
                       )}
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Shipping ({selectedShippingOption?.name})</span>
-                        <span>{formatPrice(shippingPrice)}</span>
+                        <span className="text-muted-foreground">
+                          Shipping {travelSelection ? `(${travelSelection.countryLabel})` : ""}
+                        </span>
                       </div>
                       {addOnsTotal > 0 && (
                         <div className="flex justify-between">
