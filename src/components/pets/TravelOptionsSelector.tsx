@@ -184,78 +184,10 @@ const TravelOptionsSelector = ({
   return (
     <Card className="border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20">
       <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2 text-blue-700 dark:text-blue-400">
-            <Plane className="w-5 h-5" />
-            Travel Options
-          </CardTitle>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-xs gap-1.5 h-8 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50"
-              >
-                <Info className="w-3.5 h-3.5" />
-                Domestic Prices
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent 
-              className="w-80 p-0 bg-background border shadow-lg z-50" 
-              align="end"
-              sideOffset={8}
-            >
-              <div className="p-3 border-b bg-muted/50">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold text-sm">Domestic Ground Transport</h4>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Average prices within the same country
-                    </p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 text-xs gap-1"
-                    onClick={handleCopyAllPrices}
-                  >
-                    <Copy className="w-3 h-3" />
-                    Copy All
-                  </Button>
-                </div>
-              </div>
-              <ScrollArea className="h-64">
-                <div className="p-2">
-                  {DOMESTIC_GROUND_PRICES.map((item, index) => (
-                    <div
-                      key={item.country}
-                      className="flex items-center justify-between py-2 px-2 rounded hover:bg-muted/50 group transition-colors"
-                    >
-                      <span className="text-sm">{item.country}</span>
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-primary text-sm">
-                          ${item.price}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => handleCopyPrice(item.country, item.price, index)}
-                        >
-                          {copiedIndex === index ? (
-                            <Check className="w-3 h-3 text-green-500" />
-                          ) : (
-                            <Copy className="w-3 h-3" />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </PopoverContent>
-          </Popover>
-        </div>
+        <CardTitle className="text-lg flex items-center gap-2 text-blue-700 dark:text-blue-400">
+          <Plane className="w-5 h-5" />
+          Travel Options
+        </CardTitle>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Globe className="w-4 h-4" />
           Shipping from USA
@@ -318,6 +250,74 @@ const TravelOptionsSelector = ({
               </div>
             </div>
           </RadioGroup>
+
+          {/* Domestic Ground Transport Prices Info */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs gap-1.5 h-auto py-1.5 px-2 text-muted-foreground hover:text-foreground"
+              >
+                <Info className="w-3.5 h-3.5" />
+                If the pet is located in the same country, view Ground Transport prices
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent 
+              className="w-80 p-0 bg-background border shadow-lg z-50" 
+              align="start"
+              sideOffset={8}
+            >
+              <div className="p-3 border-b bg-muted/50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-semibold text-sm">Domestic Ground Transport</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Average prices within the same country
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 text-xs gap-1"
+                    onClick={handleCopyAllPrices}
+                  >
+                    <Copy className="w-3 h-3" />
+                    Copy All
+                  </Button>
+                </div>
+              </div>
+              <ScrollArea className="h-64">
+                <div className="p-2">
+                  {DOMESTIC_GROUND_PRICES.map((item, index) => (
+                    <div
+                      key={item.country}
+                      className="flex items-center justify-between py-2 px-2 rounded hover:bg-muted/50 group transition-colors"
+                    >
+                      <span className="text-sm">{item.country}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-primary text-sm">
+                          ${item.price}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => handleCopyPrice(item.country, item.price, index)}
+                        >
+                          {copiedIndex === index ? (
+                            <Check className="w-3 h-3 text-green-500" />
+                          ) : (
+                            <Copy className="w-3 h-3" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </PopoverContent>
+          </Popover>
         </div>
 
         {/* Country Selection */}
