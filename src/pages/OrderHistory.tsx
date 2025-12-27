@@ -1,7 +1,7 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { format } from "date-fns";
+import { format, isAfter, isBefore, startOfDay, endOfDay } from "date-fns";
 import {
   Package,
   Clock,
@@ -11,6 +11,10 @@ import {
   Eye,
   Upload,
   ChevronRight,
+  Search,
+  Filter,
+  X,
+  Calendar,
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -18,6 +22,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -66,6 +84,12 @@ const OrderHistory = () => {
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Filter states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
 
   const fetchOrders = useCallback(async () => {
     if (!user?.email) return;
@@ -158,6 +182,48 @@ const OrderHistory = () => {
     return statusConfig[status] || statusConfig.pending;
   };
 
+  // Filter orders based on search and filters
+  const filteredOrders = useMemo(() => {
+    return orders.filter((order) => {
+      // Search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch = 
+          order.pet_name.toLowerCase().includes(query) ||
+          order.id.toLowerCase().includes(query);
+        if (!matchesSearch) return false;
+      }
+
+      // Status filter
+      if (statusFilter !== "all" && order.status !== statusFilter) {
+        return false;
+      }
+
+      // Date from filter
+      if (dateFrom) {
+        const orderDate = new Date(order.created_at);
+        if (isBefore(orderDate, startOfDay(dateFrom))) return false;
+      }
+
+      // Date to filter
+      if (dateTo) {
+        const orderDate = new Date(order.created_at);
+        if (isAfter(orderDate, endOfDay(dateTo))) return false;
+      }
+
+      return true;
+    });
+  }, [orders, searchQuery, statusFilter, dateFrom, dateTo]);
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setStatusFilter("all");
+    setDateFrom(undefined);
+    setDateTo(undefined);
+  };
+
+  const hasActiveFilters = searchQuery || statusFilter !== "all" || dateFrom || dateTo;
+
   return (
     <>
       <Helmet>
@@ -173,6 +239,95 @@ const OrderHistory = () => {
               Track your adoption requests and payment status
             </p>
           </div>
+
+          {/* Filters */}
+          {orders.length > 0 && (
+            <Card className="mb-6">
+              <CardContent className="p-4">
+                <div className="flex flex-col gap-4">
+                  {/* Search */}
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search by pet name or order ID..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-9"
+                    />
+                  </div>
+
+                  <div className="flex flex-wrap gap-3">
+                    {/* Status Filter */}
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="w-[160px]">
+                        <Filter className="h-4 w-4 mr-2" />
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Statuses</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="confirmed">Confirmed</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="rejected">Rejected</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    {/* Date From */}
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="w-[140px] justify-start text-left font-normal">
+                          <Calendar className="mr-2 h-4 w-4" />
+                          {dateFrom ? format(dateFrom, "MMM d, yy") : "From"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <CalendarComponent
+                          mode="single"
+                          selected={dateFrom}
+                          onSelect={setDateFrom}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+
+                    {/* Date To */}
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="w-[140px] justify-start text-left font-normal">
+                          <Calendar className="mr-2 h-4 w-4" />
+                          {dateTo ? format(dateTo, "MMM d, yy") : "To"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <CalendarComponent
+                          mode="single"
+                          selected={dateTo}
+                          onSelect={setDateTo}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+
+                    {/* Clear Filters */}
+                    {hasActiveFilters && (
+                      <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground">
+                        <X className="h-4 w-4 mr-1" />
+                        Clear
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Results count */}
+                  {hasActiveFilters && (
+                    <p className="text-sm text-muted-foreground">
+                      Showing {filteredOrders.length} of {orders.length} orders
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {isLoading ? (
             <div className="space-y-4">
@@ -204,9 +359,22 @@ const OrderHistory = () => {
                 </Button>
               </CardContent>
             </Card>
+          ) : filteredOrders.length === 0 ? (
+            <Card className="text-center py-12">
+              <CardContent>
+                <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <h2 className="font-display text-xl font-bold mb-2">No matching orders</h2>
+                <p className="text-muted-foreground mb-4">
+                  Try adjusting your filters or search query
+                </p>
+                <Button variant="outline" onClick={clearFilters} className="rounded-full">
+                  Clear Filters
+                </Button>
+              </CardContent>
+            </Card>
           ) : (
             <div className="space-y-4">
-              {orders.map((order) => {
+              {filteredOrders.map((order) => {
                 const statusInfo = getStatusInfo(order.status);
                 const StatusIcon = statusInfo.icon;
 
