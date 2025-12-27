@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, Heart, User, LogOut, Settings } from "lucide-react";
+import { Menu, X, Heart, User, LogOut, Settings, ChevronDown, Cat, Dog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import CurrencySelector from "@/components/cart/CurrencySelector";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,6 +24,18 @@ const Navbar = () => {
     { name: "Foster", path: "/foster" },
     { name: "Donate", path: "/donate" },
     { name: "About", path: "/about" },
+  ];
+
+  const breedLinks = [
+    { name: "Cat Breeds", path: "/cat-breeds", icon: Cat },
+    { name: "Dog Breeds", path: "/dog-breeds", icon: Dog },
+  ];
+
+  const moreLinks = [
+    { name: "Delivery Options", path: "/delivery-options" },
+    { name: "Health Guarantee", path: "/health-guarantee" },
+    { name: "Emotional Support", path: "/emotional-support" },
+    { name: "Contact", path: "/contact" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -41,7 +60,7 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-6">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
@@ -55,10 +74,42 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
+            
+            {/* Breeds Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 font-body font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Breeds <ChevronDown className="w-4 h-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center">
+                {breedLinks.map((link) => (
+                  <DropdownMenuItem key={link.path} asChild>
+                    <Link to={link.path} className="flex items-center gap-2">
+                      <link.icon className="w-4 h-4" />
+                      {link.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* More Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 font-body font-medium text-muted-foreground hover:text-foreground transition-colors">
+                More <ChevronDown className="w-4 h-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center">
+                {moreLinks.map((link) => (
+                  <DropdownMenuItem key={link.path} asChild>
+                    <Link to={link.path}>{link.name}</Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-2">
+            <CurrencySelector />
             <ThemeToggle />
             {user ? (
               <>
@@ -87,14 +138,14 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors"
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
 
         {isOpen && (
-          <div className="md:hidden py-4 border-t border-border animate-fade-in">
+          <div className="lg:hidden py-4 border-t border-border animate-fade-in max-h-[80vh] overflow-y-auto">
             <div className="flex flex-col gap-4">
               {navLinks.map((link) => (
                 <Link
@@ -110,6 +161,40 @@ const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
+              
+              <div className="border-t border-border pt-4 mt-2">
+                <p className="text-xs text-muted-foreground uppercase mb-2">Breeds</p>
+                {breedLinks.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-2 font-body font-medium py-2 text-muted-foreground hover:text-foreground"
+                  >
+                    <link.icon className="w-4 h-4" />
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
+
+              <div className="border-t border-border pt-4 mt-2">
+                <p className="text-xs text-muted-foreground uppercase mb-2">More</p>
+                {moreLinks.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    onClick={() => setIsOpen(false)}
+                    className="font-body font-medium py-2 block text-muted-foreground hover:text-foreground"
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-between py-2 border-t border-border mt-2 pt-4">
+                <span className="font-body font-medium text-muted-foreground">Currency</span>
+                <CurrencySelector />
+              </div>
               <div className="flex items-center justify-between py-2">
                 <span className="font-body font-medium text-muted-foreground">Theme</span>
                 <ThemeToggle />
