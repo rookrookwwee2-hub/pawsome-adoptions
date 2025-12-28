@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 interface PetImageSectionProps {
   variant?: "single" | "dual" | "triple";
@@ -76,16 +76,29 @@ const getImagesForVariant = (variant: string, seed: number) => {
 
 const PetImageSection = ({ variant = "single", className = "" }: PetImageSectionProps) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [parallaxOffset, setParallaxOffset] = useState(0);
   const sectionRef = useRef<HTMLDivElement>(null);
   const [seed] = useState(() => Math.random() * 1000);
   const images = getImagesForVariant(variant, seed);
+
+  const handleScroll = useCallback(() => {
+    if (!sectionRef.current) return;
+    
+    const rect = sectionRef.current.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    const elementCenter = rect.top + rect.height / 2;
+    const viewportCenter = windowHeight / 2;
+    
+    // Calculate offset based on element position relative to viewport center
+    const offset = (viewportCenter - elementCenter) * 0.15;
+    setParallaxOffset(Math.max(-30, Math.min(30, offset)));
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
-          observer.disconnect();
         }
       },
       { threshold: 0.1, rootMargin: "50px" }
@@ -95,8 +108,15 @@ const PetImageSection = ({ variant = "single", className = "" }: PetImageSection
       observer.observe(sectionRef.current);
     }
 
-    return () => observer.disconnect();
-  }, []);
+    // Add scroll listener for parallax
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll(); // Initial calculation
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [handleScroll]);
 
   const getGridClass = () => {
     switch (variant) {
@@ -110,7 +130,7 @@ const PetImageSection = ({ variant = "single", className = "" }: PetImageSection
   };
 
   return (
-    <section ref={sectionRef} className={`py-12 ${className}`}>
+    <section ref={sectionRef} className={`py-12 overflow-hidden ${className}`}>
       <div className="container-custom">
         <div className={`grid ${getGridClass()} gap-6`}>
           {images.map((image, index) => (
@@ -124,7 +144,9 @@ const PetImageSection = ({ variant = "single", className = "" }: PetImageSection
                   : "opacity-0 translate-y-8"
                 }
               `}
-              style={{ transitionDelay: `${index * 150}ms` }}
+              style={{ 
+                transitionDelay: `${index * 150}ms`,
+              }}
             >
               <div className="aspect-[4/3] overflow-hidden">
                 <img
@@ -132,6 +154,10 @@ const PetImageSection = ({ variant = "single", className = "" }: PetImageSection
                   alt={image.alt}
                   loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-105"
+                  style={{ 
+                    transform: `translateY(${parallaxOffset * (index % 2 === 0 ? 1 : -0.7)}px) scale(1.1)`,
+                    transition: "transform 0.1s ease-out"
+                  }}
                 />
               </div>
               {/* Subtle gradient overlay */}
