@@ -15,6 +15,7 @@ import { Home, Loader2, CheckCircle, Heart, Users, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import PetImageSection from "@/components/shared/PetImageSection";
 
 const fosterSchema = z.object({
   applicant_name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
@@ -171,6 +172,8 @@ const Foster = () => {
                 </CardContent>
               </Card>
             </div>
+
+            <PetImageSection variant="dual" className="py-8" />
 
             {/* Application Form */}
             <Card>

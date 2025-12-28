@@ -13,6 +13,7 @@ import { Heart, Upload, Loader2, CheckCircle, Building2, CreditCard, Copy, Globe
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import PetImageSection from "@/components/shared/PetImageSection";
 
 const donationSchema = z.object({
   donor_name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
@@ -207,6 +208,8 @@ const Donate = () => {
                 Your generosity helps us rescue, rehabilitate, and rehome pets in need. Every contribution makes a difference.
               </p>
             </div>
+
+            <PetImageSection variant="single" className="py-8" />
 
             <div className="grid md:grid-cols-2 gap-8">
               {/* Bank Details */}

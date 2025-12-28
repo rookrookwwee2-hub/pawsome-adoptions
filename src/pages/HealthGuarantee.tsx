@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import PetImageSection from "@/components/shared/PetImageSection";
 
 const guarantees = [
   {
@@ -122,6 +123,8 @@ const HealthGuarantee = () => {
             </div>
           </section>
 
+          <PetImageSection variant="dual" />
+
           {/* Health Checklist */}
           <section className="py-16 bg-accent/30">
             <div className="container-custom">
@@ -146,6 +149,8 @@ const HealthGuarantee = () => {
               </div>
             </div>
           </section>
+
+          <PetImageSection variant="single" className="bg-muted/20" />
 
           {/* Optional Plans */}
           <section className="py-16">

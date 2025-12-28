@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import PetImageSection from "@/components/shared/PetImageSection";
 
 const deliveryOptions = [
   {
@@ -137,6 +138,8 @@ const DeliveryOptions = () => {
             </div>
           </section>
 
+          <PetImageSection variant="dual" />
+
           {/* Safety Note */}
           <section className="py-12 bg-accent/30">
             <div className="container-custom">
@@ -149,6 +152,8 @@ const DeliveryOptions = () => {
               </div>
             </div>
           </section>
+
+          <PetImageSection variant="single" className="bg-muted/20" />
         </main>
         <Footer />
       </div>
