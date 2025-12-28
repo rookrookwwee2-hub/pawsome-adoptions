@@ -1,19 +1,19 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Search, Eye, Check, X, Download, FileText, Clock, CheckCircle, XCircle } from "lucide-react";
+import { Search, Eye, Check, X, Download, FileText, Clock, CheckCircle, XCircle, Trash2 } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-
 interface PaymentProof {
   id: string;
   guest_name: string;
@@ -38,6 +38,7 @@ const PaymentProofsManagement = () => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedProof, setSelectedProof] = useState<PaymentProof | null>(null);
   const [adminNotes, setAdminNotes] = useState("");
+  const [deleteProofId, setDeleteProofId] = useState<string | null>(null);
 
   const { data: proofs = [], isLoading } = useQuery({
     queryKey: ["payment-proofs", statusFilter],
@@ -72,6 +73,24 @@ const PaymentProofsManagement = () => {
     },
     onError: (error: any) => {
       toast.error("Failed to update status", { description: error.message });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("payment_proofs")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["payment-proofs"] });
+      toast.success("Payment proof deleted successfully");
+      setDeleteProofId(null);
+    },
+    onError: (error: any) => {
+      toast.error("Failed to delete payment proof", { description: error.message });
     },
   });
 
@@ -225,6 +244,13 @@ const PaymentProofsManagement = () => {
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => setDeleteProofId(proof.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -323,6 +349,27 @@ const PaymentProofsManagement = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!deleteProofId} onOpenChange={() => setDeleteProofId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Payment Proof</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this payment proof? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => deleteProofId && deleteMutation.mutate(deleteProofId)}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 };
