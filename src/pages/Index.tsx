@@ -8,6 +8,7 @@ import TrustSection from "@/components/home/TrustSection";
 import Testimonials from "@/components/home/Testimonials";
 import CallToAction from "@/components/home/CallToAction";
 import NewsletterSignup from "@/components/home/NewsletterSignup";
+import PetImageSection from "@/components/shared/PetImageSection";
 
 const Index = () => {
   return (
@@ -30,8 +31,11 @@ const Index = () => {
         <main>
           <Hero />
           <FeaturedPets />
+          <PetImageSection variant="dual" />
           <TrustSection />
+          <PetImageSection variant="single" className="bg-muted/30" />
           <AdoptionJourney />
+          <PetImageSection variant="triple" />
           <Testimonials />
           <NewsletterSignup />
           <CallToAction />

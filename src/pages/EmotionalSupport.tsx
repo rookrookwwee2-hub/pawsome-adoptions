@@ -4,6 +4,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import { Card, CardContent } from "@/components/ui/card";
+import PetImageSection from "@/components/shared/PetImageSection";
 
 const benefits = [
   {
@@ -102,6 +103,8 @@ const EmotionalSupport = () => {
             </div>
           </section>
 
+          <PetImageSection variant="dual" />
+
           {/* Statistics Section */}
           <section className="py-16 bg-primary/5">
             <div className="container-custom">
@@ -129,6 +132,8 @@ const EmotionalSupport = () => {
               </div>
             </div>
           </section>
+
+          <PetImageSection variant="single" className="bg-muted/20" />
 
           {/* Testimonial */}
           <section className="py-16">
