@@ -19,6 +19,7 @@ import {
   Shield,
   CreditCard,
 } from "lucide-react";
+import PayPalCheckout from "@/components/checkout/PayPalCheckout";
 import PaymentSuggestionDialog from "@/components/checkout/PaymentSuggestionDialog";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -632,20 +633,65 @@ const Checkout = () => {
                           </p>
                         </div>
                       </div>
-                    ) : selectedPaymentMethod === "paypal" ? (
+                    ) : selectedPaymentMethod === "paypal" && isPayPalEnabled ? (
                       <div className="space-y-4">
-                        <div className="p-4 border rounded-xl space-y-3">
+                        <div className="p-4 border rounded-xl space-y-4">
                           <div className="flex items-center gap-2 mb-3 pb-3 border-b">
                             <CreditCard className="h-5 w-5 text-primary" />
-                            <span className="font-medium">PayPal Payment</span>
+                            <span className="font-medium">Pay with PayPal</span>
                           </div>
-                          <p className="text-sm text-muted-foreground">
-                            You will be redirected to PayPal to complete your payment securely. 
-                            After payment, you'll be returned to this site.
+                          <p className="text-sm text-muted-foreground mb-4">
+                            Click the PayPal button below to complete your payment securely. 
+                            You can pay with your PayPal account or a credit/debit card.
                           </p>
-                          {paypalSettings?.email && (
-                            <CopyableDetail label="PayPal Email" value={paypalSettings.email} />
-                          )}
+                          
+                          <PayPalCheckout
+                            clientId={paypalSettings?.clientId || ""}
+                            amount={subtotal}
+                            currency={paypalSettings?.currency || "USD"}
+                            mode={paypalSettings?.mode || "sandbox"}
+                            onSuccess={async (orderId, payerId) => {
+                              // Create guest payment record with PayPal order ID
+                              setIsSubmitting(true);
+                              try {
+                                const values = form.getValues();
+                                for (const item of items) {
+                                  const { error } = await supabase.from("guest_payments").insert({
+                                    pet_id: item.petId,
+                                    guest_name: values.name,
+                                    guest_email: values.email,
+                                    guest_phone: values.phone || null,
+                                    guest_address: values.address || null,
+                                    amount: item.isReservation && item.reservationDeposit
+                                      ? item.reservationDeposit
+                                      : item.basePrice + item.addOns.reduce((sum, a) => sum + a.price, 0) + (item.shippingMethod?.price || 0),
+                                    transaction_hash: orderId,
+                                    wallet_address: `PayPal (Payer: ${payerId})`,
+                                    message: values.message || null,
+                                    status: "completed",
+                                  });
+
+                                  if (error) throw error;
+                                }
+
+                                setStep("confirmation");
+                                toast.success("Payment completed successfully!", {
+                                  description: "Your PayPal payment has been processed.",
+                                });
+                              } catch (error) {
+                                console.error("Error saving PayPal payment:", error);
+                                toast.error("Payment received but failed to save order. Please contact support.");
+                              } finally {
+                                setIsSubmitting(false);
+                              }
+                            }}
+                            onError={(error) => {
+                              console.error("PayPal payment error:", error);
+                            }}
+                            onCancel={() => {
+                              console.log("PayPal payment cancelled");
+                            }}
+                          />
                         </div>
                         <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
                           <p className="text-sm text-primary font-medium">
@@ -692,21 +738,23 @@ const Checkout = () => {
                         <ArrowLeft className="h-4 w-4 mr-2" />
                         Back
                       </Button>
-                      <Button
-                        type="button"
-                        className="flex-1 rounded-full"
-                        onClick={handlePaymentConfirm}
-                        disabled={isSubmitting}
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Processing...
-                          </>
-                        ) : (
-                          "I've Made the Payment"
-                        )}
-                      </Button>
+                      {selectedPaymentMethod !== "paypal" && (
+                        <Button
+                          type="button"
+                          className="flex-1 rounded-full"
+                          onClick={handlePaymentConfirm}
+                          disabled={isSubmitting}
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Processing...
+                            </>
+                          ) : (
+                            "I've Made the Payment"
+                          )}
+                        </Button>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
