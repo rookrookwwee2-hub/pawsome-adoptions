@@ -11,7 +11,8 @@ import {
   Heart,
   Wallet,
   Receipt,
-  Settings
+  Settings,
+  BarChart3
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -30,6 +31,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
 
   const navItems = [
     { name: "Dashboard", path: "/admin", icon: LayoutDashboard },
+    { name: "Analytics", path: "/admin/analytics", icon: BarChart3 },
     { name: "Pets", path: "/admin/pets", icon: PawPrint },
     { name: "Adoptions", path: "/admin/adoptions", icon: FileText },
     { name: "Crypto Payments", path: "/admin/payments", icon: Wallet },
