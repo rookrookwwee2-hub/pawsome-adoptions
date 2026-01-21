@@ -80,7 +80,7 @@ const PaymentSuggestionDialog = ({ defaultEmail = "" }: PaymentSuggestionDialogP
           <div className="flex-1">
             <p className="font-medium">Suggest a Payment Method</p>
             <p className="text-sm text-muted-foreground">
-              Don't see your preferred option?
+              e.g., PayPal, Zelle, Cash App...
             </p>
           </div>
         </div>
