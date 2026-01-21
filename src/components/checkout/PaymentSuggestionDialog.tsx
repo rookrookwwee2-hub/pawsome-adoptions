@@ -3,7 +3,7 @@ import { MessageSquarePlus, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { Label as FormLabel } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -73,13 +73,17 @@ const PaymentSuggestionDialog = ({ defaultEmail = "" }: PaymentSuggestionDialogP
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button
-          type="button"
-          className="flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors mt-3"
+        <div
+          className="flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-all hover:border-primary/50"
         >
-          <MessageSquarePlus className="h-4 w-4" />
-          <span className="underline underline-offset-2">Suggest a Payment Method</span>
-        </button>
+          <MessageSquarePlus className="h-5 w-5 text-primary" />
+          <div className="flex-1">
+            <p className="font-medium">Suggest a Payment Method</p>
+            <p className="text-sm text-muted-foreground">
+              Don't see your preferred option?
+            </p>
+          </div>
+        </div>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
@@ -93,7 +97,7 @@ const PaymentSuggestionDialog = ({ defaultEmail = "" }: PaymentSuggestionDialogP
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div className="space-y-2">
-            <Label htmlFor="suggestion-email">Your Email *</Label>
+            <FormLabel htmlFor="suggestion-email">Your Email *</FormLabel>
             <Input
               id="suggestion-email"
               type="email"
@@ -104,7 +108,7 @@ const PaymentSuggestionDialog = ({ defaultEmail = "" }: PaymentSuggestionDialogP
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="suggested-method">Payment Method *</Label>
+            <FormLabel htmlFor="suggested-method">Payment Method *</FormLabel>
             <Input
               id="suggested-method"
               type="text"
@@ -115,7 +119,7 @@ const PaymentSuggestionDialog = ({ defaultEmail = "" }: PaymentSuggestionDialogP
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="suggestion-message">Additional Details (Optional)</Label>
+            <FormLabel htmlFor="suggestion-message">Additional Details (Optional)</FormLabel>
             <Textarea
               id="suggestion-message"
               placeholder="Any additional information..."
