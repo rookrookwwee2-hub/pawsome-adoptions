@@ -9,7 +9,6 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useState, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -275,17 +274,14 @@ const PaymentMethods = () => {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="suggested-method">Payment Method *</Label>
-                        <Select value={suggestedMethod} onValueChange={setSuggestedMethod}>
-                          <SelectTrigger id="suggested-method">
-                            <SelectValue placeholder="Select a payment method..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="USDT (Tether) TRC20 Network">USDT (Tether) TRC20 Network – Fast & Low Fees</SelectItem>
-                            <SelectItem value="UK Local Bank Transfer (GBP)">UK Local Bank Transfer – BACS / Faster Payments (GBP)</SelectItem>
-                            <SelectItem value="USA Local Bank Transfer (USD)">USA Local Bank Transfer – ACH / Wire (USD)</SelectItem>
-                            <SelectItem value="Eurozone SEPA Bank Transfer (EUR)">Eurozone SEPA Bank Transfer – SEPA (EUR)</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <Input
+                          id="suggested-method"
+                          type="text"
+                          placeholder="e.g., PayPal, Zelle, Cash App..."
+                          value={suggestedMethod}
+                          onChange={(e) => setSuggestedMethod(e.target.value)}
+                          required
+                        />
                       </div>
                     </div>
                     <div className="space-y-2">
