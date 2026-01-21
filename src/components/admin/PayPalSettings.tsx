@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Save, Loader2, CreditCard, Eye, EyeOff, CheckCircle2, XCircle, RefreshCw } from "lucide-react";
+import { Save, Loader2, CreditCard, Eye, EyeOff, CheckCircle2, XCircle, RefreshCw, Copy, Check, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast as sonnerToast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -15,6 +16,57 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { PayPalSettings as PayPalSettingsType } from "@/hooks/usePaymentSettings";
+
+const WebhookUrlSection = () => {
+  const [copied, setCopied] = useState(false);
+  const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/paypal-webhook`;
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(webhookUrl);
+    setCopied(true);
+    sonnerToast.success("Webhook URL copied!");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="space-y-2 p-4 border rounded-xl bg-muted/30">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-medium">Webhook URL</Label>
+        <a
+          href="https://developer.paypal.com/dashboard/applications"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-primary hover:underline flex items-center gap-1"
+        >
+          PayPal Developer Dashboard
+          <ExternalLink className="h-3 w-3" />
+        </a>
+      </div>
+      <div className="flex items-center gap-2">
+        <Input
+          value={webhookUrl}
+          readOnly
+          className="font-mono text-xs bg-background"
+        />
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleCopy}
+          className="shrink-0"
+        >
+          {copied ? (
+            <Check className="h-4 w-4 text-green-500" />
+          ) : (
+            <Copy className="h-4 w-4" />
+          )}
+        </Button>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Add this URL in your PayPal Developer Dashboard under Webhooks. Subscribe to: <code className="bg-muted px-1 rounded">PAYMENT.CAPTURE.COMPLETED</code>, <code className="bg-muted px-1 rounded">PAYMENT.CAPTURE.DENIED</code>, <code className="bg-muted px-1 rounded">PAYMENT.CAPTURE.REFUNDED</code>
+      </p>
+    </div>
+  );
+};
 
 const PayPalSettingsComponent = () => {
   const [settings, setSettings] = useState<PayPalSettingsType>({
@@ -269,6 +321,9 @@ const PayPalSettingsComponent = () => {
             </div>
           )}
         </div>
+
+        {/* Webhook URL Section */}
+        <WebhookUrlSection />
 
         {settings.mode === "sandbox" && (
           <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
