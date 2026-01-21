@@ -75,17 +75,27 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-6">
             {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.path}
-                className={`font-body font-medium transition-colors link-underline ${
-                  isActive(link.path)
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {link.name}
-              </Link>
+              link.name === "Reviews" ? (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className="font-body font-medium px-3 py-1.5 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors"
+                >
+                  {link.name}
+                </Link>
+              ) : (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className={`font-body font-medium transition-colors link-underline ${
+                    isActive(link.path)
+                      ? "text-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              )
             ))}
             
             {/* Breeds Dropdown */}
