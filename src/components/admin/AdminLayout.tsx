@@ -34,6 +34,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     { name: "Adoptions", path: "/admin/adoptions", icon: FileText },
     { name: "Crypto Payments", path: "/admin/payments", icon: Wallet },
     { name: "Bank Proofs", path: "/admin/payment-proofs", icon: Receipt },
+    { name: "Payment Suggestions", path: "/admin/payment-suggestions", icon: Heart },
     { name: "Users", path: "/admin/users", icon: Users },
     { name: "Settings", path: "/admin/settings", icon: Settings },
   ];
