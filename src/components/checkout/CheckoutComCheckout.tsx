@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { Loader2, CreditCard, Lock } from "lucide-react";
+import { Loader2, CreditCard, Lock, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -21,6 +22,7 @@ declare global {
         publicKey: string;
         style?: Record<string, unknown>;
         localization?: Record<string, string>;
+        modes?: string[];
       }) => void;
       addEventHandler: (
         event: string,
@@ -29,10 +31,12 @@ declare global {
           isElementValid?: boolean;
           token?: string;
           scheme?: string;
+          isPaymentRequestAvailable?: boolean;
         }) => void
       ) => void;
       submitCard: () => Promise<{ token: string; scheme: string }>;
       isCardValid: () => boolean;
+      enableSubmitForm: () => void;
     };
   }
 }
@@ -50,6 +54,7 @@ const CheckoutComCheckout = ({
   const [framesReady, setFramesReady] = useState(false);
   const [cardValid, setCardValid] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [paymentRequestAvailable, setPaymentRequestAvailable] = useState(false);
 
   // Load Frames SDK
   useEffect(() => {
@@ -83,6 +88,7 @@ const CheckoutComCheckout = ({
       try {
         window.Frames.init({
           publicKey,
+          modes: ["cvv_optional"],
           style: {
             base: {
               fontSize: "16px",
@@ -125,6 +131,13 @@ const CheckoutComCheckout = ({
           setIsProcessing(false);
         });
 
+        // Check if Apple Pay / Google Pay is available
+        window.Frames.addEventHandler("paymentMethodChanged", (event) => {
+          if (event.isPaymentRequestAvailable) {
+            setPaymentRequestAvailable(true);
+          }
+        });
+
         // Fallback in case frameActivated doesn't fire
         setTimeout(() => {
           if (!framesReady) {
@@ -132,10 +145,38 @@ const CheckoutComCheckout = ({
             setIsLoading(false);
           }
         }, 2000);
+
+        // Check for Payment Request API support (Apple Pay / Google Pay)
+        if (window.PaymentRequest) {
+          checkPaymentRequestAvailability();
+        }
       } catch (err) {
         console.error("Error initializing Frames:", err);
         setError("Failed to initialize payment form");
         setIsLoading(false);
+      }
+    };
+
+    const checkPaymentRequestAvailability = async () => {
+      try {
+        const supportedMethods = [
+          { supportedMethods: "https://apple.com/apple-pay" },
+          { supportedMethods: "https://google.com/pay" },
+        ];
+        
+        const details = {
+          total: {
+            label: "Total",
+            amount: { currency: currency.toUpperCase(), value: amount.toFixed(2) },
+          },
+        };
+
+        const request = new PaymentRequest(supportedMethods, details);
+        const canMakePayment = await request.canMakePayment();
+        setPaymentRequestAvailable(canMakePayment);
+      } catch {
+        // Payment Request API not fully supported
+        setPaymentRequestAvailable(false);
       }
     };
 
@@ -144,9 +185,115 @@ const CheckoutComCheckout = ({
     return () => {
       // Cleanup if needed
     };
-  }, [publicKey]);
+  }, [publicKey, amount, currency]);
 
-  const handleSubmit = useCallback(async () => {
+  const handleDigitalWalletPayment = useCallback(async () => {
+    if (isProcessing) return;
+
+    setIsProcessing(true);
+    setError(null);
+
+    try {
+      // Use Payment Request API for Apple Pay / Google Pay
+      const supportedMethods = [
+        {
+          supportedMethods: "https://apple.com/apple-pay",
+          data: {
+            version: 3,
+            merchantIdentifier: "merchant.com.checkout",
+            merchantCapabilities: ["supports3DS"],
+            supportedNetworks: ["visa", "masterCard", "amex"],
+            countryCode: "US",
+          },
+        },
+        {
+          supportedMethods: "https://google.com/pay",
+          data: {
+            environment: publicKey.includes("sbox") ? "TEST" : "PRODUCTION",
+            apiVersion: 2,
+            apiVersionMinor: 0,
+            allowedPaymentMethods: [
+              {
+                type: "CARD",
+                parameters: {
+                  allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
+                  allowedCardNetworks: ["VISA", "MASTERCARD", "AMEX"],
+                },
+                tokenizationSpecification: {
+                  type: "PAYMENT_GATEWAY",
+                  parameters: {
+                    gateway: "checkoutltd",
+                    gatewayMerchantId: publicKey,
+                  },
+                },
+              },
+            ],
+            merchantInfo: {
+              merchantName: "Petopia",
+            },
+          },
+        },
+      ];
+
+      const details = {
+        total: {
+          label: "Petopia",
+          amount: { currency: currency.toUpperCase(), value: amount.toFixed(2) },
+        },
+      };
+
+      const request = new PaymentRequest(supportedMethods, details);
+      const response = await request.show();
+
+      // Get the payment token from the response
+      const paymentData = response.details;
+
+      // Create payment session via edge function with wallet token
+      const { data: sessionData, error: sessionError } = await supabase.functions.invoke(
+        "create-checkoutcom-session",
+        {
+          body: {
+            amount,
+            currency,
+            metadata: {
+              ...metadata,
+              wallet_type: response.methodName.includes("apple") ? "apple_pay" : "google_pay",
+              wallet_token: JSON.stringify(paymentData),
+            },
+          },
+        }
+      );
+
+      await response.complete("success");
+
+      if (sessionError) throw sessionError;
+
+      if (sessionData?.error) {
+        throw new Error(sessionData.error);
+      }
+
+      if (sessionData?.sessionId) {
+        onSuccess(sessionData.sessionId);
+        toast.success("Payment completed successfully!", {
+          description: "Your payment has been processed.",
+        });
+      }
+    } catch (err) {
+      console.error("Digital wallet payment error:", err);
+      if ((err as Error).name !== "AbortError") {
+        const errorMessage = err instanceof Error ? err.message : "Payment failed";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        if (onError) {
+          onError(err as Error);
+        }
+      }
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [amount, currency, metadata, onSuccess, onError, isProcessing, publicKey]);
+
+  const handleCardSubmit = useCallback(async () => {
     if (!window.Frames || isProcessing) return;
 
     setIsProcessing(true);
@@ -189,7 +336,6 @@ const CheckoutComCheckout = ({
       }
 
       // If we got a session ID, we can consider it successful for now
-      // The actual payment completion will be handled by webhook
       if (sessionData?.sessionId) {
         onSuccess(sessionData.sessionId);
         toast.success("Payment initiated successfully!", {
@@ -231,6 +377,39 @@ const CheckoutComCheckout = ({
 
   return (
     <div className="space-y-4">
+      {/* Apple Pay / Google Pay Buttons */}
+      {paymentRequestAvailable && (
+        <>
+          <div className="space-y-3">
+            <Button
+              type="button"
+              onClick={handleDigitalWalletPayment}
+              disabled={isProcessing}
+              variant="outline"
+              className="w-full h-12 bg-black text-white hover:bg-gray-800 border-0"
+            >
+              {isProcessing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <Smartphone className="h-5 w-5 mr-2" />
+                  <span className="font-medium">Pay with Apple Pay / Google Pay</span>
+                </>
+              )}
+            </Button>
+            <p className="text-xs text-center text-muted-foreground">
+              Fast, secure payment with your digital wallet
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Separator className="flex-1" />
+            <span className="text-xs text-muted-foreground">or pay with card</span>
+            <Separator className="flex-1" />
+          </div>
+        </>
+      )}
+
       {/* Card Input Frame */}
       <div className="space-y-3">
         <div className="space-y-2">
@@ -272,7 +451,7 @@ const CheckoutComCheckout = ({
 
       <Button
         type="button"
-        onClick={handleSubmit}
+        onClick={handleCardSubmit}
         disabled={isProcessing || !cardValid}
         className="w-full"
         size="lg"
