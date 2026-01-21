@@ -10,7 +10,8 @@ import {
   LogOut,
   Heart,
   Wallet,
-  Receipt
+  Receipt,
+  Settings
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -34,6 +35,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     { name: "Crypto Payments", path: "/admin/payments", icon: Wallet },
     { name: "Bank Proofs", path: "/admin/payment-proofs", icon: Receipt },
     { name: "Users", path: "/admin/users", icon: Users },
+    { name: "Settings", path: "/admin/settings", icon: Settings },
   ];
 
   const isActive = (path: string) => location.pathname === path;

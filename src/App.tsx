@@ -28,6 +28,7 @@ import Donate from "./pages/Donate";
 import Foster from "./pages/Foster";
 import DonationsManagement from "./pages/admin/DonationsManagement";
 import FosterManagement from "./pages/admin/FosterManagement";
+import SettingsManagement from "./pages/admin/SettingsManagement";
 import NotFound from "./pages/NotFound";
 import CatBreeds from "./pages/CatBreeds";
 import DogBreeds from "./pages/DogBreeds";
@@ -78,6 +79,7 @@ const App = () => (
                   <Route path="/admin/payment-proofs" element={<ProtectedRoute requireAdmin><PaymentProofsManagement /></ProtectedRoute>} />
                   <Route path="/admin/donations" element={<ProtectedRoute requireAdmin><DonationsManagement /></ProtectedRoute>} />
                   <Route path="/admin/foster" element={<ProtectedRoute requireAdmin><FosterManagement /></ProtectedRoute>} />
+                  <Route path="/admin/settings" element={<ProtectedRoute requireAdmin><SettingsManagement /></ProtectedRoute>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <CookieConsent />
