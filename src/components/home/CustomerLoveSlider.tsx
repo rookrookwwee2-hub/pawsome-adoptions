@@ -148,7 +148,7 @@ const CustomerLoveSlider = () => {
 
         {/* See All Reviews Button */}
         <div className="text-center mt-12">
-          <Button asChild variant="outline" size="lg" className="border-background/30 text-background hover:bg-background/10">
+          <Button asChild size="lg" className="bg-green-500 text-white hover:bg-green-600 border-0">
             <Link to="/reviews">See All Reviews →</Link>
           </Button>
         </div>
