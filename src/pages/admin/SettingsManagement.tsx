@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import PayPalSettings from "@/components/admin/PayPalSettings";
+import StripeSettings from "@/components/admin/StripeSettings";
 import ApiSecretsManager from "@/components/admin/ApiSecretsManager";
 
 interface UsdtSettings {
@@ -237,7 +238,7 @@ const SettingsManagement = () => {
         </div>
 
         <Tabs defaultValue="usdt" className="space-y-6">
-          <TabsList className="grid w-full max-w-3xl grid-cols-5">
+          <TabsList className="grid w-full max-w-4xl grid-cols-6">
             <TabsTrigger value="usdt" className="flex items-center gap-2">
               <Wallet className="w-4 h-4" />
               USDT
@@ -249,6 +250,10 @@ const SettingsManagement = () => {
             <TabsTrigger value="paypal" className="flex items-center gap-2">
               <CreditCard className="w-4 h-4" />
               PayPal
+            </TabsTrigger>
+            <TabsTrigger value="stripe" className="flex items-center gap-2">
+              <CreditCard className="w-4 h-4" />
+              Stripe
             </TabsTrigger>
             <TabsTrigger value="api-keys" className="flex items-center gap-2">
               <Key className="w-4 h-4" />
@@ -427,6 +432,11 @@ const SettingsManagement = () => {
           {/* PayPal Settings */}
           <TabsContent value="paypal">
             <PayPalSettings />
+          </TabsContent>
+
+          {/* Stripe Settings */}
+          <TabsContent value="stripe">
+            <StripeSettings />
           </TabsContent>
 
           {/* API Keys & Secrets */}
