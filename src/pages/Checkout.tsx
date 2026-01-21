@@ -821,6 +821,8 @@ const Checkout = () => {
                             publicKey={checkoutcomSettings?.publicKey || ""}
                             amount={subtotal}
                             currency={checkoutcomSettings?.currency || "USD"}
+                            applePayEnabled={checkoutcomSettings?.applePayEnabled ?? true}
+                            googlePayEnabled={checkoutcomSettings?.googlePayEnabled ?? true}
                             metadata={{
                               customer_email: form.getValues("email"),
                               customer_name: form.getValues("name"),

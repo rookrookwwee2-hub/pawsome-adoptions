@@ -42,6 +42,8 @@ export interface CheckoutComSettings {
   currency: string;
   publicKey: string;
   secretKey: string;
+  applePayEnabled: boolean;
+  googlePayEnabled: boolean;
 }
 
 export const usePaymentSettings = () => {
