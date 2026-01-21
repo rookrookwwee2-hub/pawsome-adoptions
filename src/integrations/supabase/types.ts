@@ -342,6 +342,39 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_method_suggestions: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          email: string
+          id: string
+          message: string | null
+          status: string
+          suggested_method: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          message?: string | null
+          status?: string
+          suggested_method: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string | null
+          status?: string
+          suggested_method?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_proofs: {
         Row: {
           admin_notes: string | null
