@@ -36,11 +36,20 @@ export interface StripeSettings {
   publishableKey: string;
 }
 
+export interface CheckoutComSettings {
+  enabled: boolean;
+  mode: "sandbox" | "live";
+  currency: string;
+  publicKey: string;
+  secretKey: string;
+}
+
 export const usePaymentSettings = () => {
   const [usdtSettings, setUsdtSettings] = useState<UsdtSettings | null>(null);
   const [bankSettings, setBankSettings] = useState<BankSettings[]>([]);
   const [paypalSettings, setPaypalSettings] = useState<PayPalSettings | null>(null);
   const [stripeSettings, setStripeSettings] = useState<StripeSettings | null>(null);
+  const [checkoutcomSettings, setCheckoutcomSettings] = useState<CheckoutComSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -60,6 +69,7 @@ export const usePaymentSettings = () => {
         const bankData = data.find((s) => s.setting_key === "bank_details");
         const paypalData = data.find((s) => s.setting_key === "paypal");
         const stripeData = data.find((s) => s.setting_key === "stripe");
+        const checkoutcomData = data.find((s) => s.setting_key === "checkoutcom");
 
         if (usdtData) {
           setUsdtSettings(usdtData.setting_value as unknown as UsdtSettings);
@@ -73,6 +83,9 @@ export const usePaymentSettings = () => {
         if (stripeData) {
           setStripeSettings(stripeData.setting_value as unknown as StripeSettings);
         }
+        if (checkoutcomData) {
+          setCheckoutcomSettings(checkoutcomData.setting_value as unknown as CheckoutComSettings);
+        }
       }
       setLoading(false);
     };
@@ -80,5 +93,5 @@ export const usePaymentSettings = () => {
     fetchSettings();
   }, []);
 
-  return { usdtSettings, bankSettings, paypalSettings, stripeSettings, loading };
+  return { usdtSettings, bankSettings, paypalSettings, stripeSettings, checkoutcomSettings, loading };
 };

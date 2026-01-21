@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import PayPalCheckout from "@/components/checkout/PayPalCheckout";
 import StripeCheckout from "@/components/checkout/StripeCheckout";
+import CheckoutComCheckout from "@/components/checkout/CheckoutComCheckout";
 import PaymentSuggestionDialog from "@/components/checkout/PaymentSuggestionDialog";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -132,7 +133,7 @@ const checkoutSchema = z.object({
   email: z.string().email("Please enter a valid email").max(255),
   phone: z.string().optional(),
   address: z.string().min(5, "Please enter your full address").max(500),
-  paymentMethod: z.enum(["usdt", "bank_uk", "bank_usa", "bank_eu", "paypal", "stripe"], {
+  paymentMethod: z.enum(["usdt", "bank_uk", "bank_usa", "bank_eu", "paypal", "stripe", "checkoutcom"], {
     required_error: "Please select a payment method",
   }),
   message: z.string().max(500).optional(),
@@ -147,7 +148,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { items, getTotal, formatPrice, removeFromCart, clearCart, currency, exchangeRate } = useCart();
   const { user } = useAuth();
-  const { usdtSettings, bankSettings, paypalSettings, stripeSettings, loading: settingsLoading } = usePaymentSettings();
+  const { usdtSettings, bankSettings, paypalSettings, stripeSettings, checkoutcomSettings, loading: settingsLoading } = usePaymentSettings();
   const [step, setStep] = useState<"details" | "payment" | "confirmation">("details");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -160,6 +161,9 @@ const Checkout = () => {
   
   // Check if Stripe is enabled and properly configured
   const isStripeEnabled = stripeSettings?.enabled && stripeSettings?.publishableKey;
+
+  // Check if Checkout.com is enabled and properly configured
+  const isCheckoutComEnabled = checkoutcomSettings?.enabled && checkoutcomSettings?.publicKey;
 
   const form = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
@@ -548,6 +552,26 @@ const Checkout = () => {
                                         </div>
                                       </Label>
                                     )}
+
+                                    {isCheckoutComEnabled && (
+                                      <Label
+                                        htmlFor="checkoutcom"
+                                        className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-all ${
+                                          field.value === "checkoutcom"
+                                            ? "border-primary bg-primary/5"
+                                            : "hover:border-primary/50"
+                                        }`}
+                                      >
+                                        <RadioGroupItem value="checkoutcom" id="checkoutcom" />
+                                        <CreditCard className="h-5 w-5 text-primary" />
+                                        <div className="flex-1">
+                                          <p className="font-medium">Credit / Debit Card</p>
+                                          <p className="text-sm text-muted-foreground">
+                                            Visa, MasterCard, American Express
+                                          </p>
+                                        </div>
+                                      </Label>
+                                    )}
                                   </RadioGroup>
                                 </FormControl>
                                 <PaymentSuggestionDialog defaultEmail={form.watch("email")} />
@@ -785,6 +809,67 @@ const Checkout = () => {
                           </p>
                         </div>
                       </div>
+                    ) : selectedPaymentMethod === "checkoutcom" && isCheckoutComEnabled ? (
+                      <div className="space-y-4">
+                        <div className="p-4 border rounded-xl space-y-4">
+                          <div className="flex items-center gap-2 mb-3 pb-3 border-b">
+                            <CreditCard className="h-5 w-5 text-primary" />
+                            <span className="font-medium">Pay with Credit/Debit Card</span>
+                          </div>
+                          
+                          <CheckoutComCheckout
+                            publicKey={checkoutcomSettings?.publicKey || ""}
+                            amount={subtotal}
+                            currency={checkoutcomSettings?.currency || "USD"}
+                            metadata={{
+                              customer_email: form.getValues("email"),
+                              customer_name: form.getValues("name"),
+                            }}
+                            onSuccess={async (paymentId) => {
+                              setIsSubmitting(true);
+                              try {
+                                const values = form.getValues();
+                                for (const item of items) {
+                                  const { error } = await supabase.from("guest_payments").insert({
+                                    pet_id: item.petId,
+                                    guest_name: values.name,
+                                    guest_email: values.email,
+                                    guest_phone: values.phone || null,
+                                    guest_address: values.address || null,
+                                    amount: item.isReservation && item.reservationDeposit
+                                      ? item.reservationDeposit
+                                      : item.basePrice + item.addOns.reduce((sum, a) => sum + a.price, 0) + (item.shippingMethod?.price || 0),
+                                    transaction_hash: paymentId,
+                                    wallet_address: "Checkout.com Card Payment",
+                                    message: values.message || null,
+                                    status: "completed",
+                                  });
+
+                                  if (error) throw error;
+                                }
+
+                                setStep("confirmation");
+                                toast.success("Payment completed successfully!", {
+                                  description: "Your card payment has been processed.",
+                                });
+                              } catch (error) {
+                                console.error("Error saving Checkout.com payment:", error);
+                                toast.error("Payment received but failed to save order. Please contact support.");
+                              } finally {
+                                setIsSubmitting(false);
+                              }
+                            }}
+                            onError={(error) => {
+                              console.error("Checkout.com payment error:", error);
+                            }}
+                          />
+                        </div>
+                        <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
+                          <p className="text-sm text-primary font-medium">
+                            💳 Secure card payments. We accept Visa, Mastercard, and American Express.
+                          </p>
+                        </div>
+                      </div>
                     ) : selectedBank ? (
                       <div className="p-4 border rounded-xl space-y-3">
                         <div className="flex items-center gap-2 mb-3 pb-3 border-b">
@@ -807,7 +892,7 @@ const Checkout = () => {
                         <div>
                           <p className="font-medium">Secure Payment</p>
                           <p className="text-sm text-muted-foreground">
-                            {selectedPaymentMethod === "paypal" || selectedPaymentMethod === "stripe"
+                            {selectedPaymentMethod === "paypal" || selectedPaymentMethod === "stripe" || selectedPaymentMethod === "checkoutcom"
                               ? "After completing your payment, your order will be confirmed automatically."
                               : "After completing your transfer, please upload proof of payment. Payments are reviewed and confirmed within 24-48 business hours."
                             }
@@ -826,7 +911,7 @@ const Checkout = () => {
                         <ArrowLeft className="h-4 w-4 mr-2" />
                         Back
                       </Button>
-                      {selectedPaymentMethod !== "paypal" && selectedPaymentMethod !== "stripe" && (
+                      {selectedPaymentMethod !== "paypal" && selectedPaymentMethod !== "stripe" && selectedPaymentMethod !== "checkoutcom" && (
                         <Button
                           type="button"
                           className="flex-1 rounded-full"
