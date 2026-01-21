@@ -29,10 +29,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { usePaymentSettings } from "@/hooks/usePaymentSettings";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 
-const bankDetails = [
+// Fallback bank details
+const fallbackBankDetails = [
   {
     id: "uk",
     region: "UK Local Bank Transfer",
@@ -133,6 +135,10 @@ const GuestCheckout = ({
 }: GuestCheckoutProps) => {
   const [step, setStep] = useState<"info" | "payment" | "confirmation">("info");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { bankSettings } = usePaymentSettings();
+  
+  // Use database settings or fallback to defaults
+  const bankDetails = bankSettings.length > 0 ? bankSettings : fallbackBankDetails;
 
   const form = useForm<GuestFormData>({
     resolver: zodResolver(guestSchema),

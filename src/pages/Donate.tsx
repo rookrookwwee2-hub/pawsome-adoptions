@@ -13,6 +13,7 @@ import { Heart, Upload, Loader2, CheckCircle, Building2, CreditCard, Copy, Globe
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { usePaymentSettings } from "@/hooks/usePaymentSettings";
 import PetImageSection from "@/components/shared/PetImageSection";
 
 const donationSchema = z.object({
@@ -24,7 +25,8 @@ const donationSchema = z.object({
   message: z.string().max(500).optional(),
 });
 
-const bankDetails = [
+// Fallback bank details
+const fallbackBankDetails = [
   {
     id: "uk",
     region: "UK Local Bank Transfer",
@@ -69,10 +71,14 @@ const bankDetails = [
 const Donate = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { bankSettings } = usePaymentSettings();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [selectedBankId, setSelectedBankId] = useState<string>("uk");
+  
+  // Use database settings or fallback to defaults
+  const bankDetails = bankSettings.length > 0 ? bankSettings : fallbackBankDetails;
   const selectedBank = bankDetails.find((b) => b.id === selectedBankId) || bankDetails[0];
   const [formData, setFormData] = useState({
     donor_name: "",

@@ -38,10 +38,12 @@ import {
 } from "@/components/ui/form";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/hooks/useAuth";
+import { usePaymentSettings } from "@/hooks/usePaymentSettings";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const bankDetails = [
+// Fallback values while loading from database
+const fallbackBankDetails = [
   {
     id: "uk",
     region: "UK Local Bank Transfer",
@@ -83,7 +85,7 @@ const bankDetails = [
   },
 ];
 
-const usdtDetails = {
+const fallbackUsdtDetails = {
   network: "TRC20 (Tron)",
   walletAddress: "TXYZabc123def456ghi789jkl012mno345pqr",
   note: "Only send USDT on TRC20 network. Other networks will result in loss of funds.",
@@ -141,8 +143,13 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { items, getTotal, formatPrice, removeFromCart, clearCart, currency, exchangeRate } = useCart();
   const { user } = useAuth();
+  const { usdtSettings, bankSettings, loading: settingsLoading } = usePaymentSettings();
   const [step, setStep] = useState<"details" | "payment" | "confirmation">("details");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Use database settings or fallback to defaults
+  const bankDetails = bankSettings.length > 0 ? bankSettings : fallbackBankDetails;
+  const usdtDetails = usdtSettings || fallbackUsdtDetails;
 
   const form = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
