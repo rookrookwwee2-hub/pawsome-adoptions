@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { Building2, Clock, AlertTriangle, Upload, MessageSquarePlus, Send } from "lucide-react";
+import { Building2, Clock, AlertTriangle, Upload } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -7,79 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { useState, useMemo } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import ProofOfPaymentUpload from "@/components/payment/ProofOfPaymentUpload";
 
 const PaymentMethods = () => {
   const [showProofUpload, setShowProofUpload] = useState(false);
   const [searchParams] = useSearchParams();
   const selectedBank = searchParams.get("bank");
-  const { toast } = useToast();
-  
-  // Suggestion form state
-  const [suggestionEmail, setSuggestionEmail] = useState("");
-  const [suggestedMethod, setSuggestedMethod] = useState("");
-  const [suggestionMessage, setSuggestionMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const handleSuggestionSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!suggestionEmail.trim() || !suggestedMethod.trim()) {
-      toast({
-        title: "Missing Information",
-        description: "Please provide your email and the payment method you'd like to suggest.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
-    try {
-      const { error } = await supabase
-        .from("payment_method_suggestions")
-        .insert({
-          email: suggestionEmail.trim(),
-          suggested_method: suggestedMethod.trim(),
-          message: suggestionMessage.trim() || null,
-        });
-      
-      if (error) throw error;
-      
-      // Create admin notification
-      await supabase.from("admin_notifications").insert({
-        type: "payment_suggestion",
-        title: "New Payment Method Suggestion",
-        message: `${suggestionEmail.trim()} suggested: ${suggestedMethod.trim()}`,
-        reference_type: "payment_method_suggestion",
-      });
-      
-      toast({
-        title: "Suggestion Submitted!",
-        description: "Thank you for your feedback. We'll review your suggestion and get in touch.",
-      });
-      
-      // Reset form
-      setSuggestionEmail("");
-      setSuggestedMethod("");
-      setSuggestionMessage("");
-    } catch (error: any) {
-      console.error("Error submitting suggestion:", error);
-      toast({
-        title: "Submission Failed",
-        description: "Something went wrong. Please try again later.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
   const bankDetails = [
     {
       id: "uk",
@@ -235,83 +169,6 @@ const PaymentMethods = () => {
 
             <Separator className="my-12" />
 
-            {/* Suggest Alternative Payment Method Section */}
-            <div className="animate-fade-up opacity-0 stagger-4">
-              <div className="text-center mb-8">
-                <h2 className="font-display text-2xl md:text-3xl font-bold mb-4">
-                  Suggest a Payment Method
-                </h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Don't see your preferred payment method? Let us know and we'll do our best to accommodate you.
-                </p>
-              </div>
-
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                      <MessageSquarePlus className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">Request Alternative Payment</CardTitle>
-                      <CardDescription>We'll review your suggestion and contact you via email</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSuggestionSubmit} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="suggestion-email">Your Email *</Label>
-                        <Input
-                          id="suggestion-email"
-                          type="email"
-                          placeholder="your@email.com"
-                          value={suggestionEmail}
-                          onChange={(e) => setSuggestionEmail(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="suggested-method">Payment Method *</Label>
-                        <Input
-                          id="suggested-method"
-                          type="text"
-                          placeholder="e.g., PayPal, Zelle, Cash App..."
-                          value={suggestedMethod}
-                          onChange={(e) => setSuggestedMethod(e.target.value)}
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="suggestion-message">Additional Details (Optional)</Label>
-                      <Textarea
-                        id="suggestion-message"
-                        placeholder="Any additional information about your preferred payment method..."
-                        value={suggestionMessage}
-                        onChange={(e) => setSuggestionMessage(e.target.value)}
-                        rows={3}
-                      />
-                    </div>
-                    <Button 
-                      type="submit" 
-                      className="w-full sm:w-auto rounded-full"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? (
-                        "Submitting..."
-                      ) : (
-                        <>
-                          <Send className="h-4 w-4 mr-2" />
-                          Submit Suggestion
-                        </>
-                      )}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-            </div>
           </div>
         </main>
 
