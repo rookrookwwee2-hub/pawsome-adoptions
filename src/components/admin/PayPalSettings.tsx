@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Save, Loader2, CreditCard, Eye, EyeOff } from "lucide-react";
+import { Save, Loader2, CreditCard, Eye, EyeOff, CheckCircle2, XCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +27,8 @@ const PayPalSettingsComponent = () => {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{ valid: boolean; message: string } | null>(null);
   const [showSecret, setShowSecret] = useState(false);
   const { toast } = useToast();
 
@@ -51,6 +53,57 @@ const PayPalSettingsComponent = () => {
 
     fetchSettings();
   }, [toast]);
+
+  const testConnection = async () => {
+    if (!settings.clientId || !settings.secretKey) {
+      toast({
+        title: "Missing Credentials",
+        description: "Please enter both Client ID and Secret Key before testing",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setTesting(true);
+    setTestResult(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("validate-paypal-key", {
+        body: {
+          clientId: settings.clientId,
+          secretKey: settings.secretKey,
+          mode: settings.mode,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.valid) {
+        setTestResult({ valid: true, message: data.message || "PayPal connected successfully" });
+        toast({
+          title: "Connection Successful",
+          description: data.message || "PayPal credentials validated",
+        });
+      } else {
+        setTestResult({ valid: false, message: data.error || "Invalid credentials" });
+        toast({
+          title: "Connection Failed",
+          description: data.error || "Invalid PayPal credentials",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Test connection error:", error);
+      setTestResult({ valid: false, message: "Failed to validate credentials" });
+      toast({
+        title: "Error",
+        description: "Failed to validate PayPal credentials",
+        variant: "destructive",
+      });
+    } finally {
+      setTesting(false);
+    }
+  };
 
   const saveSettings = async () => {
     setSaving(true);
@@ -104,7 +157,10 @@ const PayPalSettingsComponent = () => {
             <Label htmlFor="paypal-mode">Mode</Label>
             <Select
               value={settings.mode}
-              onValueChange={(value: "sandbox" | "live") => setSettings({ ...settings, mode: value })}
+              onValueChange={(value: "sandbox" | "live") => {
+                setSettings({ ...settings, mode: value });
+                setTestResult(null);
+              }}
             >
               <SelectTrigger id="paypal-mode">
                 <SelectValue placeholder="Select mode" />
@@ -140,7 +196,10 @@ const PayPalSettingsComponent = () => {
           <Input
             id="paypal-client-id"
             value={settings.clientId}
-            onChange={(e) => setSettings({ ...settings, clientId: e.target.value })}
+            onChange={(e) => {
+              setSettings({ ...settings, clientId: e.target.value });
+              setTestResult(null);
+            }}
             placeholder="Enter PayPal Client ID"
             className="font-mono text-sm"
           />
@@ -153,7 +212,10 @@ const PayPalSettingsComponent = () => {
               id="paypal-secret"
               type={showSecret ? "text" : "password"}
               value={settings.secretKey}
-              onChange={(e) => setSettings({ ...settings, secretKey: e.target.value })}
+              onChange={(e) => {
+                setSettings({ ...settings, secretKey: e.target.value });
+                setTestResult(null);
+              }}
               placeholder="Enter PayPal Secret Key"
               className="font-mono text-sm pr-10"
             />
@@ -166,7 +228,7 @@ const PayPalSettingsComponent = () => {
             </button>
           </div>
           <p className="text-xs text-muted-foreground">
-            Your Secret Key is encrypted and stored securely.
+            Your Secret Key is stored securely and never exposed to the frontend.
           </p>
         </div>
 
@@ -179,6 +241,33 @@ const PayPalSettingsComponent = () => {
             onChange={(e) => setSettings({ ...settings, email: e.target.value })}
             placeholder="your-business@email.com"
           />
+        </div>
+
+        {/* Test Connection Button and Result */}
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={testConnection}
+            disabled={testing || !settings.clientId || !settings.secretKey}
+          >
+            {testing ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <RefreshCw className="w-4 h-4 mr-2" />
+            )}
+            Test Connection
+          </Button>
+          
+          {testResult && (
+            <div className={`flex items-center gap-2 text-sm ${testResult.valid ? "text-green-600" : "text-destructive"}`}>
+              {testResult.valid ? (
+                <CheckCircle2 className="w-4 h-4" />
+              ) : (
+                <XCircle className="w-4 h-4" />
+              )}
+              {testResult.message}
+            </div>
+          )}
         </div>
 
         {settings.mode === "sandbox" && (
