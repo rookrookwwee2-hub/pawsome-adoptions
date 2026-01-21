@@ -656,6 +656,68 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          admin_notes: string | null
+          adoption_id: string | null
+          country: string
+          country_flag: string | null
+          created_at: string
+          customer_email: string | null
+          customer_name: string
+          display_location: string
+          id: string
+          pet_type: string
+          photo_url: string | null
+          review_text: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          adoption_id?: string | null
+          country: string
+          country_flag?: string | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name: string
+          display_location?: string
+          id?: string
+          pet_type: string
+          photo_url?: string | null
+          review_text: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          adoption_id?: string | null
+          country?: string
+          country_flag?: string | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string
+          display_location?: string
+          id?: string
+          pet_type?: string
+          photo_url?: string | null
+          review_text?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_adoption_id_fkey"
+            columns: ["adoption_id"]
+            isOneToOne: false
+            referencedRelation: "adoptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string | null

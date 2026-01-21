@@ -12,7 +12,8 @@ import {
   Wallet,
   Receipt,
   Settings,
-  BarChart3
+  BarChart3,
+  MessageSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -34,6 +35,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     { name: "Analytics", path: "/admin/analytics", icon: BarChart3 },
     { name: "Pets", path: "/admin/pets", icon: PawPrint },
     { name: "Adoptions", path: "/admin/adoptions", icon: FileText },
+    { name: "Reviews", path: "/admin/reviews", icon: MessageSquare },
     { name: "Crypto Payments", path: "/admin/payments", icon: Wallet },
     { name: "Bank Proofs", path: "/admin/payment-proofs", icon: Receipt },
     { name: "Payment Suggestions", path: "/admin/payment-suggestions", icon: Heart },

@@ -5,7 +5,7 @@ import Hero from "@/components/home/Hero";
 import FeaturedPets from "@/components/home/FeaturedPets";
 import AdoptionJourney from "@/components/home/AdoptionJourney";
 import TrustSection from "@/components/home/TrustSection";
-import Testimonials from "@/components/home/Testimonials";
+import CustomerLoveSlider from "@/components/home/CustomerLoveSlider";
 import CallToAction from "@/components/home/CallToAction";
 import NewsletterSignup from "@/components/home/NewsletterSignup";
 import PetImageSection from "@/components/shared/PetImageSection";
@@ -36,7 +36,7 @@ const Index = () => {
           <PetImageSection variant="single" className="bg-muted/30" />
           <AdoptionJourney />
           <PetImageSection variant="triple" />
-          <Testimonials />
+          <CustomerLoveSlider />
           <NewsletterSignup />
           <CallToAction />
         </main>

@@ -31,6 +31,8 @@ import DonationsManagement from "./pages/admin/DonationsManagement";
 import FosterManagement from "./pages/admin/FosterManagement";
 import SettingsManagement from "./pages/admin/SettingsManagement";
 import PaymentSuggestionsManagement from "./pages/admin/PaymentSuggestionsManagement";
+import ReviewsManagement from "./pages/admin/ReviewsManagement";
+import Reviews from "./pages/Reviews";
 import NotFound from "./pages/NotFound";
 import CatBreeds from "./pages/CatBreeds";
 import DogBreeds from "./pages/DogBreeds";
@@ -71,6 +73,7 @@ const App = () => (
                   <Route path="/health-guarantee" element={<HealthGuarantee />} />
                   <Route path="/privacy" element={<PrivacyPolicy />} />
                   <Route path="/terms" element={<TermsConditions />} />
+                  <Route path="/reviews" element={<Reviews />} />
                   <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
                   <Route path="/orders" element={<ProtectedRoute><OrderHistory /></ProtectedRoute>} />
                   <Route path="/admin" element={<ProtectedRoute requireAdmin><Dashboard /></ProtectedRoute>} />
@@ -84,6 +87,7 @@ const App = () => (
                   <Route path="/admin/foster" element={<ProtectedRoute requireAdmin><FosterManagement /></ProtectedRoute>} />
                   <Route path="/admin/settings" element={<ProtectedRoute requireAdmin><SettingsManagement /></ProtectedRoute>} />
                   <Route path="/admin/payment-suggestions" element={<ProtectedRoute requireAdmin><PaymentSuggestionsManagement /></ProtectedRoute>} />
+                  <Route path="/admin/reviews" element={<ProtectedRoute requireAdmin><ReviewsManagement /></ProtectedRoute>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <CookieConsent />
