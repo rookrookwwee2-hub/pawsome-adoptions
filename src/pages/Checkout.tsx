@@ -18,6 +18,7 @@ import {
   Truck,
   Shield,
 } from "lucide-react";
+import PaymentSuggestionDialog from "@/components/checkout/PaymentSuggestionDialog";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -448,9 +449,12 @@ const Checkout = () => {
                             name="paymentMethod"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-base font-semibold">
-                                  Payment Method *
-                                </FormLabel>
+                                <div className="flex items-center justify-between">
+                                  <FormLabel className="text-base font-semibold">
+                                    Payment Method *
+                                  </FormLabel>
+                                  <PaymentSuggestionDialog defaultEmail={form.watch("email")} />
+                                </div>
                                 <FormControl>
                                   <RadioGroup
                                     onValueChange={field.onChange}
