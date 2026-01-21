@@ -13,6 +13,8 @@ interface CheckoutComCheckoutProps {
   onError?: (error: Error) => void;
   onCancel?: () => void;
   metadata?: Record<string, string>;
+  applePayEnabled?: boolean;
+  googlePayEnabled?: boolean;
 }
 
 declare global {
@@ -48,6 +50,8 @@ const CheckoutComCheckout = ({
   onSuccess,
   onError,
   metadata,
+  applePayEnabled = true,
+  googlePayEnabled = true,
 }: CheckoutComCheckoutProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -158,11 +162,20 @@ const CheckoutComCheckout = ({
     };
 
     const checkPaymentRequestAvailability = async () => {
+      // Only check if at least one wallet is enabled
+      if (!applePayEnabled && !googlePayEnabled) {
+        setPaymentRequestAvailable(false);
+        return;
+      }
+
       try {
-        const supportedMethods = [
-          { supportedMethods: "https://apple.com/apple-pay" },
-          { supportedMethods: "https://google.com/pay" },
-        ];
+        const supportedMethods = [];
+        if (applePayEnabled) {
+          supportedMethods.push({ supportedMethods: "https://apple.com/apple-pay" });
+        }
+        if (googlePayEnabled) {
+          supportedMethods.push({ supportedMethods: "https://google.com/pay" });
+        }
         
         const details = {
           total: {
@@ -378,7 +391,7 @@ const CheckoutComCheckout = ({
   return (
     <div className="space-y-4">
       {/* Apple Pay / Google Pay Buttons */}
-      {paymentRequestAvailable && (
+      {paymentRequestAvailable && (applePayEnabled || googlePayEnabled) && (
         <>
           <div className="space-y-3">
             <Button
@@ -393,7 +406,13 @@ const CheckoutComCheckout = ({
               ) : (
                 <>
                   <Smartphone className="h-5 w-5 mr-2" />
-                  <span className="font-medium">Pay with Apple Pay / Google Pay</span>
+                  <span className="font-medium">
+                    {applePayEnabled && googlePayEnabled 
+                      ? "Pay with Apple Pay / Google Pay"
+                      : applePayEnabled 
+                        ? "Pay with Apple Pay" 
+                        : "Pay with Google Pay"}
+                  </span>
                 </>
               )}
             </Button>
