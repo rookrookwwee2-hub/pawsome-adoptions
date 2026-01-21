@@ -20,9 +20,19 @@ interface BankSettings {
   details: BankDetail[];
 }
 
+export interface PayPalSettings {
+  enabled: boolean;
+  clientId: string;
+  secretKey: string;
+  email: string;
+  mode: "sandbox" | "live";
+  currency: string;
+}
+
 export const usePaymentSettings = () => {
   const [usdtSettings, setUsdtSettings] = useState<UsdtSettings | null>(null);
   const [bankSettings, setBankSettings] = useState<BankSettings[]>([]);
+  const [paypalSettings, setPaypalSettings] = useState<PayPalSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,12 +50,16 @@ export const usePaymentSettings = () => {
       if (data) {
         const usdtData = data.find((s) => s.setting_key === "usdt");
         const bankData = data.find((s) => s.setting_key === "bank_details");
+        const paypalData = data.find((s) => s.setting_key === "paypal");
 
         if (usdtData) {
           setUsdtSettings(usdtData.setting_value as unknown as UsdtSettings);
         }
         if (bankData) {
           setBankSettings(bankData.setting_value as unknown as BankSettings[]);
+        }
+        if (paypalData) {
+          setPaypalSettings(paypalData.setting_value as unknown as PayPalSettings);
         }
       }
       setLoading(false);
@@ -54,5 +68,5 @@ export const usePaymentSettings = () => {
     fetchSettings();
   }, []);
 
-  return { usdtSettings, bankSettings, loading };
+  return { usdtSettings, bankSettings, paypalSettings, loading };
 };

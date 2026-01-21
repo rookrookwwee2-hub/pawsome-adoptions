@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Save, Plus, Trash2, Wallet, Building2, UserPlus, Loader2 } from "lucide-react";
+import { Save, Plus, Trash2, Wallet, Building2, UserPlus, Loader2, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
+import PayPalSettings from "@/components/admin/PayPalSettings";
 
 interface UsdtSettings {
   network: string;
@@ -209,7 +210,7 @@ const SettingsManagement = () => {
         </div>
 
         <Tabs defaultValue="usdt" className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
+          <TabsList className="grid w-full max-w-2xl grid-cols-4">
             <TabsTrigger value="usdt" className="flex items-center gap-2">
               <Wallet className="w-4 h-4" />
               USDT
@@ -217,6 +218,10 @@ const SettingsManagement = () => {
             <TabsTrigger value="bank" className="flex items-center gap-2">
               <Building2 className="w-4 h-4" />
               Banks
+            </TabsTrigger>
+            <TabsTrigger value="paypal" className="flex items-center gap-2">
+              <CreditCard className="w-4 h-4" />
+              PayPal
             </TabsTrigger>
             <TabsTrigger value="admins" className="flex items-center gap-2">
               <UserPlus className="w-4 h-4" />
@@ -332,6 +337,11 @@ const SettingsManagement = () => {
                 Save Bank Settings
               </Button>
             </div>
+          </TabsContent>
+
+          {/* PayPal Settings */}
+          <TabsContent value="paypal">
+            <PayPalSettings />
           </TabsContent>
 
           {/* Admin Accounts */}

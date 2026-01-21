@@ -17,6 +17,7 @@ import {
   Package,
   Truck,
   Shield,
+  CreditCard,
 } from "lucide-react";
 import PaymentSuggestionDialog from "@/components/checkout/PaymentSuggestionDialog";
 import Navbar from "@/components/layout/Navbar";
@@ -129,7 +130,7 @@ const checkoutSchema = z.object({
   email: z.string().email("Please enter a valid email").max(255),
   phone: z.string().optional(),
   address: z.string().min(5, "Please enter your full address").max(500),
-  paymentMethod: z.enum(["usdt", "bank_uk", "bank_usa", "bank_eu"], {
+  paymentMethod: z.enum(["usdt", "bank_uk", "bank_usa", "bank_eu", "paypal"], {
     required_error: "Please select a payment method",
   }),
   message: z.string().max(500).optional(),
@@ -144,13 +145,16 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { items, getTotal, formatPrice, removeFromCart, clearCart, currency, exchangeRate } = useCart();
   const { user } = useAuth();
-  const { usdtSettings, bankSettings, loading: settingsLoading } = usePaymentSettings();
+  const { usdtSettings, bankSettings, paypalSettings, loading: settingsLoading } = usePaymentSettings();
   const [step, setStep] = useState<"details" | "payment" | "confirmation">("details");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Use database settings or fallback to defaults
   const bankDetails = bankSettings.length > 0 ? bankSettings : fallbackBankDetails;
   const usdtDetails = usdtSettings || fallbackUsdtDetails;
+  
+  // Check if PayPal is enabled and properly configured
+  const isPayPalEnabled = paypalSettings?.enabled && paypalSettings?.clientId;
 
   const form = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
@@ -499,6 +503,26 @@ const Checkout = () => {
                                         </div>
                                       </Label>
                                     ))}
+
+                                    {isPayPalEnabled && (
+                                      <Label
+                                        htmlFor="paypal"
+                                        className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-all ${
+                                          field.value === "paypal"
+                                            ? "border-primary bg-primary/5"
+                                            : "hover:border-primary/50"
+                                        }`}
+                                      >
+                                        <RadioGroupItem value="paypal" id="paypal" />
+                                        <CreditCard className="h-5 w-5 text-primary" />
+                                        <div className="flex-1">
+                                          <p className="font-medium">PayPal</p>
+                                          <p className="text-sm text-muted-foreground">
+                                            Pay securely with PayPal
+                                          </p>
+                                        </div>
+                                      </Label>
+                                    )}
                                   </RadioGroup>
                                 </FormControl>
                                 <PaymentSuggestionDialog defaultEmail={form.watch("email")} />
@@ -577,6 +601,8 @@ const Checkout = () => {
                     <CardTitle className="flex items-center gap-2">
                       {selectedPaymentMethod === "usdt" ? (
                         <Wallet className="h-5 w-5" />
+                      ) : selectedPaymentMethod === "paypal" ? (
+                        <CreditCard className="h-5 w-5" />
                       ) : (
                         <Building2 className="h-5 w-5" />
                       )}
@@ -603,6 +629,27 @@ const Checkout = () => {
                         <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
                           <p className="text-sm text-destructive font-medium">
                             ⚠️ {usdtDetails.note}
+                          </p>
+                        </div>
+                      </div>
+                    ) : selectedPaymentMethod === "paypal" ? (
+                      <div className="space-y-4">
+                        <div className="p-4 border rounded-xl space-y-3">
+                          <div className="flex items-center gap-2 mb-3 pb-3 border-b">
+                            <CreditCard className="h-5 w-5 text-primary" />
+                            <span className="font-medium">PayPal Payment</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            You will be redirected to PayPal to complete your payment securely. 
+                            After payment, you'll be returned to this site.
+                          </p>
+                          {paypalSettings?.email && (
+                            <CopyableDetail label="PayPal Email" value={paypalSettings.email} />
+                          )}
+                        </div>
+                        <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
+                          <p className="text-sm text-primary font-medium">
+                            💡 PayPal accepts credit/debit cards and PayPal balance. You don't need a PayPal account.
                           </p>
                         </div>
                       </div>
