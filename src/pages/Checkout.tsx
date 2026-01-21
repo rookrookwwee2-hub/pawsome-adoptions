@@ -449,12 +449,9 @@ const Checkout = () => {
                             name="paymentMethod"
                             render={({ field }) => (
                               <FormItem>
-                                <div className="flex items-center justify-between">
-                                  <FormLabel className="text-base font-semibold">
-                                    Payment Method *
-                                  </FormLabel>
-                                  <PaymentSuggestionDialog defaultEmail={form.watch("email")} />
-                                </div>
+                                <FormLabel className="text-base font-semibold">
+                                  Payment Method *
+                                </FormLabel>
                                 <FormControl>
                                   <RadioGroup
                                     onValueChange={field.onChange}
@@ -504,6 +501,7 @@ const Checkout = () => {
                                     ))}
                                   </RadioGroup>
                                 </FormControl>
+                                <PaymentSuggestionDialog defaultEmail={form.watch("email")} />
                                 <FormMessage />
                               </FormItem>
                             )}
