@@ -721,8 +721,10 @@ const Checkout = () => {
                         <div>
                           <p className="font-medium">Secure Payment</p>
                           <p className="text-sm text-muted-foreground">
-                            After completing your transfer, please upload proof of payment. 
-                            Payments are reviewed and confirmed within 24-48 business hours.
+                            {selectedPaymentMethod === "paypal" 
+                              ? "After completing your payment via PayPal, your order will be confirmed automatically."
+                              : "After completing your transfer, please upload proof of payment. Payments are reviewed and confirmed within 24-48 business hours."
+                            }
                           </p>
                         </div>
                       </div>
@@ -768,11 +770,14 @@ const Checkout = () => {
                     </div>
                     <div className="space-y-2">
                       <h2 className="font-display text-2xl font-bold">
-                        Order Submitted Successfully!
+                        {selectedPaymentMethod === "paypal" 
+                          ? "Payment Completed Successfully!" 
+                          : "Order Submitted Successfully!"}
                       </h2>
                       <p className="text-muted-foreground max-w-md mx-auto">
-                        Thank you for your order. Please complete your payment transfer 
-                        and upload proof of payment to expedite verification.
+                        {selectedPaymentMethod === "paypal"
+                          ? "Thank you for your order. Your PayPal payment has been processed and your order is now confirmed."
+                          : "Thank you for your order. Please complete your payment transfer and upload proof of payment to expedite verification."}
                       </p>
                     </div>
 
@@ -788,9 +793,11 @@ const Checkout = () => {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      <Button asChild className="rounded-full">
-                        <Link to={`/payment-methods${selectedBank ? `?bank=${selectedBank.id}` : selectedPaymentMethod === "usdt" ? "?bank=usdt" : ""}`}>Upload Proof of Payment</Link>
-                      </Button>
+                      {selectedPaymentMethod !== "paypal" && (
+                        <Button asChild className="rounded-full">
+                          <Link to={`/payment-methods${selectedBank ? `?bank=${selectedBank.id}` : selectedPaymentMethod === "usdt" ? "?bank=usdt" : ""}`}>Upload Proof of Payment</Link>
+                        </Button>
+                      )}
                       <Button
                         variant="outline"
                         className="rounded-full"
