@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Save, Loader2, CreditCard, Eye, EyeOff, CheckCircle2, XCircle, RefreshCw } from "lucide-react";
+import { Save, Loader2, CreditCard, Eye, EyeOff, CheckCircle2, XCircle, RefreshCw, Copy, Check, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,58 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { toast as sonnerToast } from "sonner";
+
+const WebhookUrlSection = () => {
+  const [copied, setCopied] = useState(false);
+  const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stripe-webhook`;
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(webhookUrl);
+    setCopied(true);
+    sonnerToast.success("Webhook URL copied!");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="space-y-2 p-4 border rounded-xl bg-muted/30">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-medium">Webhook URL</Label>
+        <a
+          href="https://dashboard.stripe.com/webhooks"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-primary hover:underline flex items-center gap-1"
+        >
+          Stripe Dashboard
+          <ExternalLink className="h-3 w-3" />
+        </a>
+      </div>
+      <div className="flex items-center gap-2">
+        <Input
+          value={webhookUrl}
+          readOnly
+          className="font-mono text-xs bg-background"
+        />
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleCopy}
+          className="shrink-0"
+        >
+          {copied ? (
+            <Check className="h-4 w-4 text-green-500" />
+          ) : (
+            <Copy className="h-4 w-4" />
+          )}
+        </Button>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Add this URL in your Stripe Dashboard under Webhooks. Subscribe to: <code className="bg-muted px-1 rounded">payment_intent.succeeded</code>, <code className="bg-muted px-1 rounded">payment_intent.payment_failed</code>, <code className="bg-muted px-1 rounded">charge.refunded</code>
+      </p>
+    </div>
+  );
+};
 
 export interface StripeSettingsType {
   enabled: boolean;
@@ -389,6 +441,9 @@ const StripeSettingsComponent = () => {
             Required for automatic payment confirmation via webhooks.
           </p>
         </div>
+
+        {/* Webhook URL Section */}
+        <WebhookUrlSection />
 
         {settings.mode === "test" && (
           <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
