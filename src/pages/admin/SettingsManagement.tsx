@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Save, Plus, Trash2, Wallet, Building2, UserPlus, Loader2, CreditCard } from "lucide-react";
+import { Save, Plus, Trash2, Wallet, Building2, UserPlus, Loader2, CreditCard, Key } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import PayPalSettings from "@/components/admin/PayPalSettings";
+import ApiSecretsManager from "@/components/admin/ApiSecretsManager";
 
 interface UsdtSettings {
   network: string;
@@ -210,7 +211,7 @@ const SettingsManagement = () => {
         </div>
 
         <Tabs defaultValue="usdt" className="space-y-6">
-          <TabsList className="grid w-full max-w-2xl grid-cols-4">
+          <TabsList className="grid w-full max-w-3xl grid-cols-5">
             <TabsTrigger value="usdt" className="flex items-center gap-2">
               <Wallet className="w-4 h-4" />
               USDT
@@ -222,6 +223,10 @@ const SettingsManagement = () => {
             <TabsTrigger value="paypal" className="flex items-center gap-2">
               <CreditCard className="w-4 h-4" />
               PayPal
+            </TabsTrigger>
+            <TabsTrigger value="api-keys" className="flex items-center gap-2">
+              <Key className="w-4 h-4" />
+              API Keys
             </TabsTrigger>
             <TabsTrigger value="admins" className="flex items-center gap-2">
               <UserPlus className="w-4 h-4" />
@@ -342,6 +347,11 @@ const SettingsManagement = () => {
           {/* PayPal Settings */}
           <TabsContent value="paypal">
             <PayPalSettings />
+          </TabsContent>
+
+          {/* API Keys & Secrets */}
+          <TabsContent value="api-keys">
+            <ApiSecretsManager />
           </TabsContent>
 
           {/* Admin Accounts */}
