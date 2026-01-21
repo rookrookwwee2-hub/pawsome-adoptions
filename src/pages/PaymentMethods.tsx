@@ -52,6 +52,14 @@ const PaymentMethods = () => {
       
       if (error) throw error;
       
+      // Create admin notification
+      await supabase.from("admin_notifications").insert({
+        type: "payment_suggestion",
+        title: "New Payment Method Suggestion",
+        message: `${suggestionEmail.trim()} suggested: ${suggestedMethod.trim()}`,
+        reference_type: "payment_method_suggestion",
+      });
+      
       toast({
         title: "Suggestion Submitted!",
         description: "Thank you for your feedback. We'll review your suggestion and get in touch.",
