@@ -128,6 +128,32 @@ const SettingsManagement = () => {
     setBankSettings(updated);
   };
 
+  const updateBankMeta = (
+    bankIndex: number,
+    updates: Partial<Pick<BankSettings, "region" | "subtitle" | "currency">>
+  ) => {
+    const updated = [...bankSettings];
+    updated[bankIndex] = { ...updated[bankIndex], ...updates };
+    setBankSettings(updated);
+  };
+
+  const addBank = () => {
+    const newBank: BankSettings = {
+      id: `custom_${Date.now()}`,
+      region: "New Bank Transfer",
+      subtitle: "Transfer Method",
+      currency: "USD",
+      details: [{ label: "Bank Name", value: "" }],
+    };
+    setBankSettings((prev) => [...prev, newBank]);
+  };
+
+  const removeBank = (bankIndex: number) => {
+    const updated = [...bankSettings];
+    updated.splice(bankIndex, 1);
+    setBankSettings(updated);
+  };
+
   const createAdminAccount = async () => {
     if (!newAdminEmail.trim()) {
       toast({ title: "Error", description: "Please enter an email address", variant: "destructive" });
@@ -287,18 +313,72 @@ const SettingsManagement = () => {
           {/* Bank Settings */}
           <TabsContent value="bank">
             <div className="space-y-6">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground">Bank accounts</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Rename banks (title + subtitle/currency) and add multiple accounts.
+                  </p>
+                </div>
+                <Button variant="outline" onClick={addBank}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Bank
+                </Button>
+              </div>
+
               {bankSettings.map((bank, bankIndex) => (
                 <Card key={bank.id}>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Building2 className="w-5 h-5" />
-                      {bank.region}
-                    </CardTitle>
-                    <CardDescription>
-                      {bank.subtitle} - {bank.currency}
-                    </CardDescription>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="space-y-1">
+                        <CardTitle className="flex items-center gap-2">
+                          <Building2 className="w-5 h-5" />
+                          {bank.region}
+                        </CardTitle>
+                        <CardDescription>
+                          {bank.subtitle} - {bank.currency}
+                        </CardDescription>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeBank(bankIndex)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Remove
+                      </Button>
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label>Bank Title</Label>
+                        <Input
+                          value={bank.region}
+                          onChange={(e) => updateBankMeta(bankIndex, { region: e.target.value })}
+                          placeholder="e.g., USA Local Bank Transfer"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Subtitle</Label>
+                        <Input
+                          value={bank.subtitle}
+                          onChange={(e) => updateBankMeta(bankIndex, { subtitle: e.target.value })}
+                          placeholder="e.g., ACH / Wire"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Currency</Label>
+                        <Input
+                          value={bank.currency}
+                          onChange={(e) => updateBankMeta(bankIndex, { currency: e.target.value.toUpperCase() })}
+                          placeholder="e.g., USD"
+                          className="font-mono"
+                        />
+                      </div>
+                    </div>
+
                     {bank.details.map((detail, detailIndex) => (
                       <div key={detailIndex} className="flex items-end gap-2">
                         <div className="flex-1 space-y-2">
