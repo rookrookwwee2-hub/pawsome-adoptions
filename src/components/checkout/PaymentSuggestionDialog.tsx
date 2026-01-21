@@ -73,10 +73,13 @@ const PaymentSuggestionDialog = ({ defaultEmail = "" }: PaymentSuggestionDialogP
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="rounded-full gap-2">
+        <button
+          type="button"
+          className="flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors mt-3"
+        >
           <MessageSquarePlus className="h-4 w-4" />
-          Suggest Other
-        </Button>
+          <span className="underline underline-offset-2">Suggest a Payment Method</span>
+        </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
