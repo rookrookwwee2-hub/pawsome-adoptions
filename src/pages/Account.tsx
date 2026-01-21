@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,6 +14,9 @@ import {
   Check,
   Clock,
   XCircle,
+  Bell,
+  Home,
+  Trash2,
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -36,10 +39,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { AvatarUpload } from "@/components/account/AvatarUpload";
+import { EmailPreferences } from "@/components/account/EmailPreferences";
+import { DeleteAccountDialog } from "@/components/account/DeleteAccountDialog";
+import { FosterApplicationsTab } from "@/components/account/FosterApplicationsTab";
 
 const profileSchema = z.object({
   full_name: z.string().max(100).optional(),
@@ -170,6 +178,14 @@ const Account = () => {
     }
   };
 
+  const handleAvatarChange = (url: string) => {
+    queryClient.invalidateQueries({ queryKey: ["profile"] });
+  };
+
+  const handleAccountDeleted = () => {
+    navigate("/");
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
@@ -211,7 +227,7 @@ const Account = () => {
             <h1 className="font-display text-4xl font-bold mb-8">Account Settings</h1>
 
             <Tabs defaultValue="profile" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="profile" className="gap-2">
                   <User className="w-4 h-4" />
                   <span className="hidden sm:inline">Profile</span>
@@ -220,9 +236,17 @@ const Account = () => {
                   <Lock className="w-4 h-4" />
                   <span className="hidden sm:inline">Password</span>
                 </TabsTrigger>
+                <TabsTrigger value="notifications" className="gap-2">
+                  <Bell className="w-4 h-4" />
+                  <span className="hidden sm:inline">Emails</span>
+                </TabsTrigger>
                 <TabsTrigger value="adoptions" className="gap-2">
                   <FileText className="w-4 h-4" />
                   <span className="hidden sm:inline">Adoptions</span>
+                </TabsTrigger>
+                <TabsTrigger value="foster" className="gap-2">
+                  <Home className="w-4 h-4" />
+                  <span className="hidden sm:inline">Foster</span>
                 </TabsTrigger>
                 <TabsTrigger value="payments" className="gap-2">
                   <Wallet className="w-4 h-4" />
@@ -245,66 +269,95 @@ const Account = () => {
                         <Loader2 className="w-6 h-6 animate-spin" />
                       </div>
                     ) : (
-                      <Form {...profileForm}>
-                        <form
-                          onSubmit={profileForm.handleSubmit(handleProfileSubmit)}
-                          className="space-y-4"
-                        >
-                          <div className="space-y-2">
-                            <FormLabel>Email</FormLabel>
-                            <Input value={user.email || ""} disabled />
-                            <p className="text-xs text-muted-foreground">
-                              Email cannot be changed
+                      <div className="space-y-6">
+                        <AvatarUpload
+                          userId={user.id}
+                          currentAvatarUrl={profile?.avatar_url}
+                          userName={profile?.full_name}
+                          onAvatarChange={handleAvatarChange}
+                        />
+
+                        <Separator />
+
+                        <Form {...profileForm}>
+                          <form
+                            onSubmit={profileForm.handleSubmit(handleProfileSubmit)}
+                            className="space-y-4"
+                          >
+                            <div className="space-y-2">
+                              <FormLabel>Email</FormLabel>
+                              <Input value={user.email || ""} disabled />
+                              <p className="text-xs text-muted-foreground">
+                                Email cannot be changed
+                              </p>
+                            </div>
+
+                            <FormField
+                              control={profileForm.control}
+                              name="full_name"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Full Name</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="John Doe" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={profileForm.control}
+                              name="phone"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Phone Number</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      placeholder="+1 (555) 123-4567"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <Button
+                              type="submit"
+                              disabled={isUpdatingProfile}
+                              className="rounded-full"
+                            >
+                              {isUpdatingProfile ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                  Saving...
+                                </>
+                              ) : (
+                                "Save Changes"
+                              )}
+                            </Button>
+                          </form>
+                        </Form>
+
+                        <Separator />
+
+                        <div className="space-y-4">
+                          <div>
+                            <h3 className="text-lg font-medium text-destructive flex items-center gap-2">
+                              <Trash2 className="w-5 h-5" />
+                              Danger Zone
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              Permanently delete your account and all associated data
                             </p>
                           </div>
-
-                          <FormField
-                            control={profileForm.control}
-                            name="full_name"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Full Name</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="John Doe" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
+                          <DeleteAccountDialog
+                            userEmail={user.email || ""}
+                            onDeleted={handleAccountDeleted}
                           />
-
-                          <FormField
-                            control={profileForm.control}
-                            name="phone"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Phone Number</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    placeholder="+1 (555) 123-4567"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <Button
-                            type="submit"
-                            disabled={isUpdatingProfile}
-                            className="rounded-full"
-                          >
-                            {isUpdatingProfile ? (
-                              <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Saving...
-                              </>
-                            ) : (
-                              "Save Changes"
-                            )}
-                          </Button>
-                        </form>
-                      </Form>
+                        </div>
+                      </div>
                     )}
                   </CardContent>
                 </Card>
@@ -387,6 +440,17 @@ const Account = () => {
                 </Card>
               </TabsContent>
 
+              {/* Notifications Tab */}
+              <TabsContent value="notifications">
+                <EmailPreferences
+                  userId={user.id}
+                  adoptionUpdates={profile?.email_adoption_updates ?? true}
+                  newsletters={profile?.email_newsletters ?? true}
+                  promotions={profile?.email_promotions ?? false}
+                  onUpdate={() => queryClient.invalidateQueries({ queryKey: ["profile"] })}
+                />
+              </TabsContent>
+
               {/* Adoptions Tab */}
               <TabsContent value="adoptions">
                 <Card>
@@ -434,6 +498,11 @@ const Account = () => {
                     )}
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              {/* Foster Tab */}
+              <TabsContent value="foster">
+                <FosterApplicationsTab userId={user.id} />
               </TabsContent>
 
               {/* Payments Tab */}
