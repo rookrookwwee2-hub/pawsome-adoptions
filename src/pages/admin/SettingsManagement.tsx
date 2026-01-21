@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import PayPalSettings from "@/components/admin/PayPalSettings";
 import StripeSettings from "@/components/admin/StripeSettings";
+import CheckoutComSettings from "@/components/admin/CheckoutComSettings";
 import ApiSecretsManager from "@/components/admin/ApiSecretsManager";
 
 interface UsdtSettings {
@@ -238,7 +239,7 @@ const SettingsManagement = () => {
         </div>
 
         <Tabs defaultValue="usdt" className="space-y-6">
-          <TabsList className="grid w-full max-w-4xl grid-cols-6">
+          <TabsList className="grid w-full max-w-5xl grid-cols-7">
             <TabsTrigger value="usdt" className="flex items-center gap-2">
               <Wallet className="w-4 h-4" />
               USDT
@@ -254,6 +255,10 @@ const SettingsManagement = () => {
             <TabsTrigger value="stripe" className="flex items-center gap-2">
               <CreditCard className="w-4 h-4" />
               Stripe
+            </TabsTrigger>
+            <TabsTrigger value="checkoutcom" className="flex items-center gap-2">
+              <CreditCard className="w-4 h-4" />
+              Cards
             </TabsTrigger>
             <TabsTrigger value="api-keys" className="flex items-center gap-2">
               <Key className="w-4 h-4" />
@@ -437,6 +442,11 @@ const SettingsManagement = () => {
           {/* Stripe Settings */}
           <TabsContent value="stripe">
             <StripeSettings />
+          </TabsContent>
+
+          {/* Checkout.com Settings */}
+          <TabsContent value="checkoutcom">
+            <CheckoutComSettings />
           </TabsContent>
 
           {/* API Keys & Secrets */}

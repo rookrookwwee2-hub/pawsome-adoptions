@@ -14,3 +14,15 @@ verify_jwt = false
 
 [functions.paypal-webhook]
 verify_jwt = false
+
+[functions.validate-checkoutcom-key]
+verify_jwt = false
+
+[functions.create-checkoutcom-session]
+verify_jwt = false
+
+[functions.checkoutcom-webhook]
+verify_jwt = false
+
+[functions.send-checkoutcom-order-confirmation]
+verify_jwt = false
