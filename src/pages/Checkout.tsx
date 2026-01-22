@@ -1029,7 +1029,7 @@ const Checkout = () => {
                     </div>
 
                     <p className="text-xs text-muted-foreground text-center">
-                      {currency === "CAD" && "Prices shown in CAD"}
+                      Prices shown in USD
                     </p>
                   </CardContent>
                 </Card>

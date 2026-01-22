@@ -24,8 +24,8 @@ export interface CartItem {
 
 interface CartContextType {
   items: CartItem[];
-  currency: "USD" | "CAD";
-  setCurrency: (currency: "USD" | "CAD") => void;
+  currency: "USD";
+  setCurrency: (currency: "USD") => void;
   addToCart: (item: CartItem) => void;
   removeFromCart: (petId: string) => void;
   updateAddOns: (petId: string, addOns: CartAddOn[]) => void;
@@ -38,17 +38,14 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const CAD_EXCHANGE_RATE = 1.36; // Approximate USD to CAD rate
-
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
-  const [currency, setCurrency] = useState<"USD" | "CAD">("USD");
+  const [currency, setCurrency] = useState<"USD">("USD");
 
-  const exchangeRate = currency === "CAD" ? CAD_EXCHANGE_RATE : 1;
+  const exchangeRate = 1;
 
   const formatPrice = (price: number): string => {
-    const convertedPrice = price * exchangeRate;
-    return `${currency === "CAD" ? "C" : ""}$${convertedPrice.toFixed(2)}`;
+    return `$${price.toFixed(2)}`;
   };
 
   const addToCart = (item: CartItem) => {
