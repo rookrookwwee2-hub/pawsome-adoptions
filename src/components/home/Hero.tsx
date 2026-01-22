@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import heroDogsImage from "@/assets/hero-dogs-v2.jpg";
 import heroDogsSlide3 from "@/assets/hero-dogs-slide3.jpg";
+import heroCatSlide4 from "@/assets/hero-cat-slide4.jpg";
+import heroDogsSlide5 from "@/assets/hero-dogs-slide5.jpg";
+import heroCatsSlide6 from "@/assets/hero-cats-slide6.jpg";
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -18,9 +21,9 @@ const Hero = () => {
     heroDogsImage,
     "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=1920&h=1080&fit=crop",
     heroDogsSlide3,
-    "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=1920&h=1080&fit=crop",
-    "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=1920&h=1080&fit=crop",
-    "https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=1920&h=1080&fit=crop",
+    heroCatSlide4,
+    heroDogsSlide5,
+    heroCatsSlide6,
   ];
 
   useEffect(() => {
