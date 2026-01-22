@@ -14,12 +14,11 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import type { Database } from "@/integrations/supabase/types";
-
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type UserRole = Database['public']['Tables']['user_roles']['Row'];
 
 interface UserWithRole extends Profile {
-  roles: UserRole[];
+  roles: (UserRole & { is_protected?: boolean })[];
 }
 
 const UsersManagement = () => {
@@ -68,6 +67,19 @@ const UsersManagement = () => {
   );
 
   const toggleAdminRole = async (userId: string, isCurrentlyAdmin: boolean) => {
+    // Check if this is a protected admin
+    const user = users.find(u => u.id === userId);
+    const isProtected = user?.roles.some(r => r.role === 'admin' && r.is_protected);
+    
+    if (isProtected && isCurrentlyAdmin) {
+      toast({ 
+        title: "Cannot Remove", 
+        description: "This is a protected admin account and cannot be removed", 
+        variant: "destructive" 
+      });
+      return;
+    }
+
     if (isCurrentlyAdmin) {
       // Remove admin role
       const { error } = await supabase
@@ -99,6 +111,9 @@ const UsersManagement = () => {
 
   const isAdmin = (user: UserWithRole) => 
     user.roles.some((role) => role.role === 'admin');
+
+  const isProtectedAdmin = (user: UserWithRole) => 
+    user.roles.some((role) => role.role === 'admin' && role.is_protected);
 
   return (
     <AdminLayout>
@@ -175,35 +190,46 @@ const UsersManagement = () => {
                       {new Date(user.created_at!).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          isAdmin(user)
-                            ? "bg-primary/10 text-primary"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {isAdmin(user) ? "Admin" : "User"}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            isAdmin(user)
+                              ? "bg-primary/10 text-primary"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {isAdmin(user) ? "Admin" : "User"}
+                        </span>
+                        {isProtectedAdmin(user) && (
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-600">
+                            Protected
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleAdminRole(user.id, isAdmin(user))}
-                        className={isAdmin(user) ? "text-destructive" : "text-primary"}
-                      >
-                        {isAdmin(user) ? (
-                          <>
-                            <ShieldOff className="w-4 h-4 mr-2" />
-                            Remove Admin
-                          </>
-                        ) : (
-                          <>
-                            <Shield className="w-4 h-4 mr-2" />
-                            Make Admin
-                          </>
-                        )}
-                      </Button>
+                      {isProtectedAdmin(user) ? (
+                        <span className="text-xs text-muted-foreground">Main Admin</span>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleAdminRole(user.id, isAdmin(user))}
+                          className={isAdmin(user) ? "text-destructive" : "text-primary"}
+                        >
+                          {isAdmin(user) ? (
+                            <>
+                              <ShieldOff className="w-4 h-4 mr-2" />
+                              Remove Admin
+                            </>
+                          ) : (
+                            <>
+                              <Shield className="w-4 h-4 mr-2" />
+                              Make Admin
+                            </>
+                          )}
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))
