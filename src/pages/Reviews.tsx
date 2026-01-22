@@ -44,10 +44,10 @@ const Reviews = () => {
   return (
     <>
       <Helmet>
-        <title>Customer Reviews - PawHaven</title>
+        <title>Customer Reviews - Pawsfam</title>
         <meta
           name="description"
-          content="Read reviews from happy pet parents who found their perfect companions through PawHaven. Real stories from real families."
+          content="Read reviews from happy pet parents who found their perfect companions through Pawsfam. Real stories from real families."
         />
       </Helmet>
 
@@ -64,7 +64,7 @@ const Reviews = () => {
                 Customer Reviews
               </h1>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Real stories from families who found their perfect companions through PawHaven.
+                Real stories from families who found their perfect companions through Pawsfam.
                 Every review is from a verified adoption.
               </p>
             </div>

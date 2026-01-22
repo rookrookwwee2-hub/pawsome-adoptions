@@ -93,7 +93,7 @@ const Dashboard = () => {
             Dashboard
           </h1>
           <p className="text-muted-foreground mt-1">
-            Welcome to the PawHaven admin panel
+            Welcome to the Pawsfam admin panel
           </p>
         </div>
 

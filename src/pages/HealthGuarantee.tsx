@@ -62,7 +62,7 @@ const HealthGuarantee = () => {
   return (
     <>
       <Helmet>
-        <title>Health Guarantee | Vaccinations & Genetic Testing | PawHaven</title>
+        <title>Health Guarantee | Vaccinations & Genetic Testing | Pawsfam</title>
         <meta
           name="description"
           content="Our comprehensive health guarantee includes vaccinations, genetic testing, HCM screening, and optional extended protection plans for your new pet."
@@ -89,7 +89,7 @@ const HealthGuarantee = () => {
                   Health Guarantee
                 </h1>
                 <p className="text-muted-foreground text-lg">
-                  Every pet from PawHaven comes with comprehensive health coverage and documentation, 
+                  Every pet from Pawsfam comes with comprehensive health coverage and documentation, 
                   ensuring you receive a happy, healthy companion.
                 </p>
               </div>

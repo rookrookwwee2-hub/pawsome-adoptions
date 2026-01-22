@@ -161,7 +161,7 @@ const Auth = () => {
             </div>
           </div>
           <h1 className="font-display text-3xl font-bold text-foreground">
-            {isLogin ? "Welcome Back" : "Join PawHaven"}
+            {isLogin ? "Welcome Back" : "Join Pawsfam"}
           </h1>
           <p className="text-muted-foreground mt-2">
             {isLogin

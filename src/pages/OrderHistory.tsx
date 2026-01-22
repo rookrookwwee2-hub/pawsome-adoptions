@@ -227,7 +227,7 @@ const OrderHistory = () => {
   return (
     <>
       <Helmet>
-        <title>Order History - PawfectMatch</title>
+        <title>Order History - Pawsfam</title>
         <meta name="description" content="View your pet adoption order history and payment status." />
       </Helmet>
       <Navbar />

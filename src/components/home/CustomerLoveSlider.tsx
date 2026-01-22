@@ -69,7 +69,7 @@ const CustomerLoveSlider = () => {
             Customer Love 💕
           </h2>
           <p className="text-background/70">
-            Hear from families who found their perfect companions through PawHaven.
+            Hear from families who found their perfect companions through Pawsfam.
           </p>
         </div>
 

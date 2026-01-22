@@ -11,7 +11,7 @@ const DogBreeds = () => {
   return (
     <>
       <Helmet>
-        <title>Dog Breeds Directory | PawHaven</title>
+        <title>Dog Breeds Directory | Pawsfam</title>
         <meta
           name="description"
           content="Explore our directory of dog breeds. Find your perfect canine companion from popular breeds including Golden Retriever, French Bulldog, and more."

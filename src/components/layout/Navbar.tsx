@@ -68,7 +68,7 @@ const Navbar = () => {
               <Heart className="w-5 h-5 text-primary-foreground fill-current" />
             </div>
             <span className="font-display text-2xl font-bold text-foreground">
-              PawHaven
+              Pawsfam
             </span>
           </Link>
 

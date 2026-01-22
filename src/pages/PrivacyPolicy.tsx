@@ -57,10 +57,10 @@ const PrivacyPolicy = () => {
   return (
     <>
       <Helmet>
-        <title>Privacy Policy - PawfectMatch</title>
+        <title>Privacy Policy - Pawsfam</title>
         <meta
           name="description"
-          content="Learn how PawfectMatch protects your privacy and handles your personal data. Read our comprehensive privacy policy."
+          content="Learn how Pawsfam protects your privacy and handles your personal data. Read our comprehensive privacy policy."
         />
       </Helmet>
       <Navbar />

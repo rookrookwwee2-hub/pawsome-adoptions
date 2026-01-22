@@ -41,10 +41,10 @@ const Contact = () => {
   return (
     <>
       <Helmet>
-        <title>Contact Us | PawHaven</title>
+        <title>Contact Us | Pawsfam</title>
         <meta
           name="description"
-          content="Get in touch with PawHaven. We're here to answer your questions about pet adoption, volunteering, or partnership opportunities."
+          content="Get in touch with Pawsfam. We're here to answer your questions about pet adoption, volunteering, or partnership opportunities."
         />
       </Helmet>
 
@@ -77,8 +77,8 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold mb-1">Email</h3>
-                      <p className="text-muted-foreground">hello@pawhaven.com</p>
-                      <p className="text-muted-foreground">support@pawhaven.com</p>
+                      <p className="text-muted-foreground">hello@pawsfam.com</p>
+                      <p className="text-muted-foreground">support@pawsfam.com</p>
                     </div>
                   </div>
 
