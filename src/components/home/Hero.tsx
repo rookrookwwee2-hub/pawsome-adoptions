@@ -3,6 +3,7 @@ import { ArrowRight, Heart, Shield, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import heroDogsImage from "@/assets/hero-dogs-v2.jpg";
+import heroDogsSlide3 from "@/assets/hero-dogs-slide3.jpg";
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -16,7 +17,7 @@ const Hero = () => {
   const heroImages = [
     heroDogsImage,
     "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=1920&h=1080&fit=crop",
-    "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=1920&h=1080&fit=crop",
+    heroDogsSlide3,
     "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=1920&h=1080&fit=crop",
     "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=1920&h=1080&fit=crop",
     "https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=1920&h=1080&fit=crop",
@@ -43,7 +44,7 @@ const Hero = () => {
             <img
               src={src}
               alt={`Pet slideshow ${index + 1}`}
-              className={`w-full h-full object-cover ${index === currentSlide ? "animate-ken-burns" : ""}`}
+              className={`w-full h-full object-cover object-center ${index === currentSlide ? "animate-ken-burns" : ""}`}
               loading={index === currentSlide ? "eager" : "lazy"}
               fetchPriority={index === currentSlide ? "high" : "auto"}
               decoding="async"
