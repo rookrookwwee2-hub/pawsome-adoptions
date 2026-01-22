@@ -32,6 +32,8 @@ import FosterManagement from "./pages/admin/FosterManagement";
 import SettingsManagement from "./pages/admin/SettingsManagement";
 import PaymentSuggestionsManagement from "./pages/admin/PaymentSuggestionsManagement";
 import ReviewsManagement from "./pages/admin/ReviewsManagement";
+import GoogleOAuthPage from "./pages/admin/GoogleOAuthPage";
+import AnalyticsSettingsPage from "./pages/admin/AnalyticsSettingsPage";
 import Reviews from "./pages/Reviews";
 import NotFound from "./pages/NotFound";
 import CatBreeds from "./pages/CatBreeds";
@@ -42,6 +44,7 @@ import HealthGuarantee from "./pages/HealthGuarantee";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import CookieConsent from "./components/CookieConsent";
+import GoogleAnalytics from "./components/analytics/GoogleAnalytics";
 
 const queryClient = new QueryClient();
 
@@ -88,9 +91,12 @@ const App = () => (
                   <Route path="/admin/settings" element={<ProtectedRoute requireAdmin><SettingsManagement /></ProtectedRoute>} />
                   <Route path="/admin/payment-suggestions" element={<ProtectedRoute requireAdmin><PaymentSuggestionsManagement /></ProtectedRoute>} />
                   <Route path="/admin/reviews" element={<ProtectedRoute requireAdmin><ReviewsManagement /></ProtectedRoute>} />
+                  <Route path="/admin/google-oauth" element={<ProtectedRoute requireAdmin><GoogleOAuthPage /></ProtectedRoute>} />
+                  <Route path="/admin/analytics-settings" element={<ProtectedRoute requireAdmin><AnalyticsSettingsPage /></ProtectedRoute>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <CookieConsent />
+                <GoogleAnalytics />
               </BrowserRouter>
             </TooltipProvider>
           </CartProvider>

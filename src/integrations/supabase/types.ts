@@ -91,6 +91,36 @@ export type Database = {
           },
         ]
       }
+      analytics_settings: {
+        Row: {
+          created_at: string
+          ga_enabled: boolean
+          ga_measurement_id: string | null
+          gtm_container_id: string | null
+          gtm_enabled: boolean
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          ga_enabled?: boolean
+          ga_measurement_id?: string | null
+          gtm_container_id?: string | null
+          gtm_enabled?: boolean
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          ga_enabled?: boolean
+          ga_measurement_id?: string | null
+          gtm_container_id?: string | null
+          gtm_enabled?: boolean
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       api_secrets: {
         Row: {
           created_at: string
@@ -291,6 +321,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      google_oauth_settings: {
+        Row: {
+          client_id: string
+          created_at: string
+          default_user_role: Database["public"]["Enums"]["app_role"]
+          enabled: boolean
+          id: string
+          redirect_uri: string
+          scopes: string
+          show_on_login: boolean
+          updated_at: string
+        }
+        Insert: {
+          client_id?: string
+          created_at?: string
+          default_user_role?: Database["public"]["Enums"]["app_role"]
+          enabled?: boolean
+          id?: string
+          redirect_uri?: string
+          scopes?: string
+          show_on_login?: boolean
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          default_user_role?: Database["public"]["Enums"]["app_role"]
+          enabled?: boolean
+          id?: string
+          redirect_uri?: string
+          scopes?: string
+          show_on_login?: boolean
+          updated_at?: string
+        }
+        Relationships: []
       }
       guest_payments: {
         Row: {

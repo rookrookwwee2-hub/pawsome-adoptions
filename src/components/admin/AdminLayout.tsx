@@ -13,7 +13,9 @@ import {
   Receipt,
   Settings,
   BarChart3,
-  MessageSquare
+  MessageSquare,
+  KeyRound,
+  LineChart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -40,6 +42,8 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     { name: "Bank Proofs", path: "/admin/payment-proofs", icon: Receipt },
     { name: "Payment Suggestions", path: "/admin/payment-suggestions", icon: Heart },
     { name: "Users", path: "/admin/users", icon: Users },
+    { name: "Google OAuth", path: "/admin/google-oauth", icon: KeyRound },
+    { name: "Site Analytics", path: "/admin/analytics-settings", icon: LineChart },
     { name: "Settings", path: "/admin/settings", icon: Settings },
   ];
 
