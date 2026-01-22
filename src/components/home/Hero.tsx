@@ -50,9 +50,9 @@ const Hero = () => {
             />
           </div>
         ))}
-        {/* Gradient Overlay for Text Readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-foreground/45 via-foreground/15 to-background/80 dark:from-background/45 dark:via-background/20 dark:to-background/80" />
-        <div className="absolute inset-0 bg-gradient-to-r from-foreground/55 via-foreground/10 to-transparent dark:from-background/60 dark:via-background/25 dark:to-transparent" />
+        {/* Gradient Overlay for Text Readability - Reduced opacity */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/50" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent" />
       </div>
 
       <div className="container-custom pt-20">
