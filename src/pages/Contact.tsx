@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Send, MessageCircle } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { SocialIcons } from "@/components/shared/SocialIcons";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -105,6 +106,20 @@ const Contact = () => {
                       <p className="text-muted-foreground">New York, NY 10001</p>
                     </div>
                   </div>
+                </div>
+
+                {/* Social Media Section */}
+                <div className="p-6 bg-card rounded-2xl shadow-soft">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                      <MessageCircle className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">Connect With Us</h3>
+                      <p className="text-sm text-muted-foreground">Follow us on social media</p>
+                    </div>
+                  </div>
+                  <SocialIcons iconSize="md" showLabels className="justify-start" />
                 </div>
 
                 {/* Map Placeholder */}
