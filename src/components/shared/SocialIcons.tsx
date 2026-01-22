@@ -34,10 +34,31 @@ export const SocialIcons = ({ className = "", iconSize = "md", showLabels = fals
   }
 
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
+    <div className={`flex ${showLabels ? 'flex-wrap gap-2' : 'items-center gap-3'} ${className}`}>
       {enabledLinks.map(([platform, link]) => {
         const style = platformStyles[platform as keyof SocialLinks];
         const isSnapchat = platform === "snapchat";
+        
+        if (showLabels) {
+          return (
+            <a
+              key={platform}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${style.color} ${style.hoverColor} rounded-full px-4 py-2 flex items-center gap-2 transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105`}
+              title={style.name}
+            >
+              <SocialIcon 
+                platform={platform} 
+                className={`w-4 h-4 ${isSnapchat ? "text-black" : "text-white"}`} 
+              />
+              <span className={`text-sm font-medium ${isSnapchat ? "text-black" : "text-white"}`}>
+                {style.name}
+              </span>
+            </a>
+          );
+        }
         
         return (
           <a
@@ -52,11 +73,6 @@ export const SocialIcons = ({ className = "", iconSize = "md", showLabels = fals
               platform={platform} 
               className={`${iconSizeClasses[iconSize]} ${isSnapchat ? "text-black" : "text-white"}`} 
             />
-            {showLabels && (
-              <span className={`ml-2 text-sm font-medium ${isSnapchat ? "text-black" : "text-white"}`}>
-                {style.name}
-              </span>
-            )}
           </a>
         );
       })}
