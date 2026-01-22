@@ -72,6 +72,11 @@ const Navbar = () => {
             </span>
           </Link>
 
+          {/* Always visible Theme Toggle */}
+          <div className="lg:hidden flex items-center gap-2">
+            <ThemeToggle />
+          </div>
+
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-6">
             {navLinks.map((link) => (
@@ -327,10 +332,6 @@ const Navbar = () => {
               <div className="flex items-center justify-between py-2 border-t border-border mt-2 pt-4">
                 <span className="font-body font-medium text-muted-foreground">Currency</span>
                 <CurrencySelector />
-              </div>
-              <div className="flex items-center justify-between py-2">
-                <span className="font-body font-medium text-muted-foreground">Theme</span>
-                <ThemeToggle />
               </div>
               {user ? (
                 <>
