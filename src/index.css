@@ -268,6 +268,17 @@
   animation: kenBurns 7s ease-out forwards;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .animate-ken-burns {
+    animation: none;
+    transform: none;
+  }
+
+  .duration-1500 {
+    transition-duration: 0ms;
+  }
+}
+
 /* Smooth transition duration for slideshow */
 .duration-1500 {
   transition-duration: 1500ms;
