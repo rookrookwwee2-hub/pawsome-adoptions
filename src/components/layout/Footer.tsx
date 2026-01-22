@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Heart, Mail, Phone, MapPin, Instagram, Facebook, Twitter } from "lucide-react";
+import { Heart, Mail, Phone, MapPin } from "lucide-react";
+import { SocialIcons } from "@/components/shared/SocialIcons";
 
 const quickLinks = [
   { name: "Available Pets", path: "/pets" },
@@ -37,17 +38,8 @@ const Footer = () => {
             <p className="text-background/70 font-body leading-relaxed">
               Finding loving homes for pets since 2020. Every pet deserves a second chance at happiness.
             </p>
-            <div className="flex gap-4">
-              <a href="#" className="p-2 rounded-full bg-background/10 hover:bg-primary transition-colors">
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a href="#" className="p-2 rounded-full bg-background/10 hover:bg-primary transition-colors">
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a href="#" className="p-2 rounded-full bg-background/10 hover:bg-primary transition-colors">
-                <Twitter className="w-5 h-5" />
-              </a>
-            </div>
+            {/* Dynamic Social Icons */}
+            <SocialIcons iconSize="sm" />
           </div>
 
           {/* Quick Links */}

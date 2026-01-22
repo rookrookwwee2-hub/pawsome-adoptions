@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Save, Plus, Trash2, Wallet, Building2, UserPlus, Loader2, CreditCard, Key } from "lucide-react";
+import { Save, Plus, Trash2, Wallet, Building2, UserPlus, Loader2, CreditCard, Key, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +13,7 @@ import PayPalSettings from "@/components/admin/PayPalSettings";
 import StripeSettings from "@/components/admin/StripeSettings";
 import CheckoutComSettings from "@/components/admin/CheckoutComSettings";
 import ApiSecretsManager from "@/components/admin/ApiSecretsManager";
+import SocialMediaSettings from "@/components/admin/SocialMediaSettings";
 
 interface UsdtSettings {
   network: string;
@@ -239,7 +240,7 @@ const SettingsManagement = () => {
         </div>
 
         <Tabs defaultValue="usdt" className="space-y-6">
-          <TabsList className="grid w-full max-w-5xl grid-cols-7">
+          <TabsList className="grid w-full max-w-6xl grid-cols-8">
             <TabsTrigger value="usdt" className="flex items-center gap-2">
               <Wallet className="w-4 h-4" />
               USDT
@@ -259,6 +260,10 @@ const SettingsManagement = () => {
             <TabsTrigger value="checkoutcom" className="flex items-center gap-2">
               <CreditCard className="w-4 h-4" />
               Cards
+            </TabsTrigger>
+            <TabsTrigger value="social" className="flex items-center gap-2">
+              <MessageCircle className="w-4 h-4" />
+              Social
             </TabsTrigger>
             <TabsTrigger value="api-keys" className="flex items-center gap-2">
               <Key className="w-4 h-4" />
@@ -447,6 +452,11 @@ const SettingsManagement = () => {
           {/* Checkout.com Settings */}
           <TabsContent value="checkoutcom">
             <CheckoutComSettings />
+          </TabsContent>
+
+          {/* Social Media Settings */}
+          <TabsContent value="social">
+            <SocialMediaSettings />
           </TabsContent>
 
           {/* API Keys & Secrets */}
