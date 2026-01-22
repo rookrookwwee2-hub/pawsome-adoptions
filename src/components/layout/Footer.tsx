@@ -92,7 +92,7 @@ const Footer = () => {
 
         <div className="mt-12 pt-8 border-t border-background/10 text-center">
           <p className="text-background/50 font-body text-sm">
-            © 2024 Pawsfam. All rights reserved. Made with{" "}
+            © 2026 Pawsfam. All rights reserved. Made with{" "}
             <Heart className="w-4 h-4 inline text-primary fill-primary" /> for pets everywhere.
           </p>
         </div>
