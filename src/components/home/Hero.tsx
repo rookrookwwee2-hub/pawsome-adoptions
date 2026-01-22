@@ -23,26 +23,26 @@ const Hero = () => {
       {/* Background Family Pet Images */}
       <div className="absolute inset-0 -z-10">
         {/* Image Collage Behind Title */}
-        <div className="absolute top-16 left-0 right-0 h-[500px] lg:h-[600px] overflow-hidden">
-          <div className="grid grid-cols-3 gap-2 opacity-20 dark:opacity-15">
+        <div className="absolute top-0 left-0 right-0 h-[600px] lg:h-[700px] overflow-hidden px-4">
+          <div className="grid grid-cols-3 gap-3 pt-20">
             {familyImages.map((src, index) => (
               <div
                 key={index}
-                className={`overflow-hidden rounded-2xl ${
-                  index % 2 === 0 ? 'mt-8' : 'mt-0'
+                className={`overflow-hidden rounded-2xl shadow-lg ${
+                  index % 2 === 0 ? 'mt-12' : 'mt-4'
                 }`}
               >
                 <img
                   src={src}
                   alt={`Happy family with pet ${index + 1}`}
-                  className="w-full h-48 md:h-64 object-cover"
-                  loading="lazy"
+                  className="w-full h-40 md:h-56 lg:h-64 object-cover"
+                  loading="eager"
                 />
               </div>
             ))}
           </div>
-          {/* Gradient Overlay for Text Readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background" />
+          {/* Softer Gradient Overlay for Text Readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/90" />
         </div>
         
         {/* Additional Decorative Blurs */}
