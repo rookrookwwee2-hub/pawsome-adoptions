@@ -9,10 +9,43 @@ const Hero = () => {
     { icon: Clock, value: "24/7", label: "Support" },
   ];
 
+  const familyImages = [
+    "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&h=300&fit=crop",
+    "https://images.unsplash.com/photo-1559190394-df5a28aab5c5?w=400&h=300&fit=crop",
+    "https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=400&h=300&fit=crop",
+    "https://images.unsplash.com/photo-1544568100-847a948585b9?w=400&h=300&fit=crop",
+    "https://images.unsplash.com/photo-1606567595334-d39972c85dfd?w=400&h=300&fit=crop",
+    "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&h=300&fit=crop",
+  ];
+
   return (
     <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-      {/* Background Pattern */}
+      {/* Background Family Pet Images */}
       <div className="absolute inset-0 -z-10">
+        {/* Image Collage Behind Title */}
+        <div className="absolute top-16 left-0 right-0 h-[500px] lg:h-[600px] overflow-hidden">
+          <div className="grid grid-cols-3 gap-2 opacity-20 dark:opacity-15">
+            {familyImages.map((src, index) => (
+              <div
+                key={index}
+                className={`overflow-hidden rounded-2xl ${
+                  index % 2 === 0 ? 'mt-8' : 'mt-0'
+                }`}
+              >
+                <img
+                  src={src}
+                  alt={`Happy family with pet ${index + 1}`}
+                  className="w-full h-48 md:h-64 object-cover"
+                  loading="lazy"
+                />
+              </div>
+            ))}
+          </div>
+          {/* Gradient Overlay for Text Readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background" />
+        </div>
+        
+        {/* Additional Decorative Blurs */}
         <div className="absolute top-1/4 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
       </div>
