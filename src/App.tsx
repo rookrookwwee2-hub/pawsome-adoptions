@@ -42,7 +42,6 @@ import HealthGuarantee from "./pages/HealthGuarantee";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import CookieConsent from "./components/CookieConsent";
-import FloatingContactBar from "./components/shared/FloatingContactBar";
 
 const queryClient = new QueryClient();
 
@@ -91,7 +90,6 @@ const App = () => (
                   <Route path="/admin/reviews" element={<ProtectedRoute requireAdmin><ReviewsManagement /></ProtectedRoute>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
-                <FloatingContactBar />
                 <CookieConsent />
               </BrowserRouter>
             </TooltipProvider>

@@ -8,7 +8,6 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import CurrencySelector from "@/components/cart/CurrencySelector";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { SocialIcons } from "@/components/shared/SocialIcons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -138,8 +137,6 @@ const Navbar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center gap-2">
-            {/* Dynamic Social Icons */}
-            <SocialIcons iconSize="sm" className="mr-2" />
             <CurrencySelector />
             <ThemeToggle />
             
