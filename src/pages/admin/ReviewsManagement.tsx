@@ -56,6 +56,8 @@ import { Label } from "@/components/ui/label";
 
 interface Review {
   id: string;
+  user_id: string | null;
+  adoption_id: string | null;
   customer_name: string;
   customer_email: string | null;
   country: string;
@@ -69,6 +71,8 @@ interface Review {
   created_at: string;
 }
 
+type NewReview = Omit<Review, "created_at">;
+
 const ReviewsManagement = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -76,6 +80,7 @@ const ReviewsManagement = () => {
   
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [editingReview, setEditingReview] = useState<Review | null>(null);
+  const [creatingReview, setCreatingReview] = useState<NewReview | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -116,6 +121,26 @@ const ReviewsManagement = () => {
     },
   });
 
+  const createMutation = useMutation({
+    mutationFn: async (payload: NewReview) => {
+      const { error } = await supabase
+        .from("reviews")
+        .insert({
+          ...payload,
+          updated_at: new Date().toISOString(),
+        });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
+      toast({ title: "Review created successfully" });
+      setCreatingReview(null);
+    },
+    onError: (error) => {
+      toast({ title: "Error creating review", description: error.message, variant: "destructive" });
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("reviews").delete().eq("id", id);
@@ -132,7 +157,9 @@ const ReviewsManagement = () => {
   });
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || !e.target.files[0] || !editingReview) return;
+    if (!e.target.files || !e.target.files[0]) return;
+    const target = editingReview ?? creatingReview;
+    if (!target) return;
     
     const file = e.target.files[0];
     if (!file.type.startsWith("image/")) {
@@ -143,7 +170,7 @@ const ReviewsManagement = () => {
     setUploading(true);
     try {
       const fileExt = file.name.split(".").pop();
-      const fileName = `${editingReview.id}/${Date.now()}.${fileExt}`;
+      const fileName = `${target.id}/${Date.now()}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from("review-photos")
@@ -155,13 +182,35 @@ const ReviewsManagement = () => {
         .from("review-photos")
         .getPublicUrl(fileName);
 
-      setEditingReview({ ...editingReview, photo_url: publicUrl });
+      if (editingReview) {
+        setEditingReview({ ...editingReview, photo_url: publicUrl });
+      } else if (creatingReview) {
+        setCreatingReview({ ...creatingReview, photo_url: publicUrl });
+      }
       toast({ title: "Photo uploaded successfully" });
     } catch (error: any) {
       toast({ title: "Error uploading photo", description: error.message, variant: "destructive" });
     } finally {
       setUploading(false);
     }
+  };
+
+  const startCreate = () => {
+    setCreatingReview({
+      id: crypto.randomUUID(),
+      user_id: null,
+      adoption_id: null,
+      customer_name: "",
+      customer_email: null,
+      country: "",
+      country_flag: null,
+      pet_type: "dog",
+      review_text: "",
+      photo_url: null,
+      status: "approved",
+      display_location: "reviews_page",
+      admin_notes: null,
+    });
   };
 
   const getStatusBadge = (status: string) => {
@@ -197,6 +246,9 @@ const ReviewsManagement = () => {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <Button onClick={startCreate}>
+              Add Review
+            </Button>
             <Filter className="w-4 h-4 text-muted-foreground" />
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-40">
@@ -525,6 +577,179 @@ const ReviewsManagement = () => {
               disabled={updateMutation.isPending}
             >
               Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Dialog */}
+      <Dialog open={!!creatingReview} onOpenChange={() => setCreatingReview(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add Review</DialogTitle>
+          </DialogHeader>
+          {creatingReview && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Customer Name</Label>
+                  <Input
+                    value={creatingReview.customer_name}
+                    onChange={(e) =>
+                      setCreatingReview({ ...creatingReview, customer_name: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Country</Label>
+                  <Input
+                    value={creatingReview.country}
+                    onChange={(e) =>
+                      setCreatingReview({ ...creatingReview, country: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Country Flag (emoji)</Label>
+                  <Input
+                    value={creatingReview.country_flag || ""}
+                    onChange={(e) =>
+                      setCreatingReview({
+                        ...creatingReview,
+                        country_flag: e.target.value || null,
+                      })
+                    }
+                    placeholder="🇺🇸"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Pet Type</Label>
+                  <Select
+                    value={creatingReview.pet_type}
+                    onValueChange={(value) =>
+                      setCreatingReview({ ...creatingReview, pet_type: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="dog">Dog</SelectItem>
+                      <SelectItem value="cat">Cat</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Review Text</Label>
+                <Textarea
+                  value={creatingReview.review_text}
+                  onChange={(e) =>
+                    setCreatingReview({ ...creatingReview, review_text: e.target.value })
+                  }
+                  rows={4}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Status</Label>
+                  <Select
+                    value={creatingReview.status}
+                    onValueChange={(value) =>
+                      setCreatingReview({ ...creatingReview, status: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="approved">Approved</SelectItem>
+                      <SelectItem value="rejected">Rejected</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Display Location</Label>
+                  <Select
+                    value={creatingReview.display_location}
+                    onValueChange={(value) =>
+                      setCreatingReview({ ...creatingReview, display_location: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="reviews_page">Reviews Page Only</SelectItem>
+                      <SelectItem value="homepage">Homepage Only</SelectItem>
+                      <SelectItem value="both">Both</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Photo</Label>
+                <div className="flex items-center gap-4">
+                  {creatingReview.photo_url && (
+                    <img
+                      src={creatingReview.photo_url}
+                      alt=""
+                      className="w-24 h-24 rounded-lg object-cover"
+                    />
+                  )}
+                  <div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoUpload}
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      {uploading ? "Uploading..." : "Upload Photo"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Admin Notes</Label>
+                <Textarea
+                  value={creatingReview.admin_notes || ""}
+                  onChange={(e) =>
+                    setCreatingReview({
+                      ...creatingReview,
+                      admin_notes: e.target.value || null,
+                    })
+                  }
+                  rows={2}
+                  placeholder="Internal notes..."
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreatingReview(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => creatingReview && createMutation.mutate(creatingReview)}
+              disabled={createMutation.isPending || !creatingReview?.customer_name || !creatingReview?.country || !creatingReview?.review_text}
+            >
+              Create Review
             </Button>
           </DialogFooter>
         </DialogContent>
