@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Heart, Shield, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -42,36 +42,37 @@ const Hero = () => {
             <img
               src={src}
               alt={`Pet slideshow ${index + 1}`}
-              className={`w-full h-full object-cover ${
-                index === currentSlide ? 'animate-ken-burns' : ''
-              }`}
+              className={`w-full h-full object-cover ${index === currentSlide ? "animate-ken-burns" : ""}`}
+              loading={index === currentSlide ? "eager" : "lazy"}
+              fetchPriority={index === currentSlide ? "high" : "auto"}
+              decoding="async"
             />
           </div>
         ))}
         {/* Gradient Overlay for Text Readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/30 to-background/80" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-foreground/45 via-foreground/15 to-background/80 dark:from-background/45 dark:via-background/20 dark:to-background/80" />
+        <div className="absolute inset-0 bg-gradient-to-r from-foreground/55 via-foreground/10 to-transparent dark:from-background/60 dark:via-background/25 dark:to-transparent" />
       </div>
 
       <div className="container-custom pt-20">
         <div className="max-w-2xl">
           {/* Content */}
           <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 backdrop-blur-sm rounded-full animate-fade-up opacity-0">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-background/10 backdrop-blur-sm rounded-full animate-fade-up opacity-0">
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-              <span className="text-sm font-medium text-primary-foreground dark:text-primary">
+              <span className="text-sm font-medium text-primary-foreground dark:text-foreground">
                 Over 5,000 successful adoptions
               </span>
             </div>
 
-            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight animate-fade-up opacity-0 stagger-1 text-white drop-shadow-lg">
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight animate-fade-up opacity-0 stagger-1 text-primary-foreground dark:text-foreground drop-shadow-lg">
               Find Your{" "}
               <span className="text-primary">Perfect</span>
               <br />
               Companion
             </h1>
 
-            <p className="text-base sm:text-lg md:text-xl text-white/90 max-w-lg font-body leading-relaxed animate-fade-up opacity-0 stagger-2 drop-shadow-md">
+            <p className="text-base sm:text-lg md:text-xl text-primary-foreground/90 dark:text-foreground/90 max-w-lg font-body leading-relaxed animate-fade-up opacity-0 stagger-2 drop-shadow-md">
               Every pet deserves a loving home. Browse hundreds of adorable pets waiting for their forever families and make a difference today.
             </p>
 
@@ -82,7 +83,11 @@ const Hero = () => {
                   <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
-              <Button size="lg" variant="outline" className="w-full sm:w-auto rounded-full border-white/50 text-white hover:bg-white/20 backdrop-blur-sm">
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto rounded-full border-primary-foreground/50 text-primary-foreground hover:bg-background/10 backdrop-blur-sm dark:border-foreground/40 dark:text-foreground"
+              >
                 Learn More
               </Button>
             </div>
@@ -91,12 +96,12 @@ const Hero = () => {
             <div className="flex flex-wrap gap-6 pt-6 animate-fade-up opacity-0 stagger-4">
               {stats.map((stat, index) => (
                 <div key={index} className="flex items-center gap-3">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                    <stat.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-background/10 backdrop-blur-sm rounded-full flex items-center justify-center">
+                    <stat.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground dark:text-foreground" />
                   </div>
                   <div>
-                    <p className="font-display text-xl sm:text-2xl font-bold text-white drop-shadow-md">{stat.value}</p>
-                    <p className="text-xs sm:text-sm text-white/80">{stat.label}</p>
+                    <p className="font-display text-xl sm:text-2xl font-bold text-primary-foreground dark:text-foreground drop-shadow-md">{stat.value}</p>
+                    <p className="text-xs sm:text-sm text-primary-foreground/80 dark:text-foreground/80">{stat.label}</p>
                   </div>
                 </div>
               ))}
@@ -114,7 +119,7 @@ const Hero = () => {
             className={`w-2 h-2 rounded-full transition-all duration-300 ${
               index === currentSlide 
                 ? 'bg-primary w-6' 
-                : 'bg-white/50 hover:bg-white/70'
+                : 'bg-primary-foreground/50 hover:bg-primary-foreground/70 dark:bg-foreground/40 dark:hover:bg-foreground/60'
             }`}
             aria-label={`Go to slide ${index + 1}`}
           />
