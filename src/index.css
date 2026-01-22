@@ -253,3 +253,22 @@
     transform: scale(1);
   }
 }
+
+/* Ken Burns Effect - Slow zoom and pan animation */
+@keyframes kenBurns {
+  0% {
+    transform: scale(1) translateX(0) translateY(0);
+  }
+  100% {
+    transform: scale(1.15) translateX(-2%) translateY(-1%);
+  }
+}
+
+.animate-ken-burns {
+  animation: kenBurns 7s ease-out forwards;
+}
+
+/* Smooth transition duration for slideshow */
+.duration-1500 {
+  transition-duration: 1500ms;
+}
