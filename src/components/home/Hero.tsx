@@ -24,7 +24,7 @@ const Hero = () => {
       <div className="absolute inset-0 -z-10">
         {/* Image Collage Behind Title */}
         <div className="absolute top-0 left-0 right-0 h-[600px] lg:h-[700px] overflow-hidden px-4">
-          <div className="grid grid-cols-3 gap-3 pt-20">
+          <div className="grid grid-cols-3 gap-3 pt-20 opacity-40 dark:opacity-30">
             {familyImages.map((src, index) => (
               <div
                 key={index}
@@ -41,8 +41,8 @@ const Hero = () => {
               </div>
             ))}
           </div>
-          {/* Softer Gradient Overlay for Text Readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/90" />
+          {/* Subtle Gradient Overlay for Text Readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-transparent to-background/95" />
         </div>
         
         {/* Additional Decorative Blurs */}
