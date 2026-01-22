@@ -19,39 +19,37 @@ const Hero = () => {
   ];
 
   return (
-    <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-      {/* Background Family Pet Images */}
-      <div className="absolute inset-0 -z-10">
-        {/* Image Collage Behind Title */}
-        <div className="absolute top-0 left-0 right-0 h-[600px] lg:h-[700px] overflow-hidden px-4">
-          <div className="grid grid-cols-3 gap-3 pt-20 opacity-40 dark:opacity-30">
+    <section className="relative min-h-screen flex flex-col pt-20 overflow-hidden">
+      {/* Family Pet Images Grid - Above Title */}
+      <div className="w-full px-4 py-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-3 gap-2 md:gap-3">
             {familyImages.map((src, index) => (
               <div
                 key={index}
-                className={`overflow-hidden rounded-2xl shadow-lg ${
-                  index % 2 === 0 ? 'mt-12' : 'mt-4'
+                className={`overflow-hidden rounded-xl md:rounded-2xl shadow-md ${
+                  index % 2 === 0 ? 'mt-4' : 'mt-0'
                 }`}
               >
                 <img
                   src={src}
                   alt={`Happy family with pet ${index + 1}`}
-                  className="w-full h-40 md:h-56 lg:h-64 object-cover"
-                  loading="eager"
+                  className="w-full h-24 sm:h-32 md:h-40 lg:h-48 object-cover opacity-80 hover:opacity-100 transition-opacity duration-300"
                 />
               </div>
             ))}
           </div>
-          {/* Subtle Gradient Overlay for Text Readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-transparent to-background/95" />
         </div>
-        
-        {/* Additional Decorative Blurs */}
+      </div>
+
+      {/* Background Decorative Blurs */}
+      <div className="absolute inset-0 -z-10">
         <div className="absolute top-1/4 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="container-custom">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="container-custom flex-1 flex items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-center w-full">
           {/* Content */}
           <div className="space-y-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full animate-fade-up opacity-0">
