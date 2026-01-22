@@ -32,7 +32,7 @@ const Hero = () => {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
       {/* Ken Burns Animated Background Slideshow */}
-      <div className="absolute inset-0 -z-10">
+      <div className="absolute inset-0 z-0">
         {heroImages.map((src, index) => (
           <div
             key={index}
@@ -50,12 +50,12 @@ const Hero = () => {
             />
           </div>
         ))}
-        {/* Gradient Overlay for Text Readability - Reduced opacity */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/50" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent" />
+        {/* Gradient Overlay for Text Readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-foreground/35 via-foreground/10 to-foreground/55 dark:from-background/45 dark:via-background/15 dark:to-background/60" />
+        <div className="absolute inset-0 bg-gradient-to-r from-foreground/35 via-transparent to-transparent dark:from-background/45" />
       </div>
 
-      <div className="container-custom pt-20">
+      <div className="container-custom pt-20 relative z-10">
         <div className="max-w-2xl">
           {/* Content */}
           <div className="space-y-6">
@@ -112,7 +112,7 @@ const Hero = () => {
       </div>
 
       {/* Slide Indicators */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-10">
         {heroImages.map((_, index) => (
           <button
             key={index}
