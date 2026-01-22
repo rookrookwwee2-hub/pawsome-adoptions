@@ -11,7 +11,7 @@ const CatBreeds = () => {
   return (
     <>
       <Helmet>
-        <title>Cat Breeds Directory | PawHaven</title>
+        <title>Cat Breeds Directory | Pawsfam</title>
         <meta
           name="description"
           content="Explore our complete directory of cat breeds. Find your perfect feline companion from over 50 breeds including Maine Coon, Persian, Bengal, and more."

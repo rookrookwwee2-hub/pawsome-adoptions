@@ -40,7 +40,7 @@ const EmotionalSupport = () => {
   return (
     <>
       <Helmet>
-        <title>Emotional Support Animals | Mental Health Benefits | PawHaven</title>
+        <title>Emotional Support Animals | Mental Health Benefits | Pawsfam</title>
         <meta
           name="description"
           content="Discover the emotional and mental health benefits of pet companionship. Learn how cats and kittens can provide comfort, reduce stress, and improve wellbeing."

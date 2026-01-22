@@ -215,8 +215,8 @@ const Account = () => {
   return (
     <>
       <Helmet>
-        <title>Account Settings | PawHaven</title>
-        <meta name="description" content="Manage your PawHaven account settings, profile, and view your adoption history." />
+        <title>Account Settings | Pawsfam</title>
+        <meta name="description" content="Manage your Pawsfam account settings, profile, and view your adoption history." />
       </Helmet>
 
       <div className="min-h-screen bg-background">

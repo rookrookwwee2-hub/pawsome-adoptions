@@ -176,7 +176,7 @@ const Donate = () => {
     return (
       <>
         <Helmet>
-          <title>Thank You - PawHaven</title>
+          <title>Thank You - Pawsfam</title>
         </Helmet>
         <div className="min-h-screen bg-background">
           <Navbar />
@@ -199,8 +199,8 @@ const Donate = () => {
   return (
     <>
       <Helmet>
-        <title>Donate - Support Our Pets | PawHaven</title>
-        <meta name="description" content="Support PawHaven's mission to rescue and rehome pets. Your donation helps provide food, medical care, and shelter for animals in need." />
+        <title>Donate - Support Our Pets | Pawsfam</title>
+        <meta name="description" content="Support Pawsfam's mission to rescue and rehome pets. Your donation helps provide food, medical care, and shelter for animals in need." />
       </Helmet>
 
       <div className="min-h-screen bg-background">

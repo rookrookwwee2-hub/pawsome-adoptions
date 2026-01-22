@@ -210,12 +210,12 @@ const PetDetails = () => {
   return (
     <>
       <Helmet>
-        <title>{`Adopt ${pet.name} - ${pet.breed} | PawHaven`}</title>
+        <title>{`Adopt ${pet.name} - ${pet.breed} | Pawsfam`}</title>
         <meta
           name="description"
           content={`Meet ${pet.name}, a ${pet.age} old ${pet.breed}. ${pet.description.slice(0, 150)}...`}
         />
-        <meta property="og:title" content={`Adopt ${pet.name} | PawHaven`} />
+        <meta property="og:title" content={`Adopt ${pet.name} | Pawsfam`} />
         <meta property="og:image" content={pet.images[0]} />
         <link rel="canonical" href={window.location.href} />
       </Helmet>

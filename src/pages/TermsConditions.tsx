@@ -57,10 +57,10 @@ const TermsConditions = () => {
   return (
     <>
       <Helmet>
-        <title>Terms & Conditions - PawfectMatch</title>
+        <title>Terms & Conditions - Pawsfam</title>
         <meta
           name="description"
-          content="Read PawfectMatch's Terms and Conditions for pet adoption services. Understand your rights and responsibilities when adopting a pet."
+          content="Read Pawsfam's Terms and Conditions for pet adoption services. Understand your rights and responsibilities when adopting a pet."
         />
       </Helmet>
       <Navbar />

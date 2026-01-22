@@ -37,10 +37,10 @@ const About = () => {
   return (
     <>
       <Helmet>
-        <title>About Us | PawHaven - Pet Adoption Platform</title>
+        <title>About Us | Pawsfam - Pet Adoption Platform</title>
         <meta
           name="description"
-          content="Learn about PawHaven's mission to connect loving families with pets in need. We've helped thousands of animals find their forever homes."
+          content="Learn about Pawsfam's mission to connect loving families with pets in need. We've helped thousands of animals find their forever homes."
         />
       </Helmet>
 
@@ -59,7 +59,7 @@ const About = () => {
                 <span className="text-gradient">Loving Home</span>
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed animate-fade-up opacity-0 stagger-2">
-                Founded in 2020, PawHaven was born from a simple belief: every
+                Founded in 2020, Pawsfam was born from a simple belief: every
                 animal deserves love, care, and a family to call their own. We
                 work tirelessly to connect pets with their perfect forever families.
               </p>
@@ -98,7 +98,7 @@ const About = () => {
                   Creating Happy Endings, One Paw at a Time
                 </h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  At PawHaven, we believe that the bond between humans and animals
+                  At Pawsfam, we believe that the bond between humans and animals
                   is transformative. Our mission is to make pet adoption accessible,
                   transparent, and joyful for everyone involved.
                 </p>
@@ -129,7 +129,7 @@ const About = () => {
                 Meet the Team
               </span>
               <h2 className="font-display text-3xl md:text-4xl font-bold">
-                The People Behind PawHaven
+                The People Behind Pawsfam
               </h2>
               <p className="text-muted-foreground">
                 A passionate team dedicated to making every adoption a success story.

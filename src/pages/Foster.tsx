@@ -108,7 +108,7 @@ const Foster = () => {
     return (
       <>
         <Helmet>
-          <title>Application Submitted - PawHaven</title>
+          <title>Application Submitted - Pawsfam</title>
         </Helmet>
         <div className="min-h-screen bg-background">
           <Navbar />
@@ -131,8 +131,8 @@ const Foster = () => {
   return (
     <>
       <Helmet>
-        <title>Become a Foster - Help Pets Find Homes | PawHaven</title>
-        <meta name="description" content="Join PawHaven's foster program and provide temporary homes for pets in need. Make a difference in an animal's life while we find their forever home." />
+        <title>Become a Foster - Help Pets Find Homes | Pawsfam</title>
+        <meta name="description" content="Join Pawsfam's foster program and provide temporary homes for pets in need. Make a difference in an animal's life while we find their forever home." />
       </Helmet>
 
       <div className="min-h-screen bg-background">

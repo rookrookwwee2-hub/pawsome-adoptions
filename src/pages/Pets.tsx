@@ -49,7 +49,7 @@ const Pets = () => {
   return (
     <>
       <Helmet>
-        <title>Available Pets for Adoption | PawHaven</title>
+        <title>Available Pets for Adoption | Pawsfam</title>
         <meta
           name="description"
           content="Browse our available dogs, cats, and other pets for adoption. Find your perfect companion and give them a forever home."

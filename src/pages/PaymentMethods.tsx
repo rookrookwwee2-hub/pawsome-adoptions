@@ -65,7 +65,7 @@ const PaymentMethods = () => {
   return (
     <>
       <Helmet>
-        <title>Payment Methods | PawHaven</title>
+        <title>Payment Methods | Pawsfam</title>
         <meta
           name="description"
           content="Secure payment options for pet adoption. Bank transfer details for UK, USA, and Eurozone payments."

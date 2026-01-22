@@ -32,7 +32,7 @@ const Footer = () => {
               <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
                 <Heart className="w-5 h-5 text-primary-foreground fill-current" />
               </div>
-              <span className="font-display text-2xl font-bold">PawHaven</span>
+              <span className="font-display text-2xl font-bold">Pawsfam</span>
             </Link>
             <p className="text-background/70 font-body leading-relaxed">
               Finding loving homes for pets since 2020. Every pet deserves a second chance at happiness.
@@ -84,7 +84,7 @@ const Footer = () => {
             <ul className="space-y-3 font-body">
               <li className="flex items-center gap-3 text-background/70">
                 <Mail className="w-5 h-5 text-primary" />
-                hello@pawhaven.com
+                hello@pawsfam.com
               </li>
               <li className="flex items-center gap-3 text-background/70">
                 <Phone className="w-5 h-5 text-primary" />
@@ -100,7 +100,7 @@ const Footer = () => {
 
         <div className="mt-12 pt-8 border-t border-background/10 text-center">
           <p className="text-background/50 font-body text-sm">
-            © 2024 PawHaven. All rights reserved. Made with{" "}
+            © 2024 Pawsfam. All rights reserved. Made with{" "}
             <Heart className="w-4 h-4 inline text-primary fill-primary" /> for pets everywhere.
           </p>
         </div>

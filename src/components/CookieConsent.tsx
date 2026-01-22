@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Cookie, X } from "lucide-react";
 
-const COOKIE_CONSENT_KEY = "pawhaven_cookie_consent";
+const COOKIE_CONSENT_KEY = "pawsfam_cookie_consent";
 
 const CookieConsent = () => {
   const [isVisible, setIsVisible] = useState(false);
