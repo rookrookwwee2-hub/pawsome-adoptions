@@ -45,7 +45,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import CookieConsent from "./components/CookieConsent";
 import GoogleAnalytics from "./components/analytics/GoogleAnalytics";
-
+import MobileCartIndicator from "./components/shared/MobileCartIndicator";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -97,6 +97,7 @@ const App = () => (
                 </Routes>
                 <CookieConsent />
                 <GoogleAnalytics />
+                <MobileCartIndicator />
               </BrowserRouter>
             </TooltipProvider>
           </CartProvider>
