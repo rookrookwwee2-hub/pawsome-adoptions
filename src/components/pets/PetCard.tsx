@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
-import { Heart, MapPin } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Heart, MapPin, PawPrint } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 interface Pet {
   id: string;
@@ -20,6 +21,13 @@ interface PetCardProps {
 const PetCard = ({ pet }: PetCardProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const navigate = useNavigate();
+
+  const handleAdoptNow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate(`/pets/${pet.id}`);
+  };
 
   return (
     <Link to={`/pets/${pet.id}`} className="block group">
@@ -43,6 +51,7 @@ const PetCard = ({ pet }: PetCardProps) => {
           <button
             onClick={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               setIsFavorite(!isFavorite);
             }}
             className="absolute top-4 right-4 w-10 h-10 bg-background/90 backdrop-blur-sm rounded-full flex items-center justify-center transition-all hover:scale-110 hover:bg-background"
@@ -60,6 +69,16 @@ const PetCard = ({ pet }: PetCardProps) => {
               {pet.type}
             </span>
           </div>
+
+          {/* Adopt Now Button - positioned on image */}
+          <Button
+            onClick={handleAdoptNow}
+            size="sm"
+            className="absolute bottom-4 right-4 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg px-4 py-2 font-semibold text-sm gap-1.5"
+          >
+            <PawPrint className="w-4 h-4" />
+            Adopt Now
+          </Button>
         </div>
 
         {/* Content */}
