@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Helmet } from "react-helmet-async";
@@ -16,6 +16,7 @@ import {
   Globe,
   Play,
   Scale,
+  ShoppingCart,
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -55,6 +56,9 @@ const PetDetails = () => {
     flightNannyPrice: number;
   } | null>(null);
   const [paymentType, setPaymentType] = useState<"full" | "deposit">("full");
+  
+  // Ref for auto-scrolling to pricing section
+  const pricingSectionRef = useRef<HTMLDivElement>(null);
 
   // Get flight nanny price from pet data
   const flightNannyBasePrice = petRow?.flight_nanny_price || 500;
@@ -176,7 +180,18 @@ const PetDetails = () => {
     );
   }
 
-  const handleReserve = () => {
+  const scrollToPricing = () => {
+    if (pricingSectionRef.current) {
+      pricingSectionRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      // Add highlight effect
+      pricingSectionRef.current.classList.add("ring-2", "ring-primary", "ring-offset-2");
+      setTimeout(() => {
+        pricingSectionRef.current?.classList.remove("ring-2", "ring-primary", "ring-offset-2");
+      }, 2000);
+    }
+  };
+
+  const handleReserve = (shouldNavigate: boolean = true) => {
     // Add to cart (no login required - guests can checkout)
     addToCart({
       petId: pet.id,
@@ -196,6 +211,11 @@ const PetDetails = () => {
     toast.success("Added to cart!", {
       description: `${pet.name} has been added to your cart.`,
     });
+
+    // Scroll to pricing section if not navigating
+    if (!shouldNavigate) {
+      scrollToPricing();
+    }
   };
 
   const handleShare = () => {
@@ -412,7 +432,7 @@ const PetDetails = () => {
                 )}
 
                 {/* Pricing Summary */}
-                <Card>
+                <Card ref={pricingSectionRef} className="transition-all duration-300">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg">Pricing Summary</CardTitle>
                   </CardHeader>
@@ -454,6 +474,7 @@ const PetDetails = () => {
                         <span className="text-muted-foreground">
                           Shipping {travelSelection ? `(${travelSelection.countryLabel})` : ""}
                         </span>
+                        <span>{formatPrice(shippingPrice)}</span>
                       </div>
                       {addOnsTotal > 0 && (
                         <div className="flex justify-between">
@@ -468,11 +489,21 @@ const PetDetails = () => {
                     </div>
 
                     <div className="space-y-2 pt-2">
+                      {/* Add to Cart button - scrolls to pricing */}
+                      <Button
+                        size="lg"
+                        variant="secondary"
+                        className="w-full rounded-full gap-2"
+                        onClick={() => handleReserve(false)}
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                        Add to Cart
+                      </Button>
                       <Button
                         size="lg"
                         className="w-full rounded-full"
                         onClick={() => {
-                          handleReserve();
+                          handleReserve(true);
                           navigate("/checkout");
                         }}
                       >
@@ -483,7 +514,7 @@ const PetDetails = () => {
                         size="lg"
                         className="w-full rounded-full gap-2"
                         onClick={() => {
-                          handleReserve();
+                          handleReserve(true);
                           navigate("/checkout");
                         }}
                       >

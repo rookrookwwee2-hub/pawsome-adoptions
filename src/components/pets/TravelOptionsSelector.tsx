@@ -12,6 +12,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCart } from "@/contexts/CartContext";
+import { 
+  GROUND_TRANSPORT_COUNTRIES, 
+  AIR_CARGO_COUNTRIES 
+} from "@/data/shippingCountries";
 
 interface TravelOption {
   type: "ground" | "air";
@@ -27,40 +31,6 @@ interface TravelOptionsSelectorProps {
   flightNannyBasePrice?: number;
 }
 
-const GROUND_TRANSPORT_COUNTRIES = [
-  { id: "usa", label: "USA (Domestic)", price: 200 },
-  { id: "canada", label: "Canada", price: 400 },
-  { id: "mexico", label: "Mexico", price: 600 },
-];
-
-const AIR_CARGO_COUNTRIES = [
-  { id: "uk", label: "United Kingdom", price: 3395 },
-  { id: "germany", label: "Germany", price: 3595 },
-  { id: "france", label: "France", price: 3695 },
-  { id: "italy", label: "Italy", price: 3595 },
-  { id: "spain", label: "Spain", price: 3795 },
-  { id: "netherlands", label: "Netherlands", price: 3695 },
-  { id: "belgium", label: "Belgium", price: 3695 },
-  { id: "switzerland", label: "Switzerland", price: 3595 },
-  { id: "sweden", label: "Sweden", price: 3800 },
-  { id: "norway", label: "Norway", price: 3900 },
-  { id: "finland", label: "Finland", price: 3900 },
-  { id: "denmark", label: "Denmark", price: 3800 },
-  { id: "poland", label: "Poland", price: 3700 },
-  { id: "romania", label: "Romania", price: 3800 },
-  { id: "czech_republic", label: "Czech Republic", price: 3750 },
-  { id: "hungary", label: "Hungary", price: 3750 },
-  { id: "slovenia", label: "Slovenia", price: 3800 },
-  { id: "australia", label: "Australia", price: 5295 },
-  { id: "new_zealand", label: "New Zealand", price: 5295 },
-  { id: "japan", label: "Japan", price: 2695 },
-  { id: "south_korea", label: "South Korea", price: 3500 },
-  { id: "china", label: "China", price: 4000 },
-  { id: "russia", label: "Russia", price: 3800 },
-  { id: "brazil", label: "Brazil", price: 4250 },
-  { id: "argentina", label: "Argentina", price: 4250 },
-];
-
 const TravelOptionsSelector = ({
   onSelectionChange,
   flightNannyBasePrice = 500,
@@ -75,6 +45,18 @@ const TravelOptionsSelector = ({
     if (travelType === "air") return AIR_CARGO_COUNTRIES;
     return [];
   }, [travelType]);
+
+  // Group air cargo countries by region for easier selection
+  const groupedAirCountries = useMemo(() => {
+    const groups: Record<string, typeof AIR_CARGO_COUNTRIES> = {};
+    AIR_CARGO_COUNTRIES.forEach(country => {
+      if (!groups[country.region]) {
+        groups[country.region] = [];
+      }
+      groups[country.region].push(country);
+    });
+    return groups;
+  }, []);
 
   const selectedCountryData = useMemo(() => {
     return currentCountries.find((c) => c.id === selectedCountry);
@@ -199,22 +181,49 @@ const TravelOptionsSelector = ({
         {/* Country Selection */}
         {travelType && (
           <div className="space-y-3 animate-fade-in">
-            <Label className="text-sm font-medium">Select Country</Label>
+            <Label className="text-sm font-medium">
+              Select Country 
+              <span className="text-muted-foreground font-normal ml-1">
+                ({currentCountries.length} destinations available)
+              </span>
+            </Label>
             <Select value={selectedCountry} onValueChange={handleCountryChange}>
               <SelectTrigger className="w-full bg-background">
                 <SelectValue placeholder="Choose destination country" />
               </SelectTrigger>
-              <SelectContent className="bg-background z-50">
-                {currentCountries.map((country) => (
-                  <SelectItem key={country.id} value={country.id}>
-                    <div className="flex items-center justify-between w-full gap-4">
-                      <span>{country.label}</span>
-                      <span className="text-primary font-semibold">
-                        {formatPrice(country.price)}
-                      </span>
+              <SelectContent className="bg-background z-50 max-h-[300px]">
+                {travelType === "ground" ? (
+                  // Ground transport - simple list
+                  currentCountries.map((country) => (
+                    <SelectItem key={country.id} value={country.id}>
+                      <div className="flex items-center justify-between w-full gap-4">
+                        <span>{country.label}</span>
+                        <span className="text-primary font-semibold">
+                          {formatPrice(country.price)}
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))
+                ) : (
+                  // Air cargo - grouped by region
+                  Object.entries(groupedAirCountries).map(([region, countries]) => (
+                    <div key={region}>
+                      <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50 sticky top-0">
+                        {region}
+                      </div>
+                      {countries.map((country) => (
+                        <SelectItem key={country.id} value={country.id}>
+                          <div className="flex items-center justify-between w-full gap-4">
+                            <span>{country.label}</span>
+                            <span className="text-primary font-semibold">
+                              {formatPrice(country.price)}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
                     </div>
-                  </SelectItem>
-                ))}
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>
