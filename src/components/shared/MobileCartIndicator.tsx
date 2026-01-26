@@ -17,7 +17,7 @@ const MobileCartIndicator = () => {
   return (
     <Link
       to="/checkout"
-      className="fixed top-24 right-4 z-40 flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2.5 rounded-full shadow-lg hover:bg-primary/90 transition-all animate-fade-in"
+      className="fixed bottom-20 right-4 z-40 flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2.5 rounded-full shadow-lg hover:bg-primary/90 transition-all animate-fade-in"
     >
       <div className="relative">
         <ShoppingCart className="w-5 h-5" />
