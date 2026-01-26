@@ -46,6 +46,7 @@ import TermsConditions from "./pages/TermsConditions";
 import CookieConsent from "./components/CookieConsent";
 import GoogleAnalytics from "./components/analytics/GoogleAnalytics";
 import MobileCartIndicator from "./components/shared/MobileCartIndicator";
+import ScrollToTop from "./components/ScrollToTop";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -58,6 +59,7 @@ const App = () => (
               <Toaster />
               <Sonner />
               <BrowserRouter>
+                <ScrollToTop />
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/pets" element={<Pets />} />
