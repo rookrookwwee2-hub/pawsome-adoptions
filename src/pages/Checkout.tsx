@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -151,6 +151,11 @@ const Checkout = () => {
   const { usdtSettings, bankSettings, paypalSettings, stripeSettings, checkoutcomSettings, loading: settingsLoading } = usePaymentSettings();
   const [step, setStep] = useState<"details" | "payment" | "confirmation">("details");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Scroll to top when checkout page loads
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   // Use database settings or fallback to defaults
   const bankDetails = bankSettings.length > 0 ? bankSettings : fallbackBankDetails;
