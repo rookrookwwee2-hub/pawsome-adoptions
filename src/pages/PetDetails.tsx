@@ -180,15 +180,17 @@ const PetDetails = () => {
     );
   }
 
-  const scrollToPricing = () => {
-    if (pricingSectionRef.current) {
-      pricingSectionRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-      // Add highlight effect
-      pricingSectionRef.current.classList.add("ring-2", "ring-primary", "ring-offset-2");
-      setTimeout(() => {
-        pricingSectionRef.current?.classList.remove("ring-2", "ring-primary", "ring-offset-2");
-      }, 2000);
-    }
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    // Add highlight effect to pricing section after scroll completes
+    setTimeout(() => {
+      if (pricingSectionRef.current) {
+        pricingSectionRef.current.classList.add("ring-2", "ring-primary", "ring-offset-2");
+        setTimeout(() => {
+          pricingSectionRef.current?.classList.remove("ring-2", "ring-primary", "ring-offset-2");
+        }, 2000);
+      }
+    }, 300);
   };
 
   const handleReserve = (shouldNavigate: boolean = true) => {
@@ -212,9 +214,9 @@ const PetDetails = () => {
       description: `${pet.name} has been added to your cart.`,
     });
 
-    // Scroll to pricing section if not navigating
+    // Scroll to top if not navigating
     if (!shouldNavigate) {
-      scrollToPricing();
+      scrollToTop();
     }
   };
 
@@ -442,7 +444,10 @@ const PetDetails = () => {
                       <Button
                         variant={paymentType === "full" ? "default" : "outline"}
                         size="sm"
-                        onClick={() => setPaymentType("full")}
+                        onClick={() => {
+                          setPaymentType("full");
+                          scrollToTop();
+                        }}
                         className="flex-1"
                       >
                         Full Payment
@@ -450,7 +455,10 @@ const PetDetails = () => {
                       <Button
                         variant={paymentType === "deposit" ? "default" : "outline"}
                         size="sm"
-                        onClick={() => setPaymentType("deposit")}
+                        onClick={() => {
+                          setPaymentType("deposit");
+                          scrollToTop();
+                        }}
                         className="flex-1"
                       >
                         Reserve (30%)
