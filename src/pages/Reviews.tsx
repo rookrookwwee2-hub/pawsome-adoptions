@@ -49,6 +49,11 @@ const Reviews = () => {
           name="description"
           content="Read reviews from happy pet parents who found their perfect companions through Pawsfam. Real stories from real families."
         />
+        <meta property="og:title" content="Customer Reviews - Pawsfam" />
+        <meta property="og:description" content="Read reviews from happy pet parents who found their perfect companions through Pawsfam." />
+        <meta property="og:image" content="/og-reviews.png" />
+        <meta name="twitter:title" content="Customer Reviews - Pawsfam" />
+        <meta name="twitter:image" content="/og-reviews.png" />
       </Helmet>
 
       <div className="min-h-screen bg-background">

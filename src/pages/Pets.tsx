@@ -54,6 +54,11 @@ const Pets = () => {
           name="description"
           content="Browse our available dogs, cats, and other pets for adoption. Find your perfect companion and give them a forever home."
         />
+        <meta property="og:title" content="Available Pets for Adoption | Pawsfam" />
+        <meta property="og:description" content="Browse our available dogs, cats, and other pets for adoption. Find your perfect companion." />
+        <meta property="og:image" content="/og-pets.png" />
+        <meta name="twitter:title" content="Available Pets for Adoption | Pawsfam" />
+        <meta name="twitter:image" content="/og-pets.png" />
       </Helmet>
 
       <div className="min-h-screen bg-background">

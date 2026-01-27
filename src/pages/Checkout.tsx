@@ -241,7 +241,9 @@ const Checkout = () => {
     return (
       <>
         <Helmet>
-          <title>Checkout - PawfectMatch</title>
+          <title>Checkout - Pawsfam</title>
+          <meta property="og:title" content="Checkout - Pawsfam" />
+          <meta property="og:image" content="/og-checkout.png" />
         </Helmet>
         <Navbar />
         <main className="min-h-screen bg-background pt-24 pb-16">
@@ -268,8 +270,13 @@ const Checkout = () => {
   return (
     <>
       <Helmet>
-        <title>Checkout - PawfectMatch</title>
-        <meta name="description" content="Complete your pet adoption checkout securely." />
+        <title>Checkout - Pawsfam</title>
+        <meta name="description" content="Complete your pet adoption checkout securely with Pawsfam." />
+        <meta property="og:title" content="Checkout - Pawsfam" />
+        <meta property="og:description" content="Complete your pet adoption and welcome your new companion home." />
+        <meta property="og:image" content="/og-checkout.png" />
+        <meta name="twitter:title" content="Checkout - Pawsfam" />
+        <meta name="twitter:image" content="/og-checkout.png" />
       </Helmet>
       <Navbar />
       <main className="min-h-screen bg-background pt-24 pb-16">
