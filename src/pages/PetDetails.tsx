@@ -229,17 +229,37 @@ const PetDetails = () => {
 
   const videoEmbedUrl = petRow?.video_url ? getVideoEmbedUrl(petRow.video_url) : null;
 
+  // Generate clean description for meta tags
+  const metaDescription = pet.description 
+    ? `Meet ${pet.name}, a ${pet.age} old ${pet.breed}. ${pet.description.replace(/[^\w\s.,!?-]/g, '').slice(0, 140)}...`
+    : `Adopt ${pet.name}, a lovely ${pet.age} old ${pet.breed} looking for a forever home.`;
+
+  const pageUrl = `${window.location.origin}/pets/${pet.id}`;
+  const ogTitle = `${pet.name} – ${pet.breed} ${pet.type} for Adoption | Pawsfam`;
+
   return (
     <>
       <Helmet>
-        <title>{`Adopt ${pet.name} - ${pet.breed} | Pawsfam`}</title>
-        <meta
-          name="description"
-          content={`Meet ${pet.name}, a ${pet.age} old ${pet.breed}. ${pet.description.slice(0, 150)}...`}
-        />
-        <meta property="og:title" content={`Adopt ${pet.name} | Pawsfam`} />
+        <title>{ogTitle}</title>
+        <meta name="description" content={metaDescription} />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Pawsfam" />
+        <meta property="og:title" content={ogTitle} />
+        <meta property="og:description" content={metaDescription} />
         <meta property="og:image" content={pet.images[0]} />
-        <link rel="canonical" href={window.location.href} />
+        <meta property="og:image:alt" content={`${pet.name} - ${pet.breed} available for adoption at Pawsfam`} />
+        <meta property="og:url" content={pageUrl} />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@pawsfam" />
+        <meta name="twitter:title" content={ogTitle} />
+        <meta name="twitter:description" content={metaDescription} />
+        <meta name="twitter:image" content={pet.images[0]} />
+        
+        <link rel="canonical" href={pageUrl} />
       </Helmet>
 
       <div className="min-h-screen bg-background">
