@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Car, Plane, UserCheck, Globe, Clock, Shield } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
@@ -5,7 +6,9 @@ import Footer from "@/components/layout/Footer";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PetImageSection from "@/components/shared/PetImageSection";
+import GroundTransportSelector from "@/components/pets/GroundTransportSelector";
 
 const deliveryOptions = [
   {
@@ -50,6 +53,8 @@ const deliveryOptions = [
 ];
 
 const DeliveryOptions = () => {
+  const [selectedTab, setSelectedTab] = useState("calculator");
+  
   return (
     <>
       <Helmet>
@@ -103,38 +108,60 @@ const DeliveryOptions = () => {
             </div>
           </section>
 
-          {/* Delivery Options Grid */}
-          <section className="py-16">
+          {/* Tabs for Calculator vs Overview */}
+          <section className="py-8">
             <div className="container-custom">
-              <div className="grid md:grid-cols-3 gap-8">
-                {deliveryOptions.map((option, index) => (
-                  <Card
-                    key={index}
-                    className="relative overflow-hidden hover:shadow-lg transition-all opacity-0 animate-fade-up"
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    <Badge className="absolute top-4 right-4">{option.badge}</Badge>
-                    <CardHeader className="text-center pt-12">
-                      <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-2xl flex items-center justify-center">
-                        <option.icon className="w-8 h-8 text-primary" />
-                      </div>
-                      <CardTitle className="font-display text-xl">{option.title}</CardTitle>
-                      <p className="text-2xl font-bold text-primary mt-2">{option.price}</p>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground text-center mb-6">{option.description}</p>
-                      <ul className="space-y-3">
-                        {option.details.map((detail, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm">
-                            <Shield className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                            <span>{detail}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
+                <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+                  <TabsTrigger value="calculator">Price Calculator</TabsTrigger>
+                  <TabsTrigger value="options">Delivery Options</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="calculator" className="mt-8">
+                  <div className="max-w-2xl mx-auto">
+                    <GroundTransportSelector
+                      petLocation="California, USA"
+                      className="shadow-lg"
+                    />
+                    <p className="text-center text-sm text-muted-foreground mt-4">
+                      * This is a sample calculator. Actual prices are calculated on the pet details page.
+                    </p>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="options" className="mt-8">
+                  {/* Delivery Options Grid */}
+                  <div className="grid md:grid-cols-3 gap-8">
+                    {deliveryOptions.map((option, index) => (
+                      <Card
+                        key={index}
+                        className="relative overflow-hidden hover:shadow-lg transition-all opacity-0 animate-fade-up"
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                      >
+                        <Badge className="absolute top-4 right-4">{option.badge}</Badge>
+                        <CardHeader className="text-center pt-12">
+                          <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-2xl flex items-center justify-center">
+                            <option.icon className="w-8 h-8 text-primary" />
+                          </div>
+                          <CardTitle className="font-display text-xl">{option.title}</CardTitle>
+                          <p className="text-2xl font-bold text-primary mt-2">{option.price}</p>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-muted-foreground text-center mb-6">{option.description}</p>
+                          <ul className="space-y-3">
+                            {option.details.map((detail, i) => (
+                              <li key={i} className="flex items-start gap-2 text-sm">
+                                <Shield className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                                <span>{detail}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </TabsContent>
+              </Tabs>
             </div>
           </section>
 

@@ -358,6 +358,57 @@ export type Database = {
         }
         Relationships: []
       }
+      ground_transport_settings: {
+        Row: {
+          base_price: number
+          companion_base_fee: number
+          companion_max_fee: number
+          companion_per_km: number
+          created_at: string
+          estimated_speed_kmh: number
+          id: string
+          is_enabled: boolean
+          max_ground_distance_km: number
+          price_per_km: number
+          price_per_mile: number
+          private_multiplier: number
+          standard_multiplier: number
+          updated_at: string
+        }
+        Insert: {
+          base_price?: number
+          companion_base_fee?: number
+          companion_max_fee?: number
+          companion_per_km?: number
+          created_at?: string
+          estimated_speed_kmh?: number
+          id?: string
+          is_enabled?: boolean
+          max_ground_distance_km?: number
+          price_per_km?: number
+          price_per_mile?: number
+          private_multiplier?: number
+          standard_multiplier?: number
+          updated_at?: string
+        }
+        Update: {
+          base_price?: number
+          companion_base_fee?: number
+          companion_max_fee?: number
+          companion_per_km?: number
+          created_at?: string
+          estimated_speed_kmh?: number
+          id?: string
+          is_enabled?: boolean
+          max_ground_distance_km?: number
+          price_per_km?: number
+          price_per_mile?: number
+          private_multiplier?: number
+          standard_multiplier?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       guest_payments: {
         Row: {
           amount: number

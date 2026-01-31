@@ -34,6 +34,7 @@ import PaymentSuggestionsManagement from "./pages/admin/PaymentSuggestionsManage
 import ReviewsManagement from "./pages/admin/ReviewsManagement";
 import GoogleOAuthPage from "./pages/admin/GoogleOAuthPage";
 import AnalyticsSettingsPage from "./pages/admin/AnalyticsSettingsPage";
+import GroundTransportSettings from "./pages/admin/GroundTransportSettings";
 import Reviews from "./pages/Reviews";
 import NotFound from "./pages/NotFound";
 import CatBreeds from "./pages/CatBreeds";
@@ -95,6 +96,7 @@ const App = () => (
                   <Route path="/admin/reviews" element={<ProtectedRoute requireAdmin><ReviewsManagement /></ProtectedRoute>} />
                   <Route path="/admin/google-oauth" element={<ProtectedRoute requireAdmin><GoogleOAuthPage /></ProtectedRoute>} />
                   <Route path="/admin/analytics-settings" element={<ProtectedRoute requireAdmin><AnalyticsSettingsPage /></ProtectedRoute>} />
+                  <Route path="/admin/ground-transport" element={<ProtectedRoute requireAdmin><GroundTransportSettings /></ProtectedRoute>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <CookieConsent />
