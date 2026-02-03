@@ -123,9 +123,6 @@ const DeliveryOptions = () => {
                       petLocation="California, USA"
                       className="shadow-lg"
                     />
-                    <p className="text-center text-sm text-muted-foreground mt-4">
-                      * This is a sample calculator. Actual prices are calculated on the pet details page.
-                    </p>
                   </div>
                 </TabsContent>
                 
