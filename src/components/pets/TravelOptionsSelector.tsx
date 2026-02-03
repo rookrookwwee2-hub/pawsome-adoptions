@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { Car, Plane, UserCheck, Globe, Clock, MapPin } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { Plane, UserCheck, Globe, Clock, MapPin } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -12,10 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCart } from "@/contexts/CartContext";
-import { 
-  GROUND_TRANSPORT_COUNTRIES, 
-  AIR_CARGO_COUNTRIES 
-} from "@/data/shippingCountries";
+import { AIR_CARGO_COUNTRIES } from "@/data/shippingCountries";
+import GroundTransportSelector from "./GroundTransportSelector";
 
 interface TravelOption {
   type: "ground" | "air";
@@ -26,30 +24,39 @@ interface TravelOption {
   flightNannyPrice: number;
 }
 
+interface GroundTransportResult {
+  distanceKm: number;
+  distanceMiles: number;
+  estimatedTime: string;
+  transportType: "standard" | "private";
+  transportTypeName: string;
+  hasCompanion: boolean;
+  baseShippingPrice: number;
+  companionFee: number;
+  totalPrice: number;
+}
+
 interface TravelOptionsSelectorProps {
   onSelectionChange?: (option: TravelOption | null) => void;
   flightNannyBasePrice?: number;
+  petLocation?: string;
 }
 
 const TravelOptionsSelector = ({
   onSelectionChange,
   flightNannyBasePrice = 500,
+  petLocation = "California, USA",
 }: TravelOptionsSelectorProps) => {
   const { formatPrice } = useCart();
   const [travelType, setTravelType] = useState<"ground" | "air" | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [flightNannyEnabled, setFlightNannyEnabled] = useState(false);
-
-  const currentCountries = useMemo(() => {
-    if (travelType === "ground") return GROUND_TRANSPORT_COUNTRIES;
-    if (travelType === "air") return AIR_CARGO_COUNTRIES;
-    return [];
-  }, [travelType]);
+  const [groundTransportResult, setGroundTransportResult] = useState<GroundTransportResult | null>(null);
 
   // Group air cargo countries by region for easier selection
   const groupedAirCountries = useMemo(() => {
     const groups: Record<string, typeof AIR_CARGO_COUNTRIES> = {};
-    AIR_CARGO_COUNTRIES.forEach(country => {
+    AIR_CARGO_COUNTRIES.forEach((country) => {
       if (!groups[country.region]) {
         groups[country.region] = [];
       }
@@ -59,43 +66,44 @@ const TravelOptionsSelector = ({
   }, []);
 
   const selectedCountryData = useMemo(() => {
-    return currentCountries.find((c) => c.id === selectedCountry);
-  }, [currentCountries, selectedCountry]);
+    return AIR_CARGO_COUNTRIES.find((c) => c.id === selectedCountry);
+  }, [selectedCountry]);
 
-  const totalPrice = useMemo(() => {
+  const totalAirPrice = useMemo(() => {
     if (!selectedCountryData) return 0;
     let price = selectedCountryData.price;
-    if (travelType === "air" && flightNannyEnabled) {
+    if (flightNannyEnabled) {
       price += flightNannyBasePrice;
     }
     return price;
-  }, [selectedCountryData, travelType, flightNannyEnabled, flightNannyBasePrice]);
+  }, [selectedCountryData, flightNannyEnabled, flightNannyBasePrice]);
 
   const handleTravelTypeChange = (value: "ground" | "air") => {
     setTravelType(value);
     setSelectedCountry("");
     setFlightNannyEnabled(false);
+    setGroundTransportResult(null);
     onSelectionChange?.(null);
   };
 
   const handleCountryChange = (value: string) => {
     setSelectedCountry(value);
-    const countryData = currentCountries.find((c) => c.id === value);
-    if (countryData && travelType) {
+    const countryData = AIR_CARGO_COUNTRIES.find((c) => c.id === value);
+    if (countryData) {
       onSelectionChange?.({
-        type: travelType,
+        type: "air",
         country: value,
         countryLabel: countryData.label,
         price: countryData.price,
-        flightNanny: travelType === "air" && flightNannyEnabled,
-        flightNannyPrice: travelType === "air" && flightNannyEnabled ? flightNannyBasePrice : 0,
+        flightNanny: flightNannyEnabled,
+        flightNannyPrice: flightNannyEnabled ? flightNannyBasePrice : 0,
       });
     }
   };
 
   const handleFlightNannyChange = (checked: boolean) => {
     setFlightNannyEnabled(checked);
-    if (selectedCountryData && travelType === "air") {
+    if (selectedCountryData) {
       onSelectionChange?.({
         type: "air",
         country: selectedCountry,
@@ -106,6 +114,30 @@ const TravelOptionsSelector = ({
       });
     }
   };
+
+  // Handle ground transport selection changes
+  const handleGroundTransportChange = (result: GroundTransportResult | null) => {
+    setGroundTransportResult(result);
+    if (result) {
+      onSelectionChange?.({
+        type: "ground",
+        country: "ground_transport",
+        countryLabel: `Ground Transport (${result.distanceKm.toLocaleString()} km)`,
+        price: result.totalPrice,
+        flightNanny: false,
+        flightNannyPrice: 0,
+      });
+    } else {
+      onSelectionChange?.(null);
+    }
+  };
+
+  // When switching to ground, notify parent that selection cleared
+  useEffect(() => {
+    if (travelType === "ground" && !groundTransportResult) {
+      onSelectionChange?.(null);
+    }
+  }, [travelType, groundTransportResult, onSelectionChange]);
 
   return (
     <Card className="border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20">
@@ -142,13 +174,12 @@ const TravelOptionsSelector = ({
             >
               <div className="flex items-center gap-3">
                 <RadioGroupItem value="ground" id="ground" />
-                <Car className="w-5 h-5 text-blue-600" />
                 <div>
                   <Label htmlFor="ground" className="font-medium cursor-pointer">
                     Ground Transport
                   </Label>
                   <p className="text-xs text-muted-foreground">
-                    Available for USA, Canada & Mexico
+                    Distance-based pricing with live calculator
                   </p>
                 </div>
               </div>
@@ -178,13 +209,24 @@ const TravelOptionsSelector = ({
           </RadioGroup>
         </div>
 
-        {/* Country Selection */}
-        {travelType && (
+        {/* Ground Transport Calculator */}
+        {travelType === "ground" && (
+          <div className="animate-fade-in">
+            <GroundTransportSelector
+              petLocation={petLocation}
+              onSelectionChange={handleGroundTransportChange}
+              embedded
+            />
+          </div>
+        )}
+
+        {/* Air Cargo Country Selection */}
+        {travelType === "air" && (
           <div className="space-y-3 animate-fade-in">
             <Label className="text-sm font-medium">
-              Select Country 
+              Select Country
               <span className="text-muted-foreground font-normal ml-1">
-                ({currentCountries.length} destinations available)
+                ({AIR_CARGO_COUNTRIES.length} destinations available)
               </span>
             </Label>
             <Select value={selectedCountry} onValueChange={handleCountryChange}>
@@ -192,38 +234,23 @@ const TravelOptionsSelector = ({
                 <SelectValue placeholder="Choose destination country" />
               </SelectTrigger>
               <SelectContent className="bg-background z-50 max-h-[300px]">
-                {travelType === "ground" ? (
-                  // Ground transport - simple list
-                  currentCountries.map((country) => (
-                    <SelectItem key={country.id} value={country.id}>
-                      <div className="flex items-center justify-between w-full gap-4">
-                        <span>{country.label}</span>
-                        <span className="text-primary font-semibold">
-                          {formatPrice(country.price)}
-                        </span>
-                      </div>
-                    </SelectItem>
-                  ))
-                ) : (
-                  // Air cargo - grouped by region
-                  Object.entries(groupedAirCountries).map(([region, countries]) => (
-                    <div key={region}>
-                      <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50 sticky top-0">
-                        {region}
-                      </div>
-                      {countries.map((country) => (
-                        <SelectItem key={country.id} value={country.id}>
-                          <div className="flex items-center justify-between w-full gap-4">
-                            <span>{country.label}</span>
-                            <span className="text-primary font-semibold">
-                              {formatPrice(country.price)}
-                            </span>
-                          </div>
-                        </SelectItem>
-                      ))}
+                {Object.entries(groupedAirCountries).map(([region, countries]) => (
+                  <div key={region}>
+                    <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50 sticky top-0">
+                      {region}
                     </div>
-                  ))
-                )}
+                    {countries.map((country) => (
+                      <SelectItem key={country.id} value={country.id}>
+                        <div className="flex items-center justify-between w-full gap-4">
+                          <span>{country.label}</span>
+                          <span className="text-primary font-semibold">
+                            {formatPrice(country.price)}
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </div>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -265,8 +292,8 @@ const TravelOptionsSelector = ({
           </div>
         )}
 
-        {/* Price Summary */}
-        {selectedCountryData && (
+        {/* Air Cargo Price Summary */}
+        {travelType === "air" && selectedCountryData && (
           <div className="pt-4 border-t border-border space-y-3 animate-fade-in">
             <h4 className="font-medium text-sm flex items-center gap-2">
               <MapPin className="w-4 h-4 text-primary" />
@@ -275,9 +302,7 @@ const TravelOptionsSelector = ({
             <div className="bg-background rounded-lg p-4 space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Travel Type:</span>
-                <span className="font-medium">
-                  {travelType === "ground" ? "Ground Transport" : "Air Cargo"}
-                </span>
+                <span className="font-medium">Air Cargo</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Destination:</span>
@@ -289,7 +314,7 @@ const TravelOptionsSelector = ({
                   {formatPrice(selectedCountryData.price)}
                 </span>
               </div>
-              {travelType === "air" && flightNannyEnabled && (
+              {flightNannyEnabled && (
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Flight Nanny:</span>
                   <span className="font-medium text-primary">
@@ -300,7 +325,7 @@ const TravelOptionsSelector = ({
               <div className="flex justify-between pt-2 border-t border-dashed">
                 <span className="font-semibold">Total Shipping:</span>
                 <span className="font-bold text-lg text-primary">
-                  {formatPrice(totalPrice)}
+                  {formatPrice(totalAirPrice)}
                 </span>
               </div>
             </div>

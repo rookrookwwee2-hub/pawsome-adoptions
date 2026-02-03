@@ -53,6 +53,7 @@ interface GroundTransportSelectorProps {
   petLocation: string; // e.g., "California, USA"
   onSelectionChange?: (result: GroundTransportResult | null) => void;
   className?: string;
+  embedded?: boolean; // When true, renders without card wrapper
 }
 
 // Parse pet location to find matching region
@@ -80,6 +81,7 @@ export default function GroundTransportSelector({
   petLocation,
   onSelectionChange,
   className,
+  embedded = false,
 }: GroundTransportSelectorProps) {
   const { data: settings, isLoading: settingsLoading } = useGroundTransportSettings();
   
@@ -181,6 +183,15 @@ export default function GroundTransportSelector({
   }, [settings, petOrigin, selectedRegion]);
 
   if (settingsLoading) {
+    if (embedded) {
+      return (
+        <div className={cn("space-y-4", className)}>
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-20 w-full" />
+        </div>
+      );
+    }
     return (
       <Card className={cn("border-2", className)}>
         <CardHeader>
@@ -199,6 +210,230 @@ export default function GroundTransportSelector({
     return null; // Ground transport not available
   }
 
+  // Main content that's shared between embedded and card modes
+  const content = (
+    <div className="space-y-6">
+      {/* Title and Subtext - Only show when embedded */}
+      {embedded && (
+        <div className="space-y-1">
+          <h4 className="font-semibold flex items-center gap-2">
+            <Truck className="h-5 w-5 text-primary" />
+            Price Calculator – Ground Transportation
+          </h4>
+          <p className="text-sm text-muted-foreground">
+            Pet shipping from <span className="font-medium">{petLocation}</span>
+          </p>
+        </div>
+      )}
+
+      {/* Location Selection */}
+      <div className="space-y-4">
+        <Label className="flex items-center gap-2">
+          <MapPin className="h-4 w-4 text-primary" />
+          Your Destination
+        </Label>
+        
+        {/* Country Selector */}
+        <Select value={selectedCountryId} onValueChange={setSelectedCountryId}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select your country" />
+          </SelectTrigger>
+          <SelectContent>
+            {worldCountries.map((country) => (
+              <SelectItem key={country.id} value={country.id}>
+                <span className="flex items-center gap-2">
+                  <span>{country.flag}</span>
+                  <span>{country.name}</span>
+                </span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Region Selector */}
+        {selectedCountry && (
+          <Select value={selectedRegionId} onValueChange={setSelectedRegionId}>
+            <SelectTrigger>
+              <SelectValue placeholder={`Select state/region in ${selectedCountry.name}`} />
+            </SelectTrigger>
+            <SelectContent>
+              {selectedCountry.regions.map((region) => (
+                <SelectItem key={region.id} value={region.id}>
+                  {region.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      </div>
+
+      {/* Distance Too Far Warning */}
+      {isDistanceTooFar && selectedRegion && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+          <div>
+            <p className="font-medium text-destructive">Distance Too Far</p>
+            <p className="text-sm text-muted-foreground">
+              Ground transport is only available for distances up to {settings.max_ground_distance_km.toLocaleString()} km.
+              Consider air cargo for this destination.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Transport Type Selection */}
+      {selectedRegion && !isDistanceTooFar && (
+        <>
+          <Separator />
+          <div className="space-y-3">
+            <Label>Transport Type</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setTransportType("standard")}
+                className={cn(
+                  "p-4 rounded-lg border-2 text-left transition-all",
+                  transportType === "standard"
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/50"
+                )}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <Truck className="h-5 w-5 text-primary" />
+                  <span className="font-medium">Standard</span>
+                  <Badge variant="secondary" className="ml-auto text-xs">
+                    ×{settings.standard_multiplier}
+                  </Badge>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Shared ground transport with other pets
+                </p>
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => setTransportType("private")}
+                className={cn(
+                  "p-4 rounded-lg border-2 text-left transition-all",
+                  transportType === "private"
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/50"
+                )}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <Car className="h-5 w-5 text-primary" />
+                  <span className="font-medium">Private VIP</span>
+                  <Badge className="ml-auto text-xs">
+                    ×{settings.private_multiplier}
+                  </Badge>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Direct door-to-door private transport
+                </p>
+              </button>
+            </div>
+          </div>
+
+          {/* Companion Option */}
+          <div className="flex items-start gap-3 p-4 rounded-lg border bg-muted/30">
+            <Checkbox
+              id="companion"
+              checked={hasCompanion}
+              onCheckedChange={(checked) => setHasCompanion(checked === true)}
+            />
+            <div className="flex-1">
+              <Label htmlFor="companion" className="flex items-center gap-2 cursor-pointer">
+                <UserCheck className="h-4 w-4 text-primary" />
+                Add Personal Handler / Companion
+              </Label>
+              <p className="text-sm text-muted-foreground mt-1">
+                A dedicated handler will accompany your pet during the entire journey.
+                <span className="text-primary font-medium ml-1">
+                  +${settings.companion_base_fee} - ${settings.companion_max_fee}
+                </span>
+              </p>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Trip Summary */}
+      {result && (
+        <>
+          <Separator />
+          <div className="space-y-4">
+            <h4 className="font-semibold flex items-center gap-2">
+              <Route className="h-4 w-4" />
+              Trip Summary
+            </h4>
+            
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">Distance:</span>
+              </div>
+              <div className="font-medium text-right">
+                {result.distanceKm.toLocaleString()} km ({result.distanceMiles.toLocaleString()} mi)
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">Est. Time:</span>
+              </div>
+              <div className="font-medium text-right">
+                {result.estimatedTime}
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Truck className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">Transport:</span>
+              </div>
+              <div className="font-medium text-right">
+                {result.transportTypeName}
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <UserCheck className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">Companion:</span>
+              </div>
+              <div className="font-medium text-right">
+                {result.hasCompanion ? "Yes" : "No"}
+              </div>
+            </div>
+            
+            {/* Pricing Breakdown */}
+            <div className="bg-primary/5 rounded-lg p-4 space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Shipping Cost:</span>
+                <span>${result.baseShippingPrice.toFixed(2)}</span>
+              </div>
+              {result.hasCompanion && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Companion Fee:</span>
+                  <span>${result.companionFee.toFixed(2)}</span>
+                </div>
+              )}
+              <Separator className="my-2" />
+              <div className="flex justify-between font-bold text-lg">
+                <span className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5 text-primary" />
+                  Total Shipping:
+                </span>
+                <span className="text-primary">${result.totalPrice.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+
+  // Return content directly when embedded
+  if (embedded) {
+    return <div className={className}>{content}</div>;
+  }
+
+  // Return with card wrapper for standalone use
   return (
     <Card className={cn("border-2 border-primary/20", className)}>
       <CardHeader className="pb-4">
@@ -210,207 +445,7 @@ export default function GroundTransportSelector({
           Pet shipping from <span className="font-medium">{petLocation}</span>
         </p>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Location Selection */}
-        <div className="space-y-4">
-          <Label className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-primary" />
-            Your Destination
-          </Label>
-          
-          {/* Country Selector */}
-          <Select value={selectedCountryId} onValueChange={setSelectedCountryId}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select your country" />
-            </SelectTrigger>
-            <SelectContent>
-              {worldCountries.map((country) => (
-                <SelectItem key={country.id} value={country.id}>
-                  <span className="flex items-center gap-2">
-                    <span>{country.flag}</span>
-                    <span>{country.name}</span>
-                  </span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {/* Region Selector */}
-          {selectedCountry && (
-            <Select value={selectedRegionId} onValueChange={setSelectedRegionId}>
-              <SelectTrigger>
-                <SelectValue placeholder={`Select state/region in ${selectedCountry.name}`} />
-              </SelectTrigger>
-              <SelectContent>
-                {selectedCountry.regions.map((region) => (
-                  <SelectItem key={region.id} value={region.id}>
-                    {region.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-        </div>
-
-        {/* Distance Too Far Warning */}
-        {isDistanceTooFar && selectedRegion && (
-          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
-            <div>
-              <p className="font-medium text-destructive">Distance Too Far</p>
-              <p className="text-sm text-muted-foreground">
-                Ground transport is only available for distances up to {settings.max_ground_distance_km.toLocaleString()} km.
-                Consider air cargo for this destination.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Transport Type Selection */}
-        {selectedRegion && !isDistanceTooFar && (
-          <>
-            <Separator />
-            <div className="space-y-3">
-              <Label>Transport Type</Label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setTransportType("standard")}
-                  className={cn(
-                    "p-4 rounded-lg border-2 text-left transition-all",
-                    transportType === "standard"
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50"
-                  )}
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <Truck className="h-5 w-5 text-primary" />
-                    <span className="font-medium">Standard</span>
-                    <Badge variant="secondary" className="ml-auto text-xs">
-                      ×{settings.standard_multiplier}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Shared ground transport with other pets
-                  </p>
-                </button>
-                
-                <button
-                  type="button"
-                  onClick={() => setTransportType("private")}
-                  className={cn(
-                    "p-4 rounded-lg border-2 text-left transition-all",
-                    transportType === "private"
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50"
-                  )}
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <Car className="h-5 w-5 text-primary" />
-                    <span className="font-medium">Private VIP</span>
-                    <Badge className="ml-auto text-xs">
-                      ×{settings.private_multiplier}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Direct door-to-door private transport
-                  </p>
-                </button>
-              </div>
-            </div>
-
-            {/* Companion Option */}
-            <div className="flex items-start gap-3 p-4 rounded-lg border bg-muted/30">
-              <Checkbox
-                id="companion"
-                checked={hasCompanion}
-                onCheckedChange={(checked) => setHasCompanion(checked === true)}
-              />
-              <div className="flex-1">
-                <Label htmlFor="companion" className="flex items-center gap-2 cursor-pointer">
-                  <UserCheck className="h-4 w-4 text-primary" />
-                  Add Personal Handler / Companion
-                </Label>
-                <p className="text-sm text-muted-foreground mt-1">
-                  A dedicated handler will accompany your pet during the entire journey.
-                  <span className="text-primary font-medium ml-1">
-                    +${settings.companion_base_fee} - ${settings.companion_max_fee}
-                  </span>
-                </p>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* Trip Summary */}
-        {result && (
-          <>
-            <Separator />
-            <div className="space-y-4">
-              <h4 className="font-semibold flex items-center gap-2">
-                <Route className="h-4 w-4" />
-                Trip Summary
-              </h4>
-              
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Distance:</span>
-                </div>
-                <div className="font-medium text-right">
-                  {result.distanceKm.toLocaleString()} km ({result.distanceMiles.toLocaleString()} mi)
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Est. Time:</span>
-                </div>
-                <div className="font-medium text-right">
-                  {result.estimatedTime}
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <Truck className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Transport:</span>
-                </div>
-                <div className="font-medium text-right">
-                  {result.transportTypeName}
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <UserCheck className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Companion:</span>
-                </div>
-                <div className="font-medium text-right">
-                  {result.hasCompanion ? "Yes" : "No"}
-                </div>
-              </div>
-              
-              {/* Pricing Breakdown */}
-              <div className="bg-primary/5 rounded-lg p-4 space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Shipping Cost:</span>
-                  <span>${result.baseShippingPrice.toFixed(2)}</span>
-                </div>
-                {result.hasCompanion && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Companion Fee:</span>
-                    <span>${result.companionFee.toFixed(2)}</span>
-                  </div>
-                )}
-                <Separator className="my-2" />
-                <div className="flex justify-between font-bold text-lg">
-                  <span className="flex items-center gap-2">
-                    <DollarSign className="h-5 w-5 text-primary" />
-                    Total Shipping:
-                  </span>
-                  <span className="text-primary">${result.totalPrice.toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-      </CardContent>
+      <CardContent>{content}</CardContent>
     </Card>
   );
 }
