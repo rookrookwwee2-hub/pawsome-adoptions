@@ -443,6 +443,7 @@ const PetDetails = () => {
                 <TravelOptionsSelector
                   onSelectionChange={setTravelSelection}
                   flightNannyBasePrice={flightNannyBasePrice}
+                  petLocation={pet.location || "California, USA"}
                 />
 
                 {/* Add-Ons */}
