@@ -204,7 +204,7 @@ export default function GroundTransportSelector({
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-lg">
           <Truck className="h-5 w-5 text-primary" />
-          Travel Options
+          Ground Transportation
         </CardTitle>
         <p className="text-sm text-muted-foreground">
           Pet shipping from <span className="font-medium">{petLocation}</span>
@@ -407,9 +407,6 @@ export default function GroundTransportSelector({
                   <span className="text-primary">${result.totalPrice.toFixed(2)}</span>
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground text-center mt-3">
-                * This is a sample calculator. Actual prices are calculated on the pet details page.
-              </p>
             </div>
           </>
         )}
