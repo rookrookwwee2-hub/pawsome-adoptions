@@ -27,7 +27,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
 import AddOnsSelection from "@/components/cart/AddOnsSelection";
-import TravelOptionsSelector from "@/components/pets/TravelOptionsSelector";
+import GroundTransportSelector from "@/components/pets/GroundTransportSelector";
 import { useCart, CartAddOn } from "@/contexts/CartContext";
 import {
   formatPetStatusLabel,
@@ -47,22 +47,24 @@ const PetDetails = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedAddOns, setSelectedAddOns] = useState<CartAddOn[]>([]);
-  const [travelSelection, setTravelSelection] = useState<{
-    type: "ground" | "air";
-    country: string;
-    countryLabel: string;
-    price: number;
-    flightNanny: boolean;
-    flightNannyPrice: number;
+  const [groundTransportSelection, setGroundTransportSelection] = useState<{
+    distanceKm: number;
+    distanceMiles: number;
+    estimatedTime: string;
+    transportType: "standard" | "private";
+    transportTypeName: string;
+    hasCompanion: boolean;
+    baseShippingPrice: number;
+    companionFee: number;
+    totalPrice: number;
   } | null>(null);
   const [paymentType, setPaymentType] = useState<"full" | "deposit">("full");
   
   // Ref for auto-scrolling to pricing section
   const pricingSectionRef = useRef<HTMLDivElement>(null);
 
-  // Get flight nanny price from pet data
-  const flightNannyBasePrice = petRow?.flight_nanny_price || 500;
-  const shippingPrice = travelSelection ? travelSelection.price + travelSelection.flightNannyPrice : 0;
+  // Calculate shipping price from ground transport selection
+  const shippingPrice = groundTransportSelection?.totalPrice || 0;
   const addOnsTotal = selectedAddOns.reduce((sum, a) => sum + a.price, 0);
   const reservationDeposit = pet ? Math.round(pet.fee * 0.3) : 0; // 30% deposit
   const baseAmount = paymentType === "deposit" ? reservationDeposit : (pet?.fee || 0);
@@ -201,10 +203,10 @@ const PetDetails = () => {
       petImage: pet.images[0],
       basePrice: pet.fee,
       addOns: selectedAddOns,
-      shippingMethod: travelSelection ? {
-        id: `${travelSelection.type}_${travelSelection.country}`,
-        name: `${travelSelection.type === "ground" ? "Ground Transport" : "Air Cargo"} to ${travelSelection.countryLabel}${travelSelection.flightNanny ? " + Flight Nanny" : ""}`,
-        price: travelSelection.price + travelSelection.flightNannyPrice,
+      shippingMethod: groundTransportSelection ? {
+        id: `ground_${groundTransportSelection.transportType}`,
+        name: `${groundTransportSelection.transportTypeName}${groundTransportSelection.hasCompanion ? " + Companion" : ""}`,
+        price: groundTransportSelection.totalPrice,
       } : undefined,
       isReservation: paymentType === "deposit",
       reservationDeposit: reservationDeposit,
@@ -440,9 +442,9 @@ const PetDetails = () => {
                 ) : null}
 
                 {/* Travel Options */}
-                <TravelOptionsSelector
-                  onSelectionChange={setTravelSelection}
-                  flightNannyBasePrice={flightNannyBasePrice}
+                <GroundTransportSelector
+                  petLocation={pet.location || "California, USA"}
+                  onSelectionChange={setGroundTransportSelection}
                 />
 
                 {/* Add-Ons */}
@@ -500,7 +502,7 @@ const PetDetails = () => {
                       )}
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">
-                          Shipping {travelSelection ? `(${travelSelection.countryLabel})` : ""}
+                          Shipping {groundTransportSelection ? `(${groundTransportSelection.transportTypeName})` : ""}
                         </span>
                         <span>{formatPrice(shippingPrice)}</span>
                       </div>
