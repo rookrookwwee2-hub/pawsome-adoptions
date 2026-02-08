@@ -40,12 +40,16 @@ interface TravelOptionsSelectorProps {
   onSelectionChange?: (option: TravelOption | null) => void;
   flightNannyBasePrice?: number;
   petLocation?: string;
+  petLocationCountry?: string;
+  petLocationRegion?: string;
 }
 
 const TravelOptionsSelector = ({
   onSelectionChange,
   flightNannyBasePrice = 500,
   petLocation = "California, USA",
+  petLocationCountry,
+  petLocationRegion,
 }: TravelOptionsSelectorProps) => {
   const { formatPrice } = useCart();
   const [travelType, setTravelType] = useState<"ground" | "air" | null>(null);
@@ -214,6 +218,8 @@ const TravelOptionsSelector = ({
           <div className="animate-fade-in">
             <GroundTransportSelector
               petLocation={petLocation}
+              petLocationCountry={petLocationCountry}
+              petLocationRegion={petLocationRegion}
               onSelectionChange={handleGroundTransportChange}
               embedded
             />

@@ -50,13 +50,15 @@ interface GroundTransportResult {
 }
 
 interface GroundTransportSelectorProps {
-  petLocation: string; // e.g., "California, USA"
+  petLocation: string; // e.g., "California, USA" (display string for fallback)
+  petLocationCountry?: string; // Country ID from worldLocations (e.g., "usa")
+  petLocationRegion?: string;  // Region ID from worldLocations (e.g., "us-ca")
   onSelectionChange?: (result: GroundTransportResult | null) => void;
   className?: string;
   embedded?: boolean; // When true, renders without card wrapper
 }
 
-// Parse pet location to find matching region
+// Parse pet location to find matching region (fallback for legacy location strings)
 function parsePetLocation(location: string): { countryId: string; regionId: string } | null {
   const locationLower = location.toLowerCase();
   
@@ -79,6 +81,8 @@ function parsePetLocation(location: string): { countryId: string; regionId: stri
 
 export default function GroundTransportSelector({
   petLocation,
+  petLocationCountry,
+  petLocationRegion,
   onSelectionChange,
   className,
   embedded = false,
@@ -90,8 +94,13 @@ export default function GroundTransportSelector({
   const [transportType, setTransportType] = useState<TransportType>("standard");
   const [hasCompanion, setHasCompanion] = useState(false);
 
-  // Parse pet location
-  const petLocationParsed = useMemo(() => parsePetLocation(petLocation), [petLocation]);
+  // Use structured location if provided, otherwise parse from location string
+  const petLocationParsed = useMemo(() => {
+    if (petLocationCountry && petLocationRegion) {
+      return { countryId: petLocationCountry, regionId: petLocationRegion };
+    }
+    return parsePetLocation(petLocation);
+  }, [petLocation, petLocationCountry, petLocationRegion]);
   
   // Get selected country and region
   const selectedCountry = useMemo(
@@ -111,6 +120,18 @@ export default function GroundTransportSelector({
     if (!petLocationParsed) return null;
     return getRegionById(petLocationParsed.countryId, petLocationParsed.regionId);
   }, [petLocationParsed]);
+
+  // Display location string based on structured data or fallback
+  const petLocationDisplay = useMemo(() => {
+    if (petLocationCountry && petLocationRegion) {
+      const country = getCountryById(petLocationCountry);
+      const region = getRegionById(petLocationCountry, petLocationRegion);
+      if (country && region) {
+        return `${region.name}, ${country.name}`;
+      }
+    }
+    return petLocation;
+  }, [petLocation, petLocationCountry, petLocationRegion]);
 
   // Calculate distance and pricing
   const result = useMemo<GroundTransportResult | null>(() => {
@@ -221,7 +242,7 @@ export default function GroundTransportSelector({
             Price Calculator – Ground Transportation
           </h4>
           <p className="text-sm text-muted-foreground">
-            Pet shipping from <span className="font-medium">{petLocation}</span>
+            Pet shipping from <span className="font-medium">{petLocationDisplay}</span>
           </p>
         </div>
       )}
@@ -442,7 +463,7 @@ export default function GroundTransportSelector({
           Ground Transportation
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Pet shipping from <span className="font-medium">{petLocation}</span>
+          Pet shipping from <span className="font-medium">{petLocationDisplay}</span>
         </p>
       </CardHeader>
       <CardContent>{content}</CardContent>

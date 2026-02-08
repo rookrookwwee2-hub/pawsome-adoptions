@@ -639,6 +639,8 @@ export type Database = {
           image_url: string | null
           images: string[] | null
           location: string | null
+          location_country: string | null
+          location_region: string | null
           microchipped: boolean | null
           name: string
           neutered: boolean | null
@@ -679,6 +681,8 @@ export type Database = {
           image_url?: string | null
           images?: string[] | null
           location?: string | null
+          location_country?: string | null
+          location_region?: string | null
           microchipped?: boolean | null
           name: string
           neutered?: boolean | null
@@ -719,6 +723,8 @@ export type Database = {
           image_url?: string | null
           images?: string[] | null
           location?: string | null
+          location_country?: string | null
+          location_region?: string | null
           microchipped?: boolean | null
           name?: string
           neutered?: boolean | null
