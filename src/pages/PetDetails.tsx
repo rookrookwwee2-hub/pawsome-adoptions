@@ -444,6 +444,8 @@ const PetDetails = () => {
                   onSelectionChange={setTravelSelection}
                   flightNannyBasePrice={flightNannyBasePrice}
                   petLocation={pet.location || "California, USA"}
+                  petLocationCountry={(petRow as any)?.location_country}
+                  petLocationRegion={(petRow as any)?.location_region}
                 />
 
                 {/* Add-Ons */}

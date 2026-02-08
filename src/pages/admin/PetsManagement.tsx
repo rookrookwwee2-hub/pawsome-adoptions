@@ -39,14 +39,22 @@ import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import MultiImageUpload from "@/components/admin/MultiImageUpload";
 import VideoUpload from "@/components/admin/VideoUpload";
+import PetLocationSelector from "@/components/admin/PetLocationSelector";
 import { cn } from "@/lib/utils";
 import type { Database } from "@/integrations/supabase/types";
 import { catBreeds, dogBreeds } from "@/data/breeds";
+import { getCountryById, getRegionById } from "@/data/worldLocations";
 
 type Pet = Database['public']['Tables']['pets']['Row'];
 type PetInsert = Database['public']['Tables']['pets']['Insert'];
 
-const defaultPet: PetInsert = {
+// Extended type to include new location columns
+interface PetFormData extends PetInsert {
+  location_country?: string | null;
+  location_region?: string | null;
+}
+
+const defaultPet: PetFormData = {
   name: "",
   type: "Cat",
   breed: "",
@@ -54,6 +62,8 @@ const defaultPet: PetInsert = {
   size: "Medium",
   gender: "Male",
   location: "",
+  location_country: "",
+  location_region: "",
   description: "",
   adoption_fee: 0,
   status: "available",
@@ -92,10 +102,12 @@ const PetsManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
-  const [formData, setFormData] = useState<PetInsert>(defaultPet);
+  const [formData, setFormData] = useState<PetFormData>(defaultPet);
   const [birthDate, setBirthDate] = useState<Date | undefined>(undefined);
   const [petImages, setPetImages] = useState<string[]>([]);
   const [petVideoUrl, setPetVideoUrl] = useState<string | null>(null);
+  const [locationCountry, setLocationCountry] = useState<string>("");
+  const [locationRegion, setLocationRegion] = useState<string>("");
   const { toast } = useToast();
 
   const fetchPets = async () => {
@@ -136,6 +148,16 @@ const PetsManagement = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Generate display location from structured location data
+    let displayLocation = formData.location || null;
+    if (locationCountry && locationRegion) {
+      const country = getCountryById(locationCountry);
+      const region = getRegionById(locationCountry, locationRegion);
+      if (country && region) {
+        displayLocation = `${region.name}, ${country.name}`;
+      }
+    }
+
     const petData = {
       name: formData.name,
       type: formData.type,
@@ -143,7 +165,9 @@ const PetsManagement = () => {
       age: formData.age || null,
       size: formData.size || null,
       gender: formData.gender || null,
-      location: formData.location || null,
+      location: displayLocation,
+      location_country: locationCountry || null,
+      location_region: locationRegion || null,
       description: formData.description || null,
       adoption_fee: formData.adoption_fee || 0,
       status: formData.status || "available",
@@ -193,6 +217,8 @@ const PetsManagement = () => {
           setBirthDate(undefined);
           setPetImages([]);
           setPetVideoUrl(null);
+          setLocationCountry("");
+          setLocationRegion("");
         }
       } else {
         const { error } = await supabase.from('pets').insert(petData);
@@ -208,6 +234,8 @@ const PetsManagement = () => {
           setBirthDate(undefined);
           setPetImages([]);
           setPetVideoUrl(null);
+          setLocationCountry("");
+          setLocationRegion("");
         }
       }
     } catch (err) {
@@ -275,6 +303,9 @@ const PetsManagement = () => {
       : pet.image_url ? [pet.image_url] : [];
     setPetImages(existingImages);
     setPetVideoUrl(pet.video_url || null);
+    // Set location from the pet's structured location data
+    setLocationCountry((pet as any).location_country || "");
+    setLocationRegion((pet as any).location_region || "");
     setDialogOpen(true);
   };
 
@@ -284,6 +315,8 @@ const PetsManagement = () => {
     setBirthDate(undefined);
     setPetImages([]);
     setPetVideoUrl(null);
+    setLocationCountry("");
+    setLocationRegion("");
     setDialogOpen(true);
   };
 
@@ -475,12 +508,12 @@ const PetsManagement = () => {
                         </PopoverContent>
                       </Popover>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="location">Location</Label>
-                      <Input
-                        id="location"
-                        value={formData.location || ""}
-                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    <div className="col-span-2">
+                      <PetLocationSelector
+                        countryId={locationCountry}
+                        regionId={locationRegion}
+                        onCountryChange={setLocationCountry}
+                        onRegionChange={setLocationRegion}
                       />
                     </div>
                   </div>
