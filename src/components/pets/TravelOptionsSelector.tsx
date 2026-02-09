@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Plane, UserCheck, Globe, Clock, MapPin } from "lucide-react";
+import { Plane, UserCheck, Globe, Clock, MapPin, Truck } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -178,6 +178,7 @@ const TravelOptionsSelector = ({
             >
               <div className="flex items-center gap-3">
                 <RadioGroupItem value="ground" id="ground" />
+                <Truck className="w-5 h-5 text-emerald-600" />
                 <div>
                   <Label htmlFor="ground" className="font-medium cursor-pointer">
                     Ground Transport
