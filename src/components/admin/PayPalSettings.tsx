@@ -19,7 +19,24 @@ import type { PayPalSettings as PayPalSettingsType } from "@/hooks/usePaymentSet
 
 const WebhookUrlSection = () => {
   const [copied, setCopied] = useState(false);
+  const [webhookIdCopied, setWebhookIdCopied] = useState(false);
+  const [webhookId, setWebhookId] = useState("");
+  const [savingWebhookId, setSavingWebhookId] = useState(false);
   const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/paypal-webhook`;
+
+  useEffect(() => {
+    const fetchWebhookId = async () => {
+      const { data } = await supabase
+        .from("api_secrets")
+        .select("key_value")
+        .eq("key_name", "PAYPAL_WEBHOOK_ID")
+        .single();
+      if (data) {
+        setWebhookId(data.key_value);
+      }
+    };
+    fetchWebhookId();
+  }, []);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(webhookUrl);
@@ -28,10 +45,52 @@ const WebhookUrlSection = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const saveWebhookId = async () => {
+    if (!webhookId.trim()) {
+      sonnerToast.error("Please enter your PayPal Webhook ID");
+      return;
+    }
+
+    setSavingWebhookId(true);
+    
+    // Check if the secret already exists
+    const { data: existing } = await supabase
+      .from("api_secrets")
+      .select("id")
+      .eq("key_name", "PAYPAL_WEBHOOK_ID")
+      .single();
+
+    let error;
+    if (existing) {
+      // Update existing
+      const result = await supabase
+        .from("api_secrets")
+        .update({ key_value: webhookId, is_enabled: true })
+        .eq("key_name", "PAYPAL_WEBHOOK_ID");
+      error = result.error;
+    } else {
+      // Insert new
+      const result = await supabase.from("api_secrets").insert({
+        key_name: "PAYPAL_WEBHOOK_ID",
+        key_value: webhookId,
+        description: "PayPal Webhook ID for signature verification",
+        is_enabled: true,
+      });
+      error = result.error;
+    }
+
+    if (error) {
+      sonnerToast.error("Failed to save Webhook ID: " + error.message);
+    } else {
+      sonnerToast.success("Webhook ID saved successfully!");
+    }
+    setSavingWebhookId(false);
+  };
+
   return (
-    <div className="space-y-2 p-4 border rounded-xl bg-muted/30">
+    <div className="space-y-4 p-4 border rounded-xl bg-muted/30">
       <div className="flex items-center justify-between">
-        <Label className="text-sm font-medium">Webhook URL</Label>
+        <Label className="text-sm font-medium">Webhook Configuration</Label>
         <a
           href="https://developer.paypal.com/dashboard/applications"
           target="_blank"
@@ -42,25 +101,60 @@ const WebhookUrlSection = () => {
           <ExternalLink className="h-3 w-3" />
         </a>
       </div>
-      <div className="flex items-center gap-2">
-        <Input
-          value={webhookUrl}
-          readOnly
-          className="font-mono text-xs bg-background"
-        />
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handleCopy}
-          className="shrink-0"
-        >
-          {copied ? (
-            <Check className="h-4 w-4 text-green-500" />
-          ) : (
-            <Copy className="h-4 w-4" />
-          )}
-        </Button>
+      
+      {/* Webhook URL */}
+      <div className="space-y-2">
+        <Label className="text-xs text-muted-foreground">Webhook URL</Label>
+        <div className="flex items-center gap-2">
+          <Input
+            value={webhookUrl}
+            readOnly
+            className="font-mono text-xs bg-background"
+          />
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleCopy}
+            className="shrink-0"
+          >
+            {copied ? (
+              <Check className="h-4 w-4 text-green-500" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
       </div>
+
+      {/* Webhook ID for signature verification */}
+      <div className="space-y-2">
+        <Label className="text-xs text-muted-foreground">Webhook ID (for signature verification)</Label>
+        <div className="flex items-center gap-2">
+          <Input
+            value={webhookId}
+            onChange={(e) => setWebhookId(e.target.value)}
+            placeholder="Enter your PayPal Webhook ID"
+            className="font-mono text-xs"
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={saveWebhookId}
+            disabled={savingWebhookId}
+            className="shrink-0"
+          >
+            {savingWebhookId ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Find your Webhook ID in the PayPal Developer Dashboard after creating the webhook. This is required for secure signature verification.
+        </p>
+      </div>
+
       <p className="text-xs text-muted-foreground">
         Add this URL in your PayPal Developer Dashboard under Webhooks. Subscribe to: <code className="bg-muted px-1 rounded">PAYMENT.CAPTURE.COMPLETED</code>, <code className="bg-muted px-1 rounded">PAYMENT.CAPTURE.DENIED</code>, <code className="bg-muted px-1 rounded">PAYMENT.CAPTURE.REFUNDED</code>
       </p>
