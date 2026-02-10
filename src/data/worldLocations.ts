@@ -1749,3 +1749,52 @@ export function getRegionByName(countryId: string, regionName: string): Region |
   const country = getCountryById(countryId);
   return country?.regions.find(r => r.name.toLowerCase() === regionName.toLowerCase());
 }
+
+// ==================== AIR CARGO UTILITIES ====================
+
+const AVERAGE_FLIGHT_SPEED_KMH = 800;
+
+// Estimate flight time in hours
+export function estimateFlightTime(distanceKm: number): { hours: number; minutes: number; display: string } {
+  const totalHours = distanceKm / AVERAGE_FLIGHT_SPEED_KMH;
+  const hours = Math.floor(totalHours);
+  const minutes = Math.round((totalHours - hours) * 60);
+
+  let display: string;
+  if (hours >= 24) {
+    const days = Math.floor(hours / 24);
+    const remHours = hours % 24;
+    display = remHours > 0
+      ? `${days}d ${remHours}h ${minutes}m`
+      : `${days}d ${minutes}m`;
+  } else {
+    display = `${hours}h ${minutes}m`;
+  }
+
+  return { hours, minutes, display };
+}
+
+// Calculate air cargo price based on distance
+export function calculateAirCargoPrice(distanceKm: number): number {
+  if (distanceKm <= 1000) {
+    // $400–$800: linear interpolation
+    return 400 + (distanceKm / 1000) * 400;
+  } else if (distanceKm <= 3000) {
+    // $800–$1800
+    const ratio = (distanceKm - 1000) / 2000;
+    return 800 + ratio * 1000;
+  } else if (distanceKm <= 6000) {
+    // $1500–$3000
+    const ratio = (distanceKm - 3000) / 3000;
+    return 1500 + ratio * 1500;
+  } else {
+    // $3000–$6000+ (caps at ~$6000 around 18000 km)
+    const ratio = Math.min((distanceKm - 6000) / 12000, 1);
+    return 3000 + ratio * 3000;
+  }
+}
+
+// Calculate companion fee based on distance
+export function calculateCompanionFee(distanceKm: number): number {
+  return distanceKm < 3000 ? 300 : 700;
+}
