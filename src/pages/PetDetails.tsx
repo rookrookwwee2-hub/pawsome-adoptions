@@ -519,6 +519,12 @@ const PetDetails = () => {
                       </div>
                     </div>
 
+                    {!travelSelection && (
+                      <p className="text-sm text-destructive font-medium text-center">
+                        ⚠ Please select a travel option above before proceeding
+                      </p>
+                    )}
+
                     <div className="space-y-2 pt-2">
                       {/* Add to Cart button - scrolls to pricing */}
                       <Button
@@ -526,6 +532,7 @@ const PetDetails = () => {
                         variant="secondary"
                         className="w-full rounded-full gap-2"
                         onClick={() => handleReserve(false)}
+                        disabled={!travelSelection}
                       >
                         <ShoppingCart className="w-4 h-4" />
                         Add to Cart
@@ -533,6 +540,7 @@ const PetDetails = () => {
                       <Button
                         size="lg"
                         className="w-full rounded-full"
+                        disabled={!travelSelection}
                         onClick={() => {
                           handleReserve(true);
                           navigate("/checkout");
@@ -544,6 +552,7 @@ const PetDetails = () => {
                         variant="outline"
                         size="lg"
                         className="w-full rounded-full gap-2"
+                        disabled={!travelSelection}
                         onClick={() => {
                           handleReserve(true);
                           navigate("/checkout");

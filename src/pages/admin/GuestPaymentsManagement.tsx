@@ -56,6 +56,7 @@ interface GuestPayment {
   pets?: {
     name: string;
     type: string;
+    adoption_fee: number | null;
   };
 }
 
@@ -72,7 +73,7 @@ const GuestPaymentsManagement = () => {
     queryFn: async () => {
       let query = supabase
         .from("guest_payments")
-        .select("*, pets(name, type)")
+        .select("*, pets(name, type, adoption_fee)")
         .order("created_at", { ascending: false });
 
       if (statusFilter !== "all") {
@@ -179,8 +180,10 @@ const GuestPaymentsManagement = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Guest</TableHead>
+                <TableHead>Phone</TableHead>
                 <TableHead>Pet</TableHead>
-                <TableHead>Amount</TableHead>
+                <TableHead>Pet Price</TableHead>
+                <TableHead>Paid</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -189,14 +192,14 @@ const GuestPaymentsManagement = () => {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">
+                <TableCell colSpan={8} className="text-center py-8">
                     Loading payments...
                   </TableCell>
                 </TableRow>
               ) : filteredPayments?.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={6}
+                    colSpan={8}
                     className="text-center py-8 text-muted-foreground"
                   >
                     No payments found
@@ -213,7 +216,18 @@ const GuestPaymentsManagement = () => {
                         </p>
                       </div>
                     </TableCell>
-                    <TableCell>{payment.pets?.name || "Unknown"}</TableCell>
+                    <TableCell className="text-sm">
+                      {payment.guest_phone || "—"}
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium">{payment.pets?.name || "Unknown"}</p>
+                        <p className="text-sm text-muted-foreground">{payment.pets?.type || ""}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-mono text-sm">
+                      ${payment.pets?.adoption_fee ?? 0}
+                    </TableCell>
                     <TableCell className="font-medium">
                       ${payment.amount} USDT
                     </TableCell>
@@ -284,38 +298,54 @@ const GuestPaymentsManagement = () => {
 
             {selectedPayment && (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className="text-sm text-muted-foreground">Guest Name</p>
+                    <p className="text-muted-foreground">Guest Name</p>
                     <p className="font-medium">{selectedPayment.guest_name}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Email</p>
+                    <p className="text-muted-foreground">Email</p>
                     <p className="font-medium">{selectedPayment.guest_email}</p>
                   </div>
                   {selectedPayment.guest_phone && (
                     <div>
-                      <p className="text-sm text-muted-foreground">Phone</p>
-                      <p className="font-medium">
-                        {selectedPayment.guest_phone}
-                      </p>
+                      <p className="text-muted-foreground">Phone</p>
+                      <p className="font-medium">{selectedPayment.guest_phone}</p>
                     </div>
                   )}
                   {selectedPayment.guest_address && (
                     <div>
-                      <p className="text-sm text-muted-foreground">Address</p>
-                      <p className="font-medium">
-                        {selectedPayment.guest_address}
-                      </p>
+                      <p className="text-muted-foreground">Address</p>
+                      <p className="font-medium">{selectedPayment.guest_address}</p>
                     </div>
                   )}
+                  {selectedPayment.pets && (
+                    <>
+                      <div>
+                        <p className="text-muted-foreground">Pet Name</p>
+                        <p className="font-medium">{selectedPayment.pets.name}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Pet Type</p>
+                        <p className="font-medium">{selectedPayment.pets.type}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Pet Price</p>
+                        <p className="font-medium font-mono">${selectedPayment.pets.adoption_fee ?? 0}</p>
+                      </div>
+                    </>
+                  )}
+                  <div>
+                    <p className="text-muted-foreground">Wallet Address</p>
+                    <code className="text-xs bg-muted p-1 rounded break-all">{selectedPayment.wallet_address}</code>
+                  </div>
                 </div>
 
                 <div className="p-4 bg-muted rounded-xl">
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="text-sm text-muted-foreground">
-                        Pet: {selectedPayment.pets?.name}
+                        Crypto Payment (USDT)
                       </p>
                       <p className="font-display text-2xl font-bold text-primary">
                         ${selectedPayment.amount} USDT

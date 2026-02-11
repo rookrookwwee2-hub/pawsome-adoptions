@@ -10,19 +10,31 @@ import { mapDbPetToPetCard, usePublicPets } from "@/lib/pets";
 
 const petTypes = ["All", "Dog", "Cat", "Bird", "Other"];
 const sizes = ["All", "Small", "Medium", "Large"];
+const sortOptions = ["Newest", "Oldest", "Name A-Z", "Name Z-A"];
 
 const Pets = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("All");
   const [selectedSize, setSelectedSize] = useState("All");
+  const [selectedCountry, setSelectedCountry] = useState("All");
+  const [sortBy, setSortBy] = useState("Newest");
   const [showFilters, setShowFilters] = useState(false);
 
   const { data: pets = [], isLoading } = usePublicPets();
 
+  // Extract unique countries from pets
+  const countries = useMemo(() => {
+    const set = new Set<string>();
+    pets.forEach((p) => {
+      if (p.location_country) set.add(p.location_country);
+    });
+    return ["All", ...Array.from(set).sort()];
+  }, [pets]);
+
   const filteredPets = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
-    return pets.filter((pet) => {
+    let result = pets.filter((pet) => {
       const name = (pet.name ?? "").toLowerCase();
       const breed = (pet.breed ?? "").toLowerCase();
       const location = (pet.location ?? "").toLowerCase();
@@ -32,19 +44,38 @@ const Pets = () => {
 
       const matchesType = selectedType === "All" || pet.type === selectedType;
       const matchesSize = selectedSize === "All" || (pet.size ?? "") === selectedSize;
+      const matchesCountry = selectedCountry === "All" || pet.location_country === selectedCountry;
 
-      return matchesSearch && matchesType && matchesSize;
+      return matchesSearch && matchesType && matchesSize && matchesCountry;
     });
-  }, [pets, searchQuery, selectedType, selectedSize]);
+
+    // Sort
+    switch (sortBy) {
+      case "Oldest":
+        result = [...result].sort((a, b) => new Date(a.created_at ?? 0).getTime() - new Date(b.created_at ?? 0).getTime());
+        break;
+      case "Name A-Z":
+        result = [...result].sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case "Name Z-A":
+        result = [...result].sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      // Newest is default from query
+    }
+
+    return result;
+  }, [pets, searchQuery, selectedType, selectedSize, selectedCountry, sortBy]);
 
   const clearFilters = () => {
     setSearchQuery("");
     setSelectedType("All");
     setSelectedSize("All");
+    setSelectedCountry("All");
+    setSortBy("Newest");
   };
 
   const hasActiveFilters =
-    searchQuery || selectedType !== "All" || selectedSize !== "All";
+    searchQuery || selectedType !== "All" || selectedSize !== "All" || selectedCountry !== "All";
 
   return (
     <>
@@ -117,6 +148,28 @@ const Pets = () => {
                 </div>
               </div>
 
+              {/* Desktop extra filters */}
+              <div className="hidden md:flex gap-2 items-center">
+                <select
+                  value={selectedCountry}
+                  onChange={(e) => setSelectedCountry(e.target.value)}
+                  className="h-10 rounded-full border border-border bg-background px-4 text-sm"
+                >
+                  {countries.map((c) => (
+                    <option key={c} value={c}>{c === "All" ? "All Countries" : c}</option>
+                  ))}
+                </select>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="h-10 rounded-full border border-border bg-background px-4 text-sm"
+                >
+                  {sortOptions.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+
               {/* Mobile Filters */}
               {showFilters && (
                 <div className="md:hidden p-4 bg-muted rounded-2xl space-y-4 animate-scale-in">
@@ -151,6 +204,30 @@ const Pets = () => {
                         </Button>
                       ))}
                     </div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium mb-2">Country</p>
+                    <select
+                      value={selectedCountry}
+                      onChange={(e) => setSelectedCountry(e.target.value)}
+                      className="w-full h-10 rounded-full border border-border bg-background px-4 text-sm"
+                    >
+                      {countries.map((c) => (
+                        <option key={c} value={c}>{c === "All" ? "All Countries" : c}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium mb-2">Sort By</p>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="w-full h-10 rounded-full border border-border bg-background px-4 text-sm"
+                    >
+                      {sortOptions.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               )}
