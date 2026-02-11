@@ -16,7 +16,8 @@ import {
   MessageSquare,
   KeyRound,
   LineChart,
-  Truck
+  Truck,
+  Plane
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -44,6 +45,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     { name: "Payment Suggestions", path: "/admin/payment-suggestions", icon: Heart },
     { name: "Users", path: "/admin/users", icon: Users },
     { name: "Ground Transport", path: "/admin/ground-transport", icon: Truck },
+    { name: "Air Cargo", path: "/admin/air-cargo", icon: Plane },
     { name: "Google OAuth", path: "/admin/google-oauth", icon: KeyRound },
     { name: "Site Analytics", path: "/admin/analytics-settings", icon: LineChart },
     { name: "Settings", path: "/admin/settings", icon: Settings },
