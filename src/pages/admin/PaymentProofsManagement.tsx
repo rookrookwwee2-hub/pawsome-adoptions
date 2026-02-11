@@ -29,7 +29,12 @@ interface PaymentProof {
   admin_notes: string | null;
   created_at: string;
   pet_id: string | null;
-  pets?: { name: string } | null;
+  user_id: string | null;
+  pets?: {
+    name: string;
+    type: string;
+    adoption_fee: number | null;
+  } | null;
 }
 
 const PaymentProofsManagement = () => {
@@ -45,7 +50,7 @@ const PaymentProofsManagement = () => {
     queryFn: async () => {
       let query = supabase
         .from("payment_proofs")
-        .select("*, pets(name)")
+        .select("*, pets(name, type, adoption_fee)")
         .order("created_at", { ascending: false });
 
       if (statusFilter !== "all") {
@@ -196,6 +201,7 @@ const PaymentProofsManagement = () => {
                 <TableRow>
                   <TableHead>Submitted</TableHead>
                   <TableHead>Customer</TableHead>
+                  <TableHead>Pet</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead>Reference</TableHead>
                   <TableHead>Method</TableHead>
@@ -213,6 +219,12 @@ const PaymentProofsManagement = () => {
                       <div>
                         <p className="font-medium">{proof.guest_name}</p>
                         <p className="text-sm text-muted-foreground">{proof.guest_email}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium">{proof.pets?.name || "—"}</p>
+                        <p className="text-sm text-muted-foreground">{proof.pets?.type || ""}</p>
                       </div>
                     </TableCell>
                     <TableCell className="font-mono">
@@ -279,7 +291,7 @@ const PaymentProofsManagement = () => {
                   <p className="text-muted-foreground">{selectedProof.guest_email}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Amount</p>
+                  <p className="text-muted-foreground">Amount Paid</p>
                   <p className="font-medium font-mono">
                     {selectedProof.currency} {selectedProof.amount_sent.toLocaleString()}
                   </p>
@@ -298,11 +310,27 @@ const PaymentProofsManagement = () => {
                   <p className="text-muted-foreground">Transaction Reference</p>
                   <p className="font-medium font-mono">{selectedProof.transaction_reference}</p>
                 </div>
-                {selectedProof.pets?.name && (
-                  <div className="col-span-2">
-                    <p className="text-muted-foreground">Pet</p>
-                    <p className="font-medium">{selectedProof.pets.name}</p>
-                  </div>
+                {selectedProof.pets && (
+                  <>
+                    <div>
+                      <p className="text-muted-foreground">Pet Name</p>
+                      <p className="font-medium">{selectedProof.pets.name}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Pet Type</p>
+                      <p className="font-medium">{selectedProof.pets.type}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Pet Price</p>
+                      <p className="font-medium font-mono">${selectedProof.pets.adoption_fee ?? 0}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Shipping Cost</p>
+                      <p className="font-medium font-mono">
+                        ${Math.max(0, selectedProof.amount_sent - (selectedProof.pets.adoption_fee ?? 0))}
+                      </p>
+                    </div>
+                  </>
                 )}
               </div>
 
