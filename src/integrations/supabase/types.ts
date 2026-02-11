@@ -91,6 +91,60 @@ export type Database = {
           },
         ]
       }
+      air_cargo_settings: {
+        Row: {
+          average_speed_kmh: number
+          base_price: number
+          companion_base_fee: number
+          companion_max_fee: number
+          companion_per_km: number
+          created_at: string
+          id: string
+          is_enabled: boolean
+          long_flight_companion_fee: number
+          long_flight_threshold_km: number
+          price_per_km: number
+          price_per_mile: number
+          private_multiplier: number
+          standard_multiplier: number
+          updated_at: string
+        }
+        Insert: {
+          average_speed_kmh?: number
+          base_price?: number
+          companion_base_fee?: number
+          companion_max_fee?: number
+          companion_per_km?: number
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          long_flight_companion_fee?: number
+          long_flight_threshold_km?: number
+          price_per_km?: number
+          price_per_mile?: number
+          private_multiplier?: number
+          standard_multiplier?: number
+          updated_at?: string
+        }
+        Update: {
+          average_speed_kmh?: number
+          base_price?: number
+          companion_base_fee?: number
+          companion_max_fee?: number
+          companion_per_km?: number
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          long_flight_companion_fee?: number
+          long_flight_threshold_km?: number
+          price_per_km?: number
+          price_per_mile?: number
+          private_multiplier?: number
+          standard_multiplier?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       analytics_settings: {
         Row: {
           created_at: string

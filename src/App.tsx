@@ -35,6 +35,7 @@ import ReviewsManagement from "./pages/admin/ReviewsManagement";
 import GoogleOAuthPage from "./pages/admin/GoogleOAuthPage";
 import AnalyticsSettingsPage from "./pages/admin/AnalyticsSettingsPage";
 import GroundTransportSettings from "./pages/admin/GroundTransportSettings";
+import AirCargoSettings from "./pages/admin/AirCargoSettings";
 import Reviews from "./pages/Reviews";
 import NotFound from "./pages/NotFound";
 import CatBreeds from "./pages/CatBreeds";
@@ -97,6 +98,7 @@ const App = () => (
                   <Route path="/admin/google-oauth" element={<ProtectedRoute requireAdmin><GoogleOAuthPage /></ProtectedRoute>} />
                   <Route path="/admin/analytics-settings" element={<ProtectedRoute requireAdmin><AnalyticsSettingsPage /></ProtectedRoute>} />
                   <Route path="/admin/ground-transport" element={<ProtectedRoute requireAdmin><GroundTransportSettings /></ProtectedRoute>} />
+                  <Route path="/admin/air-cargo" element={<ProtectedRoute requireAdmin><AirCargoSettings /></ProtectedRoute>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <CookieConsent />

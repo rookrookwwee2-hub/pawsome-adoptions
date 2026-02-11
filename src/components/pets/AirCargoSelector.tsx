@@ -22,14 +22,12 @@ import {
   worldCountries,
   calculateDistance,
   kmToMiles,
-  estimateFlightTime,
-  calculateAirCargoPrice,
-  calculateCompanionFee,
   getCountryById,
   getRegionById,
   type Region,
 } from "@/data/worldLocations";
 import { useCart } from "@/contexts/CartContext";
+import { useAirCargoSettings } from "@/hooks/useAirCargoSettings";
 import { cn } from "@/lib/utils";
 
 export interface AirCargoResult {
@@ -71,6 +69,7 @@ export default function AirCargoSelector({
   className,
 }: AirCargoSelectorProps) {
   const { formatPrice } = useCart();
+  const { data: airSettings } = useAirCargoSettings();
 
   const [selectedCountryId, setSelectedCountryId] = useState<string>("");
   const [selectedRegionId, setSelectedRegionId] = useState<string>("");
@@ -116,6 +115,38 @@ export default function AirCargoSelector({
     setSelectedRegionId("");
   }, [selectedCountryId]);
 
+  // Settings-based calculation helpers
+  const calcFlightTime = (distanceKm: number) => {
+    const speed = airSettings?.average_speed_kmh || 800;
+    const totalHours = distanceKm / speed;
+    const hours = Math.floor(totalHours);
+    const minutes = Math.round((totalHours - hours) * 60);
+    let display: string;
+    if (hours >= 24) {
+      const days = Math.floor(hours / 24);
+      const remHours = hours % 24;
+      display = remHours > 0 ? `${days}d ${remHours}h ${minutes}m` : `${days}d ${minutes}m`;
+    } else {
+      display = `${hours}h ${minutes}m`;
+    }
+    return { hours, minutes, display };
+  };
+
+  const calcAirPrice = (distanceKm: number) => {
+    const base = Number(airSettings?.base_price ?? 400);
+    const perKm = Number(airSettings?.price_per_km ?? 0.6);
+    return base + distanceKm * perKm;
+  };
+
+  const calcCompanionFee = (distanceKm: number) => {
+    const threshold = airSettings?.long_flight_threshold_km ?? 3000;
+    if (distanceKm >= threshold) return Number(airSettings?.long_flight_companion_fee ?? 700);
+    return Math.min(
+      Number(airSettings?.companion_base_fee ?? 300) + distanceKm * Number(airSettings?.companion_per_km ?? 0.05),
+      Number(airSettings?.companion_max_fee ?? 700)
+    );
+  };
+
   // Calculate result
   const result = useMemo<AirCargoResult | null>(() => {
     if (!petOrigin || !selectedRegion || !selectedCountry) return null;
@@ -127,9 +158,9 @@ export default function AirCargoSelector({
       selectedRegion.lng
     );
     const distanceMiles = kmToMiles(distanceKm);
-    const flightTime = estimateFlightTime(distanceKm);
-    const basePrice = calculateAirCargoPrice(distanceKm);
-    const companionFee = hasCompanion ? calculateCompanionFee(distanceKm) : 0;
+    const flightTime = calcFlightTime(distanceKm);
+    const basePrice = calcAirPrice(distanceKm);
+    const companionFee = hasCompanion ? calcCompanionFee(distanceKm) : 0;
 
     return {
       distanceKm: Math.round(distanceKm),
@@ -141,7 +172,7 @@ export default function AirCargoSelector({
       totalPrice: Math.round(basePrice) + companionFee,
       destinationLabel: `${selectedRegion.name}, ${selectedCountry.name}`,
     };
-  }, [petOrigin, selectedRegion, selectedCountry, hasCompanion]);
+  }, [petOrigin, selectedRegion, selectedCountry, hasCompanion, airSettings]);
 
   // Notify parent
   useEffect(() => {
@@ -153,7 +184,7 @@ export default function AirCargoSelector({
       {/* Header */}
       <div className="space-y-1">
         <h4 className="font-semibold flex items-center gap-2">
-          <Plane className="h-5 w-5 text-blue-600" />
+          <Plane className="h-5 w-5 text-primary" />
           Price Calculator – Air Cargo
         </h4>
         <p className="text-sm text-muted-foreground">
@@ -228,7 +259,7 @@ export default function AirCargoSelector({
               Add Personal Handler
               {result && (
                 <span className="text-primary font-semibold text-sm">
-                  +{formatPrice(result.companionFee || calculateCompanionFee(result.distanceKm))}
+                  +{formatPrice(result.companionFee || calcCompanionFee(result.distanceKm))}
                 </span>
               )}
             </Label>
@@ -236,7 +267,7 @@ export default function AirCargoSelector({
               Your pet travels in-cabin with a personal escort who provides
               extra care, comfort, and attention during the entire flight.
               <span className="block mt-1 text-primary/80 font-medium">
-                Short/Medium flights (&lt;3,000 km): +$300 · Long flights (≥3,000 km): +$700
+                Short/Medium flights (&lt;{((airSettings?.long_flight_threshold_km ?? 3000) / 1000).toLocaleString()},000 km): +${Number(airSettings?.companion_base_fee ?? 300)} · Long flights (≥{((airSettings?.long_flight_threshold_km ?? 3000) / 1000).toLocaleString()},000 km): +${Number(airSettings?.long_flight_companion_fee ?? 700)}
               </span>
             </p>
           </div>
