@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format } from "date-fns";
 import { CalendarIcon, Upload, FileText, X } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,11 +21,15 @@ import { useAuth } from "@/hooks/useAuth";
 const proofSchema = z.object({
   guestName: z.string().min(2, "Name is required"),
   guestEmail: z.string().email("Valid email is required"),
+  guestPhone: z.string().optional(),
+  guestAddress: z.string().optional(),
   transactionReference: z.string().min(3, "Transaction reference is required"),
   transferDate: z.date({ required_error: "Transfer date is required" }),
   amountSent: z.string().min(1, "Amount is required"),
   currency: z.string().min(1, "Currency is required"),
   paymentMethod: z.string().min(1, "Payment method is required"),
+  shippingMethod: z.string().optional(),
+  clientNotes: z.string().optional(),
 });
 
 type ProofFormData = z.infer<typeof proofSchema>;
@@ -47,10 +52,14 @@ const ProofOfPaymentUpload = ({ open, onOpenChange, petId, petName }: ProofOfPay
     defaultValues: {
       guestName: "",
       guestEmail: "",
+      guestPhone: "",
+      guestAddress: "",
       transactionReference: "",
       amountSent: "",
       currency: "USD",
       paymentMethod: "",
+      shippingMethod: "",
+      clientNotes: "",
     },
   });
 
@@ -99,12 +108,16 @@ const ProofOfPaymentUpload = ({ open, onOpenChange, petId, petName }: ProofOfPay
         user_id: user?.id || null,
         guest_name: data.guestName,
         guest_email: data.guestEmail,
+        guest_phone: data.guestPhone || null,
+        guest_address: data.guestAddress || null,
         pet_id: petId || null,
         transaction_reference: data.transactionReference,
         transfer_date: format(data.transferDate, "yyyy-MM-dd"),
         amount_sent: parseFloat(data.amountSent),
         currency: data.currency,
         payment_method: data.paymentMethod,
+        shipping_method: data.shippingMethod || null,
+        client_notes: data.clientNotes || null,
         file_url: filePath,
         file_name: file.name,
         status: "pending",
@@ -180,6 +193,58 @@ const ProofOfPaymentUpload = ({ open, onOpenChange, petId, petName }: ProofOfPay
                     )}
                   />
                 </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="guestPhone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone</FormLabel>
+                        <FormControl>
+                          <Input placeholder="+1 (555) 123-4567" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="shippingMethod"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Shipping Method</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select method" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="ground">Ground Transport</SelectItem>
+                            <SelectItem value="air_cargo">Air Cargo</SelectItem>
+                            <SelectItem value="flight_nanny">Flight Nanny</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="guestAddress"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Delivery Address</FormLabel>
+                      <FormControl>
+                        <Input placeholder="123 Main St, Apt 4B, City, State, ZIP" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}
@@ -294,6 +359,20 @@ const ProofOfPaymentUpload = ({ open, onOpenChange, petId, petName }: ProofOfPay
                     )}
                   />
                 </div>
+
+                <FormField
+                  control={form.control}
+                  name="clientNotes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notes (Optional)</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="Any additional notes..." rows={2} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 {/* File Upload */}
                 <div className="space-y-2">

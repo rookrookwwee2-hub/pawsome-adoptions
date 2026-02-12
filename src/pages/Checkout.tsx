@@ -202,6 +202,8 @@ const Checkout = () => {
     try {
       // Create guest payment records for each item
       for (const item of items) {
+        const shippingCost = item.shippingMethod?.price || 0;
+        const shippingMethodName = item.shippingMethod?.name || null;
         const { error } = await supabase.from("guest_payments").insert({
           pet_id: item.petId,
           guest_name: values.name,
@@ -210,11 +212,13 @@ const Checkout = () => {
           guest_address: values.address || null,
           amount: item.isReservation && item.reservationDeposit
             ? item.reservationDeposit
-            : item.basePrice + item.addOns.reduce((sum, a) => sum + a.price, 0) + (item.shippingMethod?.price || 0),
+            : item.basePrice + item.addOns.reduce((sum, a) => sum + a.price, 0) + shippingCost,
           transaction_hash: null,
           wallet_address: selectedPaymentMethod === "usdt" ? "USDT TRC20" : selectedBank?.region || "Bank Transfer",
           message: values.message || null,
           status: "pending",
+          shipping_method: shippingMethodName,
+          shipping_cost: shippingCost,
         });
 
         if (error) throw error;
