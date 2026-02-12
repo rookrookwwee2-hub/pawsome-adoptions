@@ -12,17 +12,24 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
 interface PaymentProof {
   id: string;
   guest_name: string;
   guest_email: string;
+  guest_phone: string | null;
+  guest_address: string | null;
   transaction_reference: string;
   transfer_date: string;
   amount_sent: number;
   currency: string;
   payment_method: string;
+  shipping_method: string | null;
+  shipping_cost: number | null;
+  client_notes: string | null;
   file_url: string;
   file_name: string | null;
   status: string;
@@ -34,6 +41,9 @@ interface PaymentProof {
     name: string;
     type: string;
     adoption_fee: number | null;
+    location: string | null;
+    location_country: string | null;
+    location_region: string | null;
   } | null;
 }
 
@@ -50,7 +60,7 @@ const PaymentProofsManagement = () => {
     queryFn: async () => {
       let query = supabase
         .from("payment_proofs")
-        .select("*, pets(name, type, adoption_fee)")
+        .select("*, pets(name, type, adoption_fee, location, location_country, location_region)")
         .order("created_at", { ascending: false });
 
       if (statusFilter !== "all") {
@@ -83,10 +93,7 @@ const PaymentProofsManagement = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("payment_proofs")
-        .delete()
-        .eq("id", id);
+      const { error } = await supabase.from("payment_proofs").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -129,14 +136,20 @@ const PaymentProofsManagement = () => {
     return labels[method] || method;
   };
 
+  const getShippingMethodLabel = (method: string | null) => {
+    if (!method) return "—";
+    const labels: Record<string, string> = {
+      ground: "Ground Transport",
+      air_cargo: "Air Cargo",
+      flight_nanny: "Flight Nanny",
+    };
+    return labels[method] || method;
+  };
+
   const handleDownloadFile = async (fileUrl: string, fileName: string | null) => {
     try {
-      const { data, error } = await supabase.storage
-        .from("payment-proofs")
-        .download(fileUrl);
-      
+      const { data, error } = await supabase.storage.from("payment-proofs").download(fileUrl);
       if (error) throw error;
-
       const url = URL.createObjectURL(data);
       const a = document.createElement("a");
       a.href = url;
@@ -152,11 +165,7 @@ const PaymentProofsManagement = () => {
 
   const handleStatusUpdate = (status: string) => {
     if (!selectedProof) return;
-    updateStatusMutation.mutate({
-      id: selectedProof.id,
-      status,
-      notes: adminNotes,
-    });
+    updateStatusMutation.mutate({ id: selectedProof.id, status, notes: adminNotes });
   };
 
   return (
@@ -202,9 +211,9 @@ const PaymentProofsManagement = () => {
                   <TableHead>Submitted</TableHead>
                   <TableHead>Customer</TableHead>
                   <TableHead>Pet</TableHead>
+                  <TableHead>Shipping</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead>Reference</TableHead>
-                  <TableHead>Method</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -227,40 +236,25 @@ const PaymentProofsManagement = () => {
                         <p className="text-sm text-muted-foreground">{proof.pets?.type || ""}</p>
                       </div>
                     </TableCell>
+                    <TableCell className="text-sm">
+                      {getShippingMethodLabel(proof.shipping_method)}
+                    </TableCell>
                     <TableCell className="font-mono">
                       {proof.currency} {proof.amount_sent.toLocaleString()}
                     </TableCell>
                     <TableCell className="font-mono text-sm">
                       {proof.transaction_reference}
                     </TableCell>
-                    <TableCell className="text-sm">
-                      {getPaymentMethodLabel(proof.payment_method)}
-                    </TableCell>
                     <TableCell>{getStatusBadge(proof.status)}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex gap-2 justify-end">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDownloadFile(proof.file_url, proof.file_name)}
-                        >
+                        <Button variant="outline" size="sm" onClick={() => handleDownloadFile(proof.file_url, proof.file_name)}>
                           <Download className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedProof(proof);
-                            setAdminNotes(proof.admin_notes || "");
-                          }}
-                        >
+                        <Button variant="outline" size="sm" onClick={() => { setSelectedProof(proof); setAdminNotes(proof.admin_notes || ""); }}>
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => setDeleteProofId(proof.id)}
-                        >
+                        <Button variant="destructive" size="sm" onClick={() => setDeleteProofId(proof.id)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -273,79 +267,133 @@ const PaymentProofsManagement = () => {
         )}
       </div>
 
+      {/* Detail Dialog */}
       <Dialog open={!!selectedProof} onOpenChange={() => setSelectedProof(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Payment Proof Details</DialogTitle>
-            <DialogDescription>
-              Review the submitted payment proof and update its status
-            </DialogDescription>
+            <DialogDescription>Full order and payment information</DialogDescription>
           </DialogHeader>
 
           {selectedProof && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="space-y-5">
+              {/* Animal Information */}
+              {selectedProof.pets && (
                 <div>
-                  <p className="text-muted-foreground">Customer</p>
-                  <p className="font-medium">{selectedProof.guest_name}</p>
-                  <p className="text-muted-foreground">{selectedProof.guest_email}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Amount Paid</p>
-                  <p className="font-medium font-mono">
-                    {selectedProof.currency} {selectedProof.amount_sent.toLocaleString()}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Transfer Date</p>
-                  <p className="font-medium">
-                    {format(new Date(selectedProof.transfer_date), "MMM d, yyyy")}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Payment Method</p>
-                  <p className="font-medium">{getPaymentMethodLabel(selectedProof.payment_method)}</p>
-                </div>
-                <div className="col-span-2">
-                  <p className="text-muted-foreground">Transaction Reference</p>
-                  <p className="font-medium font-mono">{selectedProof.transaction_reference}</p>
-                </div>
-                {selectedProof.pets && (
-                  <>
+                  <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">🐾 Animal Information</h4>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <p className="text-muted-foreground">Pet Name</p>
+                      <p className="text-muted-foreground">Animal Name</p>
                       <p className="font-medium">{selectedProof.pets.name}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Pet Type</p>
+                      <p className="text-muted-foreground">Type / Species</p>
                       <p className="font-medium">{selectedProof.pets.type}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Location</p>
+                      <p className="font-medium">{selectedProof.pets.location || "—"}</p>
                     </div>
                     <div>
                       <p className="text-muted-foreground">Pet Price</p>
                       <p className="font-medium font-mono">${selectedProof.pets.adoption_fee ?? 0}</p>
                     </div>
-                    <div>
-                      <p className="text-muted-foreground">Shipping Cost</p>
-                      <p className="font-medium font-mono">
-                        ${Math.max(0, selectedProof.amount_sent - (selectedProof.pets.adoption_fee ?? 0))}
-                      </p>
-                    </div>
-                  </>
-                )}
+                  </div>
+                </div>
+              )}
+
+              <Separator />
+
+              {/* Client Information */}
+              <div>
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">👤 Client Information</h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Full Name</p>
+                    <p className="font-medium">{selectedProof.guest_name}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Email</p>
+                    <p className="font-medium">{selectedProof.guest_email}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Phone</p>
+                    <p className="font-medium">{selectedProof.guest_phone || "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Delivery Address</p>
+                    <p className="font-medium">{selectedProof.guest_address || "—"}</p>
+                  </div>
+                </div>
               </div>
 
+              <Separator />
+
+              {/* Shipping Information */}
+              <div>
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">🚚 Shipping Information</h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Shipping Method</p>
+                    <p className="font-medium">{getShippingMethodLabel(selectedProof.shipping_method)}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Shipping Cost</p>
+                    <p className="font-medium font-mono">
+                      ${selectedProof.shipping_cost ?? Math.max(0, selectedProof.amount_sent - (selectedProof.pets?.adoption_fee ?? 0))}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Payment Information */}
+              <div>
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">💳 Payment Information</h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Payment Method</p>
+                    <p className="font-medium">{getPaymentMethodLabel(selectedProof.payment_method)}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Total Paid</p>
+                    <p className="font-medium font-mono text-primary">
+                      {selectedProof.currency} {selectedProof.amount_sent.toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Transfer Date</p>
+                    <p className="font-medium">{format(new Date(selectedProof.transfer_date), "MMM d, yyyy")}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-muted-foreground">Transaction Reference</p>
+                    <p className="font-medium font-mono">{selectedProof.transaction_reference}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Client Notes */}
+              {selectedProof.client_notes && (
+                <>
+                  <Separator />
+                  <div>
+                    <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">📝 Client Notes</h4>
+                    <p className="text-sm bg-muted p-3 rounded-lg">{selectedProof.client_notes}</p>
+                  </div>
+                </>
+              )}
+
+              {/* Proof File */}
               <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
                 <FileText className="h-5 w-5 text-primary" />
                 <span className="flex-1 text-sm">{selectedProof.file_name || "Payment Proof"}</span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDownloadFile(selectedProof.file_url, selectedProof.file_name)}
-                >
+                <Button variant="outline" size="sm" onClick={() => handleDownloadFile(selectedProof.file_url, selectedProof.file_name)}>
                   <Download className="h-4 w-4 mr-1" /> Download
                 </Button>
               </div>
 
+              {/* Admin Notes */}
               <div className="space-y-2">
                 <Label>Admin Notes</Label>
                 <Textarea
@@ -357,19 +405,10 @@ const PaymentProofsManagement = () => {
               </div>
 
               <div className="flex gap-2">
-                <Button
-                  className="flex-1 bg-green-600 hover:bg-green-700"
-                  onClick={() => handleStatusUpdate("approved")}
-                  disabled={updateStatusMutation.isPending}
-                >
+                <Button className="flex-1 bg-green-600 hover:bg-green-700" onClick={() => handleStatusUpdate("approved")} disabled={updateStatusMutation.isPending}>
                   <Check className="h-4 w-4 mr-1" /> Approve
                 </Button>
-                <Button
-                  variant="destructive"
-                  className="flex-1"
-                  onClick={() => handleStatusUpdate("rejected")}
-                  disabled={updateStatusMutation.isPending}
-                >
+                <Button variant="destructive" className="flex-1" onClick={() => handleStatusUpdate("rejected")} disabled={updateStatusMutation.isPending}>
                   <X className="h-4 w-4 mr-1" /> Reject
                 </Button>
               </div>
@@ -382,9 +421,7 @@ const PaymentProofsManagement = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Payment Proof</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this payment proof? This action cannot be undone.
-            </AlertDialogDescription>
+            <AlertDialogDescription>Are you sure? This action cannot be undone.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>

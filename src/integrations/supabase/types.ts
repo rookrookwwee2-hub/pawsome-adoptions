@@ -474,6 +474,8 @@ export type Database = {
           id: string
           message: string | null
           pet_id: string
+          shipping_cost: number | null
+          shipping_method: string | null
           status: string
           transaction_hash: string | null
           updated_at: string
@@ -489,6 +491,8 @@ export type Database = {
           id?: string
           message?: string | null
           pet_id: string
+          shipping_cost?: number | null
+          shipping_method?: string | null
           status?: string
           transaction_hash?: string | null
           updated_at?: string
@@ -504,6 +508,8 @@ export type Database = {
           id?: string
           message?: string | null
           pet_id?: string
+          shipping_cost?: number | null
+          shipping_method?: string | null
           status?: string
           transaction_hash?: string | null
           updated_at?: string
@@ -580,15 +586,20 @@ export type Database = {
         Row: {
           admin_notes: string | null
           amount_sent: number
+          client_notes: string | null
           created_at: string
           currency: string
           file_name: string | null
           file_url: string
+          guest_address: string | null
           guest_email: string | null
           guest_name: string | null
+          guest_phone: string | null
           id: string
           payment_method: string
           pet_id: string | null
+          shipping_cost: number | null
+          shipping_method: string | null
           status: string
           transaction_reference: string
           transfer_date: string
@@ -598,15 +609,20 @@ export type Database = {
         Insert: {
           admin_notes?: string | null
           amount_sent: number
+          client_notes?: string | null
           created_at?: string
           currency?: string
           file_name?: string | null
           file_url: string
+          guest_address?: string | null
           guest_email?: string | null
           guest_name?: string | null
+          guest_phone?: string | null
           id?: string
           payment_method: string
           pet_id?: string | null
+          shipping_cost?: number | null
+          shipping_method?: string | null
           status?: string
           transaction_reference: string
           transfer_date: string
@@ -616,15 +632,20 @@ export type Database = {
         Update: {
           admin_notes?: string | null
           amount_sent?: number
+          client_notes?: string | null
           created_at?: string
           currency?: string
           file_name?: string | null
           file_url?: string
+          guest_address?: string | null
           guest_email?: string | null
           guest_name?: string | null
+          guest_phone?: string | null
           id?: string
           payment_method?: string
           pet_id?: string | null
+          shipping_cost?: number | null
+          shipping_method?: string | null
           status?: string
           transaction_reference?: string
           transfer_date?: string
