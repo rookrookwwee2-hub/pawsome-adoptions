@@ -325,8 +325,12 @@ const GuestPaymentsManagement = () => {
                   <>
                     <Separator />
                     <div>
-                      <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">📝 Client Notes</h4>
-                      <p className="text-sm bg-muted p-3 rounded">{selectedPayment.message}</p>
+                      <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">📝 Order Details & Notes</h4>
+                      <div className="text-sm bg-muted p-3 rounded space-y-1">
+                        {selectedPayment.message.split(" | ").map((part, idx) => (
+                          <p key={idx}>{part}</p>
+                        ))}
+                      </div>
                     </div>
                   </>
                 )}

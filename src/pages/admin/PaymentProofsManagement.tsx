@@ -378,8 +378,12 @@ const PaymentProofsManagement = () => {
                 <>
                   <Separator />
                   <div>
-                    <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">📝 Client Notes</h4>
-                    <p className="text-sm bg-muted p-3 rounded-lg">{selectedProof.client_notes}</p>
+                    <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">📝 Order Details & Notes</h4>
+                    <div className="text-sm bg-muted p-3 rounded-lg space-y-1">
+                      {selectedProof.client_notes.split(" | ").map((part, idx) => (
+                        <p key={idx}>{part}</p>
+                      ))}
+                    </div>
                   </div>
                 </>
               )}
