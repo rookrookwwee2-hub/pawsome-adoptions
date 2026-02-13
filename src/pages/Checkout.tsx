@@ -46,6 +46,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { usePaymentSettings } from "@/hooks/usePaymentSettings";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { saveOrderContext, getPaymentMethodLabel as getOrderPaymentLabel } from "@/lib/orderContext";
 
 // Fallback values while loading from database
 const fallbackBankDetails = [
@@ -195,15 +196,60 @@ const Checkout = () => {
     setStep("payment");
   };
 
+  const buildOrderMessage = (item: typeof items[0]) => {
+    const parts: string[] = [];
+    if (item.addOns.length > 0) {
+      parts.push(`Add-ons: ${item.addOns.map(a => `${a.name} ($${a.price})`).join(", ")}`);
+    }
+    if (item.shippingMethod) {
+      parts.push(`Shipping: ${item.shippingMethod.name} ($${item.shippingMethod.price})`);
+    }
+    if (item.isReservation) {
+      parts.push(`Type: 30% Reservation Deposit`);
+    }
+    return parts.length > 0 ? parts.join(" | ") : null;
+  };
+
+  const saveOrderToLocalStorage = (item: typeof items[0], values: CheckoutFormData) => {
+    const shippingCost = item.shippingMethod?.price || 0;
+    const addOnsTotal = item.addOns.reduce((sum, a) => sum + a.price, 0);
+    const basePrice = item.isReservation && item.reservationDeposit ? item.reservationDeposit : item.basePrice;
+
+    saveOrderContext({
+      petId: item.petId,
+      petName: item.petName,
+      petType: undefined, // we don't have type in cart
+      customerName: values.name,
+      customerEmail: values.email,
+      customerPhone: values.phone || "",
+      customerAddress: values.address,
+      customerMessage: values.message || "",
+      paymentMethod: values.paymentMethod,
+      paymentMethodLabel: getOrderPaymentLabel(values.paymentMethod),
+      shippingMethod: item.shippingMethod?.name || "",
+      shippingCost,
+      addOns: item.addOns.map(a => ({ name: a.name, price: a.price })),
+      addOnsTotal,
+      basePrice,
+      totalAmount: basePrice + addOnsTotal + shippingCost,
+      currency: "USD",
+      isReservation: !!item.isReservation,
+      reservationDeposit: item.reservationDeposit,
+      createdAt: new Date().toISOString(),
+    });
+  };
+
   const handlePaymentConfirm = async () => {
     const values = form.getValues();
     setIsSubmitting(true);
 
     try {
-      // Create guest payment records for each item
       for (const item of items) {
         const shippingCost = item.shippingMethod?.price || 0;
         const shippingMethodName = item.shippingMethod?.name || null;
+        const addOnsTotal = item.addOns.reduce((sum, a) => sum + a.price, 0);
+        const orderMessage = [values.message, buildOrderMessage(item)].filter(Boolean).join(" | ");
+
         const { error } = await supabase.from("guest_payments").insert({
           pet_id: item.petId,
           guest_name: values.name,
@@ -211,17 +257,20 @@ const Checkout = () => {
           guest_phone: values.phone || null,
           guest_address: values.address || null,
           amount: item.isReservation && item.reservationDeposit
-            ? item.reservationDeposit
-            : item.basePrice + item.addOns.reduce((sum, a) => sum + a.price, 0) + shippingCost,
+            ? item.reservationDeposit + addOnsTotal + shippingCost
+            : item.basePrice + addOnsTotal + shippingCost,
           transaction_hash: null,
           wallet_address: selectedPaymentMethod === "usdt" ? "USDT TRC20" : selectedBank?.region || "Bank Transfer",
-          message: values.message || null,
+          message: orderMessage || null,
           status: "pending",
           shipping_method: shippingMethodName,
           shipping_cost: shippingCost,
         });
 
         if (error) throw error;
+
+        // Save last order to localStorage for auto-filling proof page
+        saveOrderToLocalStorage(item, values);
       }
 
       setStep("confirmation");
@@ -720,6 +769,9 @@ const Checkout = () => {
                               try {
                                 const values = form.getValues();
                                 for (const item of items) {
+                                  const shippingCost = item.shippingMethod?.price || 0;
+                                  const addOnsTotal = item.addOns.reduce((sum, a) => sum + a.price, 0);
+                                  const orderMessage = [values.message, buildOrderMessage(item)].filter(Boolean).join(" | ");
                                   const { error } = await supabase.from("guest_payments").insert({
                                     pet_id: item.petId,
                                     guest_name: values.name,
@@ -727,15 +779,18 @@ const Checkout = () => {
                                     guest_phone: values.phone || null,
                                     guest_address: values.address || null,
                                     amount: item.isReservation && item.reservationDeposit
-                                      ? item.reservationDeposit
-                                      : item.basePrice + item.addOns.reduce((sum, a) => sum + a.price, 0) + (item.shippingMethod?.price || 0),
+                                      ? item.reservationDeposit + addOnsTotal + shippingCost
+                                      : item.basePrice + addOnsTotal + shippingCost,
                                     transaction_hash: orderId,
                                     wallet_address: `PayPal (Payer: ${payerId})`,
-                                    message: values.message || null,
+                                    message: orderMessage || null,
                                     status: "completed",
+                                    shipping_method: item.shippingMethod?.name || null,
+                                    shipping_cost: shippingCost,
                                   });
 
                                   if (error) throw error;
+                                  saveOrderToLocalStorage(item, values);
                                 }
 
                                 setStep("confirmation");
@@ -785,6 +840,9 @@ const Checkout = () => {
                               try {
                                 const values = form.getValues();
                                 for (const item of items) {
+                                  const shippingCost = item.shippingMethod?.price || 0;
+                                  const addOnsTotal = item.addOns.reduce((sum, a) => sum + a.price, 0);
+                                  const orderMessage = [values.message, buildOrderMessage(item)].filter(Boolean).join(" | ");
                                   const { error } = await supabase.from("guest_payments").insert({
                                     pet_id: item.petId,
                                     guest_name: values.name,
@@ -792,15 +850,18 @@ const Checkout = () => {
                                     guest_phone: values.phone || null,
                                     guest_address: values.address || null,
                                     amount: item.isReservation && item.reservationDeposit
-                                      ? item.reservationDeposit
-                                      : item.basePrice + item.addOns.reduce((sum, a) => sum + a.price, 0) + (item.shippingMethod?.price || 0),
+                                      ? item.reservationDeposit + addOnsTotal + shippingCost
+                                      : item.basePrice + addOnsTotal + shippingCost,
                                     transaction_hash: paymentIntentId,
                                     wallet_address: "Stripe Card Payment",
-                                    message: values.message || null,
+                                    message: orderMessage || null,
                                     status: "completed",
+                                    shipping_method: item.shippingMethod?.name || null,
+                                    shipping_cost: shippingCost,
                                   });
 
                                   if (error) throw error;
+                                  saveOrderToLocalStorage(item, values);
                                 }
 
                                 setStep("confirmation");
@@ -848,6 +909,9 @@ const Checkout = () => {
                               try {
                                 const values = form.getValues();
                                 for (const item of items) {
+                                  const shippingCost = item.shippingMethod?.price || 0;
+                                  const addOnsTotal = item.addOns.reduce((sum, a) => sum + a.price, 0);
+                                  const orderMessage = [values.message, buildOrderMessage(item)].filter(Boolean).join(" | ");
                                   const { error } = await supabase.from("guest_payments").insert({
                                     pet_id: item.petId,
                                     guest_name: values.name,
@@ -855,15 +919,18 @@ const Checkout = () => {
                                     guest_phone: values.phone || null,
                                     guest_address: values.address || null,
                                     amount: item.isReservation && item.reservationDeposit
-                                      ? item.reservationDeposit
-                                      : item.basePrice + item.addOns.reduce((sum, a) => sum + a.price, 0) + (item.shippingMethod?.price || 0),
+                                      ? item.reservationDeposit + addOnsTotal + shippingCost
+                                      : item.basePrice + addOnsTotal + shippingCost,
                                     transaction_hash: paymentId,
                                     wallet_address: "Checkout.com Card Payment",
-                                    message: values.message || null,
+                                    message: orderMessage || null,
                                     status: "completed",
+                                    shipping_method: item.shippingMethod?.name || null,
+                                    shipping_cost: shippingCost,
                                   });
 
                                   if (error) throw error;
+                                  saveOrderToLocalStorage(item, values);
                                 }
 
                                 setStep("confirmation");
