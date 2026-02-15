@@ -64,9 +64,10 @@ const PetDetails = () => {
   const flightNannyBasePrice = petRow?.flight_nanny_price || 500;
   const shippingPrice = travelSelection ? travelSelection.price + travelSelection.flightNannyPrice : 0;
   const addOnsTotal = selectedAddOns.reduce((sum, a) => sum + a.price, 0);
-  const reservationDeposit = pet ? Math.round(pet.fee * 0.3) : 0; // 30% deposit
-  const baseAmount = paymentType === "deposit" ? reservationDeposit : (pet?.fee || 0);
-  const totalPrice = baseAmount + shippingPrice + addOnsTotal;
+  const fullOrderTotal = (pet?.fee || 0) + shippingPrice + addOnsTotal;
+  const reservationDeposit = Math.round(fullOrderTotal * 0.3); // 30% of FULL order total
+  const remainingBalance = fullOrderTotal - reservationDeposit;
+  const totalPrice = paymentType === "deposit" ? reservationDeposit : fullOrderTotal;
 
   // Health badges from database
   const healthBadges = useMemo(() => {
@@ -207,7 +208,7 @@ const PetDetails = () => {
         price: travelSelection.price + travelSelection.flightNannyPrice,
       } : undefined,
       isReservation: paymentType === "deposit",
-      reservationDeposit: reservationDeposit,
+      reservationDeposit: paymentType === "deposit" ? reservationDeposit : undefined,
     });
 
     toast.success("Added to cart!", {
@@ -490,17 +491,9 @@ const PetDetails = () => {
 
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">
-                          {paymentType === "deposit" ? "Reservation Deposit" : "Adoption Fee"}
-                        </span>
-                        <span>{formatPrice(baseAmount)}</span>
+                        <span className="text-muted-foreground">Adoption Fee</span>
+                        <span>{formatPrice(pet.fee)}</span>
                       </div>
-                      {paymentType === "deposit" && (
-                        <div className="flex justify-between text-muted-foreground">
-                          <span>Remaining Balance (due later)</span>
-                          <span>{formatPrice(pet.fee - reservationDeposit)}</span>
-                        </div>
-                      )}
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">
                           Shipping {travelSelection ? `(${travelSelection.countryLabel})` : ""}
@@ -512,6 +505,22 @@ const PetDetails = () => {
                           <span className="text-muted-foreground">Add-ons</span>
                           <span>{formatPrice(addOnsTotal)}</span>
                         </div>
+                      )}
+                      <div className="flex justify-between pt-2 border-t font-medium">
+                        <span>Full Order Total</span>
+                        <span>{formatPrice(fullOrderTotal)}</span>
+                      </div>
+                      {paymentType === "deposit" && (
+                        <>
+                          <div className="flex justify-between text-primary font-semibold">
+                            <span>Reservation Deposit (30%)</span>
+                            <span>{formatPrice(reservationDeposit)}</span>
+                          </div>
+                          <div className="flex justify-between text-muted-foreground">
+                            <span>Remaining Balance (due after delivery)</span>
+                            <span>{formatPrice(remainingBalance)}</span>
+                          </div>
+                        </>
                       )}
                       <div className="flex justify-between pt-2 border-t font-semibold text-base">
                         <span>Total Due Now</span>

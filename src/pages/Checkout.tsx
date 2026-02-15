@@ -213,12 +213,14 @@ const Checkout = () => {
   const saveOrderToLocalStorage = (item: typeof items[0], values: CheckoutFormData) => {
     const shippingCost = item.shippingMethod?.price || 0;
     const addOnsTotal = item.addOns.reduce((sum, a) => sum + a.price, 0);
-    const basePrice = item.isReservation && item.reservationDeposit ? item.reservationDeposit : item.basePrice;
+    const fullTotal = item.basePrice + addOnsTotal + shippingCost;
+    const isReservation = !!item.isReservation;
+    const depositAmount = isReservation && item.reservationDeposit ? item.reservationDeposit : fullTotal;
 
     saveOrderContext({
       petId: item.petId,
       petName: item.petName,
-      petType: undefined, // we don't have type in cart
+      petType: undefined,
       customerName: values.name,
       customerEmail: values.email,
       customerPhone: values.phone || "",
@@ -230,10 +232,14 @@ const Checkout = () => {
       shippingCost,
       addOns: item.addOns.map(a => ({ name: a.name, price: a.price })),
       addOnsTotal,
-      basePrice,
-      totalAmount: basePrice + addOnsTotal + shippingCost,
+      basePrice: item.basePrice,
+      totalAmount: depositAmount,
+      fullOrderTotal: fullTotal,
+      depositAmount: isReservation ? depositAmount : 0,
+      remainingBalance: isReservation ? fullTotal - depositAmount : 0,
+      paymentCategory: isReservation ? "order_deposit" : "order_full",
       currency: "USD",
-      isReservation: !!item.isReservation,
+      isReservation,
       reservationDeposit: item.reservationDeposit,
       createdAt: new Date().toISOString(),
     });
@@ -250,21 +256,29 @@ const Checkout = () => {
         const addOnsTotal = item.addOns.reduce((sum, a) => sum + a.price, 0);
         const orderMessage = [values.message, buildOrderMessage(item)].filter(Boolean).join(" | ");
 
+        const fullTotal = item.basePrice + addOnsTotal + shippingCost;
+        const isReservation = !!item.isReservation;
+        const depositAmt = isReservation && item.reservationDeposit ? item.reservationDeposit : 0;
+        const amountDue = isReservation ? depositAmt : fullTotal;
+
         const { error } = await supabase.from("guest_payments").insert({
           pet_id: item.petId,
           guest_name: values.name,
           guest_email: values.email,
           guest_phone: values.phone || null,
           guest_address: values.address || null,
-          amount: item.isReservation && item.reservationDeposit
-            ? item.reservationDeposit + addOnsTotal + shippingCost
-            : item.basePrice + addOnsTotal + shippingCost,
+          amount: amountDue,
           transaction_hash: null,
           wallet_address: selectedPaymentMethod === "usdt" ? "USDT TRC20" : selectedBank?.region || "Bank Transfer",
           message: orderMessage || null,
           status: "pending",
           shipping_method: shippingMethodName,
           shipping_cost: shippingCost,
+          payment_category: isReservation ? "order_deposit" : "order_full",
+          full_order_total: fullTotal,
+          deposit_amount: depositAmt,
+          remaining_balance: isReservation ? fullTotal - depositAmt : 0,
+          balance_status: isReservation ? "pending" : "not_applicable",
         });
 
         if (error) throw error;
@@ -779,7 +793,7 @@ const Checkout = () => {
                                     guest_phone: values.phone || null,
                                     guest_address: values.address || null,
                                     amount: item.isReservation && item.reservationDeposit
-                                      ? item.reservationDeposit + addOnsTotal + shippingCost
+                                      ? item.reservationDeposit
                                       : item.basePrice + addOnsTotal + shippingCost,
                                     transaction_hash: orderId,
                                     wallet_address: `PayPal (Payer: ${payerId})`,
@@ -787,6 +801,11 @@ const Checkout = () => {
                                     status: "completed",
                                     shipping_method: item.shippingMethod?.name || null,
                                     shipping_cost: shippingCost,
+                                    payment_category: item.isReservation ? "order_deposit" : "order_full",
+                                    full_order_total: item.basePrice + addOnsTotal + shippingCost,
+                                    deposit_amount: item.isReservation && item.reservationDeposit ? item.reservationDeposit : 0,
+                                    remaining_balance: item.isReservation && item.reservationDeposit ? (item.basePrice + addOnsTotal + shippingCost) - item.reservationDeposit : 0,
+                                    balance_status: item.isReservation ? "pending" : "not_applicable",
                                   });
 
                                   if (error) throw error;
@@ -850,7 +869,7 @@ const Checkout = () => {
                                     guest_phone: values.phone || null,
                                     guest_address: values.address || null,
                                     amount: item.isReservation && item.reservationDeposit
-                                      ? item.reservationDeposit + addOnsTotal + shippingCost
+                                      ? item.reservationDeposit
                                       : item.basePrice + addOnsTotal + shippingCost,
                                     transaction_hash: paymentIntentId,
                                     wallet_address: "Stripe Card Payment",
@@ -858,6 +877,11 @@ const Checkout = () => {
                                     status: "completed",
                                     shipping_method: item.shippingMethod?.name || null,
                                     shipping_cost: shippingCost,
+                                    payment_category: item.isReservation ? "order_deposit" : "order_full",
+                                    full_order_total: item.basePrice + addOnsTotal + shippingCost,
+                                    deposit_amount: item.isReservation && item.reservationDeposit ? item.reservationDeposit : 0,
+                                    remaining_balance: item.isReservation && item.reservationDeposit ? (item.basePrice + addOnsTotal + shippingCost) - item.reservationDeposit : 0,
+                                    balance_status: item.isReservation ? "pending" : "not_applicable",
                                   });
 
                                   if (error) throw error;
@@ -919,7 +943,7 @@ const Checkout = () => {
                                     guest_phone: values.phone || null,
                                     guest_address: values.address || null,
                                     amount: item.isReservation && item.reservationDeposit
-                                      ? item.reservationDeposit + addOnsTotal + shippingCost
+                                      ? item.reservationDeposit
                                       : item.basePrice + addOnsTotal + shippingCost,
                                     transaction_hash: paymentId,
                                     wallet_address: "Checkout.com Card Payment",
@@ -927,6 +951,11 @@ const Checkout = () => {
                                     status: "completed",
                                     shipping_method: item.shippingMethod?.name || null,
                                     shipping_cost: shippingCost,
+                                    payment_category: item.isReservation ? "order_deposit" : "order_full",
+                                    full_order_total: item.basePrice + addOnsTotal + shippingCost,
+                                    deposit_amount: item.isReservation && item.reservationDeposit ? item.reservationDeposit : 0,
+                                    remaining_balance: item.isReservation && item.reservationDeposit ? (item.basePrice + addOnsTotal + shippingCost) - item.reservationDeposit : 0,
+                                    balance_status: item.isReservation ? "pending" : "not_applicable",
                                   });
 
                                   if (error) throw error;
@@ -1076,17 +1105,15 @@ const Checkout = () => {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {items.map((item) => {
-                      const itemPrice = item.isReservation && item.reservationDeposit
-                        ? item.reservationDeposit
-                        : item.basePrice;
                       const addOnsPrice = item.addOns.reduce((sum, a) => sum + a.price, 0);
                       const shippingPrice = item.shippingMethod?.price || 0;
+                      const fullItemTotal = item.basePrice + addOnsPrice + shippingPrice;
 
                       return (
                         <div key={item.petId} className="space-y-2">
                           <div className="flex justify-between">
                             <span className="font-medium">{item.petName}</span>
-                            <span>{formatPrice(itemPrice)}</span>
+                            <span>{formatPrice(item.basePrice)}</span>
                           </div>
                           {addOnsPrice > 0 && (
                             <div className="flex justify-between text-sm text-muted-foreground pl-2">
@@ -1100,6 +1127,22 @@ const Checkout = () => {
                               <span>+{formatPrice(shippingPrice)}</span>
                             </div>
                           )}
+                          {item.isReservation && item.reservationDeposit && (
+                            <>
+                              <div className="flex justify-between text-sm pl-2 border-t pt-1">
+                                <span className="text-muted-foreground">Full Total</span>
+                                <span>{formatPrice(fullItemTotal)}</span>
+                              </div>
+                              <div className="flex justify-between text-sm pl-2 text-primary font-medium">
+                                <span>Deposit (30%)</span>
+                                <span>{formatPrice(item.reservationDeposit)}</span>
+                              </div>
+                              <div className="flex justify-between text-sm pl-2 text-muted-foreground">
+                                <span>Balance (due later)</span>
+                                <span>{formatPrice(fullItemTotal - item.reservationDeposit)}</span>
+                              </div>
+                            </>
+                          )}
                         </div>
                       );
                     })}
@@ -1107,7 +1150,7 @@ const Checkout = () => {
                     <Separator />
 
                     <div className="flex justify-between text-lg font-bold">
-                      <span>Total</span>
+                      <span>Total Due Now</span>
                       <span className="text-primary">{formatPrice(subtotal)}</span>
                     </div>
 

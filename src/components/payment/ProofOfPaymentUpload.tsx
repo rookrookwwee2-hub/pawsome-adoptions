@@ -148,6 +148,11 @@ const ProofOfPaymentUpload = ({ open, onOpenChange, petId, petName }: ProofOfPay
         file_url: filePath,
         file_name: file.name,
         status: "pending",
+        payment_category: orderCtx?.paymentCategory || "order_full",
+        full_order_total: orderCtx?.fullOrderTotal || parseFloat(data.amountSent),
+        deposit_amount: orderCtx?.depositAmount || 0,
+        remaining_balance: orderCtx?.remainingBalance || 0,
+        balance_status: orderCtx?.isReservation ? "pending" : "not_applicable",
       });
 
       if (insertError) throw insertError;

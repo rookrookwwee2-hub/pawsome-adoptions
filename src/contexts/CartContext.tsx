@@ -82,12 +82,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const getTotal = (): number => {
     return items.reduce((total, item) => {
-      const itemTotal = item.isReservation && item.reservationDeposit
-        ? item.reservationDeposit
-        : item.basePrice;
       const addOnsTotal = item.addOns.reduce((sum, addOn) => sum + addOn.price, 0);
       const shippingTotal = item.shippingMethod?.price || 0;
-      return total + itemTotal + addOnsTotal + shippingTotal;
+      const fullItemTotal = item.basePrice + addOnsTotal + shippingTotal;
+      
+      if (item.isReservation && item.reservationDeposit) {
+        // Reservation deposit is already calculated as 30% of full total
+        return total + item.reservationDeposit;
+      }
+      return total + fullItemTotal;
     }, 0);
   };
 

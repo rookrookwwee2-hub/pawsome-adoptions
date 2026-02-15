@@ -22,8 +22,7 @@ import Dashboard from "./pages/admin/Dashboard";
 import PetsManagement from "./pages/admin/PetsManagement";
 import AdoptionsManagement from "./pages/admin/AdoptionsManagement";
 import UsersManagement from "./pages/admin/UsersManagement";
-import GuestPaymentsManagement from "./pages/admin/GuestPaymentsManagement";
-import PaymentProofsManagement from "./pages/admin/PaymentProofsManagement";
+import ProofsOfPayment from "./pages/admin/ProofsOfPayment";
 import PaymentAnalytics from "./pages/admin/PaymentAnalytics";
 import Donate from "./pages/Donate";
 import Foster from "./pages/Foster";
@@ -88,8 +87,7 @@ const App = () => (
                   <Route path="/admin/pets" element={<ProtectedRoute requireAdmin><PetsManagement /></ProtectedRoute>} />
                   <Route path="/admin/adoptions" element={<ProtectedRoute requireAdmin><AdoptionsManagement /></ProtectedRoute>} />
                   <Route path="/admin/users" element={<ProtectedRoute requireAdmin><UsersManagement /></ProtectedRoute>} />
-                  <Route path="/admin/payments" element={<ProtectedRoute requireAdmin><GuestPaymentsManagement /></ProtectedRoute>} />
-                  <Route path="/admin/payment-proofs" element={<ProtectedRoute requireAdmin><PaymentProofsManagement /></ProtectedRoute>} />
+                  <Route path="/admin/proofs-of-payment" element={<ProtectedRoute requireAdmin><ProofsOfPayment /></ProtectedRoute>} />
                   <Route path="/admin/donations" element={<ProtectedRoute requireAdmin><DonationsManagement /></ProtectedRoute>} />
                   <Route path="/admin/foster" element={<ProtectedRoute requireAdmin><FosterManagement /></ProtectedRoute>} />
                   <Route path="/admin/settings" element={<ProtectedRoute requireAdmin><SettingsManagement /></ProtectedRoute>} />
