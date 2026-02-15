@@ -17,6 +17,10 @@ export interface OrderContext {
   addOnsTotal: number;
   basePrice: number;
   totalAmount: number;
+  fullOrderTotal: number;
+  depositAmount: number;
+  remainingBalance: number;
+  paymentCategory: "order_full" | "order_deposit" | "order_balance" | "donation";
   currency: string;
   isReservation: boolean;
   reservationDeposit?: number;

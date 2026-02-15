@@ -466,14 +466,19 @@ export type Database = {
       guest_payments: {
         Row: {
           amount: number
+          balance_status: string | null
           created_at: string
+          deposit_amount: number | null
+          full_order_total: number | null
           guest_address: string | null
           guest_email: string
           guest_name: string
           guest_phone: string | null
           id: string
           message: string | null
+          payment_category: string
           pet_id: string
+          remaining_balance: number | null
           shipping_cost: number | null
           shipping_method: string | null
           status: string
@@ -483,14 +488,19 @@ export type Database = {
         }
         Insert: {
           amount: number
+          balance_status?: string | null
           created_at?: string
+          deposit_amount?: number | null
+          full_order_total?: number | null
           guest_address?: string | null
           guest_email: string
           guest_name: string
           guest_phone?: string | null
           id?: string
           message?: string | null
+          payment_category?: string
           pet_id: string
+          remaining_balance?: number | null
           shipping_cost?: number | null
           shipping_method?: string | null
           status?: string
@@ -500,14 +510,19 @@ export type Database = {
         }
         Update: {
           amount?: number
+          balance_status?: string | null
           created_at?: string
+          deposit_amount?: number | null
+          full_order_total?: number | null
           guest_address?: string | null
           guest_email?: string
           guest_name?: string
           guest_phone?: string | null
           id?: string
           message?: string | null
+          payment_category?: string
           pet_id?: string
+          remaining_balance?: number | null
           shipping_cost?: number | null
           shipping_method?: string | null
           status?: string
@@ -586,18 +601,23 @@ export type Database = {
         Row: {
           admin_notes: string | null
           amount_sent: number
+          balance_status: string | null
           client_notes: string | null
           created_at: string
           currency: string
+          deposit_amount: number | null
           file_name: string | null
           file_url: string
+          full_order_total: number | null
           guest_address: string | null
           guest_email: string | null
           guest_name: string | null
           guest_phone: string | null
           id: string
+          payment_category: string
           payment_method: string
           pet_id: string | null
+          remaining_balance: number | null
           shipping_cost: number | null
           shipping_method: string | null
           status: string
@@ -609,18 +629,23 @@ export type Database = {
         Insert: {
           admin_notes?: string | null
           amount_sent: number
+          balance_status?: string | null
           client_notes?: string | null
           created_at?: string
           currency?: string
+          deposit_amount?: number | null
           file_name?: string | null
           file_url: string
+          full_order_total?: number | null
           guest_address?: string | null
           guest_email?: string | null
           guest_name?: string | null
           guest_phone?: string | null
           id?: string
+          payment_category?: string
           payment_method: string
           pet_id?: string | null
+          remaining_balance?: number | null
           shipping_cost?: number | null
           shipping_method?: string | null
           status?: string
@@ -632,18 +657,23 @@ export type Database = {
         Update: {
           admin_notes?: string | null
           amount_sent?: number
+          balance_status?: string | null
           client_notes?: string | null
           created_at?: string
           currency?: string
+          deposit_amount?: number | null
           file_name?: string | null
           file_url?: string
+          full_order_total?: number | null
           guest_address?: string | null
           guest_email?: string | null
           guest_name?: string | null
           guest_phone?: string | null
           id?: string
+          payment_category?: string
           payment_method?: string
           pet_id?: string | null
+          remaining_balance?: number | null
           shipping_cost?: number | null
           shipping_method?: string | null
           status?: string
