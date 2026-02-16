@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, Heart, User, LogOut, Settings, ChevronDown, Cat, Dog, Package, ShoppingCart, Trash2 } from "lucide-react";
-import GoogleTranslate from "@/components/shared/GoogleTranslate";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/contexts/CartContext";
@@ -73,9 +72,8 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Always visible Theme Toggle + Translate */}
+          {/* Always visible Theme Toggle */}
           <div className="lg:hidden flex items-center gap-2">
-            <GoogleTranslate />
             <ThemeToggle />
           </div>
 
@@ -139,7 +137,6 @@ const Navbar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center gap-2">
-            <GoogleTranslate />
             <CurrencySelector />
             <ThemeToggle />
             

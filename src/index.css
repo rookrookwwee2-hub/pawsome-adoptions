@@ -283,39 +283,3 @@
 .duration-1500 {
   transition-duration: 1500ms;
 }
-
-/* Google Translate Widget Styling */
-.google-translate-container {
-  display: inline-block;
-}
-
-.google-translate-container .goog-te-gadget {
-  font-size: 0 !important;
-  line-height: 0;
-}
-
-.google-translate-container .goog-te-gadget .goog-te-combo {
-  font-size: 13px;
-  padding: 4px 8px;
-  border-radius: 8px;
-  border: 1px solid hsl(var(--border));
-  background: hsl(var(--background));
-  color: hsl(var(--foreground));
-  cursor: pointer;
-  outline: none;
-  font-family: inherit;
-}
-
-.google-translate-container .goog-te-gadget .goog-te-combo:hover {
-  border-color: hsl(var(--primary));
-}
-
-/* Hide Google Translate top bar */
-.goog-te-banner-frame,
-.skiptranslate > iframe {
-  display: none !important;
-}
-
-body {
-  top: 0 !important;
-}
