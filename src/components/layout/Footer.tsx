@@ -76,7 +76,7 @@ const Footer = () => {
             <ul className="space-y-3 font-body">
               <li className="flex items-center gap-3 text-background/70">
                 <Mail className="w-5 h-5 text-primary" />
-                hello@pawsfam.com
+                hello@pawsfam.pet
               </li>
               <li className="flex items-center gap-3 text-background/70">
                 <Phone className="w-5 h-5 text-primary" />
