@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/contexts/CartContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import CurrencySelector from "@/components/cart/CurrencySelector";
+import LanguageSelector from "@/components/shared/LanguageSelector";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -137,6 +138,7 @@ const Navbar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center gap-2">
+            <LanguageSelector />
             <CurrencySelector />
             <ThemeToggle />
             
@@ -330,6 +332,10 @@ const Navbar = () => {
               </Link>
 
               <div className="flex items-center justify-between py-2 border-t border-border mt-2 pt-4">
+                <span className="font-body font-medium text-muted-foreground">Language</span>
+                <LanguageSelector />
+              </div>
+              <div className="flex items-center justify-between py-2">
                 <span className="font-body font-medium text-muted-foreground">Currency</span>
                 <CurrencySelector />
               </div>
