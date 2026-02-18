@@ -1,12 +1,15 @@
 import { useState, useRef, useEffect } from "react";
-import { Globe, ChevronDown, Loader2 } from "lucide-react";
-import { useTranslation, SUPPORTED_LANGUAGES } from "@/contexts/TranslationContext";
+import { Globe, ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { SUPPORTED_LANGUAGES } from "@/i18n";
 import { cn } from "@/lib/utils";
 
 const LanguageSelector = () => {
-  const { language, setLanguageCode, isTranslating } = useTranslation();
+  const { i18n } = useTranslation();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  const currentLang = SUPPORTED_LANGUAGES.find((l) => l.code === i18n.language) || SUPPORTED_LANGUAGES[0];
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -25,13 +28,9 @@ const LanguageSelector = () => {
         className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm hover:bg-muted transition-colors border border-border bg-background"
         aria-label="Select language"
       >
-        {isTranslating ? (
-          <Loader2 className="w-4 h-4 animate-spin text-primary" />
-        ) : (
-          <Globe className="w-4 h-4 text-muted-foreground" />
-        )}
-        <span className="hidden sm:inline">{language.flag}</span>
-        <span className="hidden md:inline text-xs">{language.code.toUpperCase()}</span>
+        <Globe className="w-4 h-4 text-muted-foreground" />
+        <span className="hidden sm:inline">{currentLang.flag}</span>
+        <span className="hidden md:inline text-xs">{currentLang.code.toUpperCase()}</span>
         <ChevronDown className="w-3 h-3 text-muted-foreground" />
       </button>
 
@@ -41,12 +40,12 @@ const LanguageSelector = () => {
             <button
               key={lang.code}
               onClick={() => {
-                setLanguageCode(lang.code);
+                i18n.changeLanguage(lang.code);
                 setOpen(false);
               }}
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-muted transition-colors text-left",
-                lang.code === language.code && "bg-primary/10 text-primary font-medium"
+                lang.code === currentLang.code && "bg-primary/10 text-primary font-medium"
               )}
             >
               <span className="text-base">{lang.flag}</span>

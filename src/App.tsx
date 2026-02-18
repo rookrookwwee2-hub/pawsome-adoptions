@@ -7,7 +7,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { CartProvider } from "@/contexts/CartContext";
-import { TranslationProvider } from "@/contexts/TranslationContext";
+import "@/i18n";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Pets from "./pages/Pets";
@@ -56,7 +56,6 @@ const App = () => (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <TranslationProvider>
           <CartProvider>
             <TooltipProvider>
               <Toaster />
@@ -107,7 +106,6 @@ const App = () => (
               </BrowserRouter>
             </TooltipProvider>
           </CartProvider>
-          </TranslationProvider>
         </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>
