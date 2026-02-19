@@ -75,7 +75,6 @@ const Navbar = () => {
 
           {/* Always visible Theme Toggle */}
           <div className="lg:hidden flex items-center gap-2">
-            <GoogleTranslateWidget />
             <ThemeToggle />
           </div>
 
@@ -333,6 +332,10 @@ const Navbar = () => {
               </Link>
 
               <div className="flex items-center justify-between py-2 border-t border-border mt-2 pt-4">
+                <span className="font-body font-medium text-muted-foreground">Language</span>
+                <GoogleTranslateWidget />
+              </div>
+              <div className="flex items-center justify-between py-2">
                 <span className="font-body font-medium text-muted-foreground">Currency</span>
                 <CurrencySelector />
               </div>
