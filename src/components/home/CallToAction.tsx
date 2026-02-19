@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 const CallToAction = () => {
+  const { t } = useTranslation();
+
   return (
     <section className="py-24 relative overflow-hidden">
-      {/* Background Pattern */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
@@ -13,7 +15,6 @@ const CallToAction = () => {
 
       <div className="container-custom">
         <div className="relative bg-primary rounded-3xl p-12 md:p-16 text-center overflow-hidden">
-          {/* Decorative Elements */}
           <div className="absolute top-0 left-0 w-64 h-64 bg-primary-foreground/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
           <div className="absolute bottom-0 right-0 w-48 h-48 bg-primary-foreground/10 rounded-full translate-x-1/4 translate-y-1/4" />
 
@@ -23,17 +24,17 @@ const CallToAction = () => {
             </div>
 
             <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground">
-              Ready to Find Your New Best Friend?
+              {t("cta.title")}
             </h2>
 
             <p className="text-primary-foreground/80 text-lg max-w-lg mx-auto">
-              Thousands of pets are waiting for loving homes. Start your adoption journey today.
+              {t("cta.subtitle")}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Link to="/pets">
                 <Button size="lg" className="w-full sm:w-auto rounded-full bg-background text-foreground hover:bg-background/90 group">
-                  Browse Available Pets
+                  {t("cta.browsePets")}
                   <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
@@ -42,7 +43,7 @@ const CallToAction = () => {
                 variant="outline"
                 className="w-full sm:w-auto rounded-full border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
               >
-                Learn About Adoption
+                {t("cta.learnMore")}
               </Button>
             </div>
           </div>
