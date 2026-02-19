@@ -1,4 +1,5 @@
 import { ShieldCheck, Award, CheckCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   Tooltip,
   TooltipContent,
@@ -6,37 +7,39 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-const trustOrganizations = [
-  {
-    name: "CFA",
-    fullName: "Cat Fanciers' Association",
-    description: "The world's largest registry of pedigreed cats, setting the standard for cat breeds since 1906.",
-    icon: Award,
-  },
-  {
-    name: "TICA",
-    fullName: "The International Cat Association",
-    description: "The world's largest genetic registry of pedigreed and household cats, promoting responsible cat ownership.",
-    icon: ShieldCheck,
-  },
-  {
-    name: "USDA",
-    fullName: "United States Department of Agriculture",
-    description: "Federal regulatory agency ensuring animal welfare standards and health certifications for pet transportation.",
-    icon: CheckCircle,
-  },
-];
-
 const TrustSection = () => {
+  const { t } = useTranslation();
+
+  const trustOrganizations = [
+    {
+      name: "CFA",
+      fullName: t("trust.cfaFull"),
+      description: t("trust.cfaDesc"),
+      icon: Award,
+    },
+    {
+      name: "TICA",
+      fullName: t("trust.ticaFull"),
+      description: t("trust.ticaDesc"),
+      icon: ShieldCheck,
+    },
+    {
+      name: "USDA",
+      fullName: t("trust.usdaFull"),
+      description: t("trust.usdaDesc"),
+      icon: CheckCircle,
+    },
+  ];
+
   return (
     <section className="py-16 bg-accent/30">
       <div className="container-custom">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
-            We Prioritize Ethical Breeding and Animal Welfare
+            {t("trust.title")}
           </h2>
           <p className="text-muted-foreground">
-            Our commitment to excellence is backed by industry-leading organizations that set the highest standards for animal care and breeding practices.
+            {t("trust.description")}
           </p>
         </div>
 
@@ -67,7 +70,7 @@ const TrustSection = () => {
 
         <div className="mt-12 text-center">
           <p className="text-sm text-muted-foreground">
-            All our breeders are certified and regularly inspected to ensure the highest standards of care.
+            {t("trust.certifiedNote")}
           </p>
         </div>
       </div>

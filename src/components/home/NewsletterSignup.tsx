@@ -4,15 +4,17 @@ import { Input } from "@/components/ui/input";
 import { Mail, CheckCircle, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
-
-const emailSchema = z.string().trim().email({ message: "Please enter a valid email address" });
 
 const NewsletterSignup = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
+
+  const emailSchema = z.string().trim().email({ message: t("newsletter.invalidEmail") });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +22,7 @@ const NewsletterSignup = () => {
     const validation = emailSchema.safeParse(email);
     if (!validation.success) {
       toast({
-        title: "Invalid email",
+        title: t("newsletter.invalidEmail"),
         description: validation.error.errors[0].message,
         variant: "destructive",
       });
@@ -37,8 +39,8 @@ const NewsletterSignup = () => {
       if (error) {
         if (error.code === "23505") {
           toast({
-            title: "Already subscribed",
-            description: "This email is already subscribed to our newsletter.",
+            title: t("newsletter.alreadySubscribed"),
+            description: t("newsletter.alreadySubscribedDesc"),
           });
         } else {
           throw error;
@@ -47,15 +49,15 @@ const NewsletterSignup = () => {
         setIsSubscribed(true);
         setEmail("");
         toast({
-          title: "Subscribed!",
-          description: "You've been added to our newsletter.",
+          title: t("newsletter.success"),
+          description: t("newsletter.successDesc"),
         });
       }
     } catch (error) {
       console.error("Newsletter subscription error:", error);
       toast({
-        title: "Subscription failed",
-        description: "Something went wrong. Please try again.",
+        title: t("newsletter.failed"),
+        description: t("newsletter.failedDesc"),
         variant: "destructive",
       });
     } finally {
@@ -70,10 +72,10 @@ const NewsletterSignup = () => {
           <div className="max-w-2xl mx-auto text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
               <CheckCircle className="h-8 w-8 text-primary" />
-              <h2 className="text-2xl font-bold text-foreground">You're Subscribed!</h2>
+              <h2 className="text-2xl font-bold text-foreground">{t("newsletter.subscribed")}</h2>
             </div>
             <p className="text-muted-foreground">
-              Thank you for subscribing. You'll receive updates about new pets, events, and adoption tips.
+              {t("newsletter.subscribedDesc")}
             </p>
           </div>
         </div>
@@ -87,15 +89,15 @@ const NewsletterSignup = () => {
         <div className="max-w-2xl mx-auto text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Mail className="h-8 w-8 text-primary" />
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Stay Updated</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">{t("newsletter.stayUpdated")}</h2>
           </div>
           <p className="text-muted-foreground mb-6">
-            Subscribe to our newsletter for updates on new pets, adoption events, and helpful tips for pet owners.
+            {t("newsletter.description")}
           </p>
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
             <Input
               type="email"
-              placeholder="Enter your email"
+              placeholder={t("newsletter.placeholder")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="flex-1"
@@ -106,15 +108,15 @@ const NewsletterSignup = () => {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Subscribing...
+                  {t("newsletter.subscribing")}
                 </>
               ) : (
-                "Subscribe"
+                t("newsletter.subscribe")
               )}
             </Button>
           </form>
           <p className="text-xs text-muted-foreground mt-4">
-            We respect your privacy. Unsubscribe at any time.
+            {t("newsletter.privacy")}
           </p>
         </div>
       </div>

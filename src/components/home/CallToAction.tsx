@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 const CallToAction = () => {
+  const { t } = useTranslation();
+
   return (
     <section className="py-24 relative overflow-hidden">
       <div className="absolute inset-0 -z-10">
@@ -21,17 +24,17 @@ const CallToAction = () => {
             </div>
 
             <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground">
-              Ready to Find Your New Best Friend?
+              {t("cta.title")}
             </h2>
 
             <p className="text-primary-foreground/80 text-lg max-w-lg mx-auto">
-              Thousands of pets are waiting for loving homes. Start your adoption journey today.
+              {t("cta.description")}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Link to="/pets">
                 <Button size="lg" className="w-full sm:w-auto rounded-full bg-background text-foreground hover:bg-background/90 group">
-                  Browse Available Pets
+                  {t("cta.browsePets")}
                   <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
@@ -40,7 +43,7 @@ const CallToAction = () => {
                 variant="outline"
                 className="w-full sm:w-auto rounded-full border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
               >
-                Learn About Adoption
+                {t("cta.learnAbout")}
               </Button>
             </div>
           </div>

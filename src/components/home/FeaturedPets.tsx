@@ -1,13 +1,15 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Cat, Dog, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import PetCard from "@/components/pets/PetCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { mapDbPetToPetCard, usePublicPets } from "@/lib/pets";
 import PetCategorySection from "./PetCategorySection";
+import { useTranslation } from "react-i18next";
 
 const FeaturedPets = () => {
   const { data: pets = [], isLoading } = usePublicPets();
+  const { t } = useTranslation();
 
   const dogs = useMemo(() => pets.filter((p) => p.type === "Dog"), [pets]);
   const cats = useMemo(() => pets.filter((p) => p.type === "Cat"), [pets]);
@@ -22,20 +24,20 @@ const FeaturedPets = () => {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
             <div className="space-y-4">
               <span className="text-primary font-medium tracking-wide uppercase text-sm">
-                Featured Friends
+                {t("featured.label")}
               </span>
               <h2 className="font-display text-4xl md:text-5xl font-bold">
-                Pets Waiting for You
+                {t("featured.title")}
               </h2>
               <p className="text-muted-foreground max-w-lg">
-                Meet some of our adorable pets who are ready to become part of your family.
+                {t("featured.description")}
               </p>
             </div>
             <Link
               to="/pets"
               className="inline-flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all group"
             >
-              View All Pets
+              {t("featured.viewAllPets")}
               <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
@@ -75,37 +77,37 @@ const FeaturedPets = () => {
 
       {/* New Arrivals */}
       <PetCategorySection
-        label="Just Added"
-        title="New Arrivals"
-        subtitle="Check out the newest pets looking for their forever home."
+        label={t("featured.justAdded")}
+        title={t("featured.newArrivals")}
+        subtitle={t("featured.newArrivalsDesc")}
         pets={newArrivals}
         isLoading={isLoading}
         linkTo="/pets"
-        linkLabel="See All New Pets"
+        linkLabel={t("featured.seeAllNewPets")}
       />
 
       {/* Dogs Section */}
       <section className="bg-muted/30">
         <PetCategorySection
-          label="🐕 Dogs"
-          title="Dogs Available for Adoption"
-          subtitle="Find your perfect canine companion from our selection of lovable dogs."
+          label={t("featured.dogsLabel")}
+          title={t("featured.dogsTitle")}
+          subtitle={t("featured.dogsDesc")}
           pets={dogs}
           isLoading={isLoading}
           linkTo="/pets?type=Dog"
-          linkLabel="View All Dogs"
+          linkLabel={t("featured.viewAllDogs")}
         />
       </section>
 
       {/* Cats Section */}
       <PetCategorySection
-        label="🐈 Cats"
-        title="Cats Available for Adoption"
-        subtitle="Discover sweet and playful cats waiting for a loving home."
+        label={t("featured.catsLabel")}
+        title={t("featured.catsTitle")}
+        subtitle={t("featured.catsDesc")}
         pets={cats}
         isLoading={isLoading}
         linkTo="/pets?type=Cat"
-        linkLabel="View All Cats"
+        linkLabel={t("featured.viewAllCats")}
       />
     </>
   );
