@@ -7,12 +7,10 @@ import PetCard from "@/components/pets/PetCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { mapDbPetToPetCard, usePublicPets } from "@/lib/pets";
-
-const petTypes = ["All", "Dog", "Cat", "Bird", "Other"];
-const sizes = ["All", "Small", "Medium", "Large"];
-const sortOptions = ["Newest", "Oldest", "Name A-Z", "Name Z-A"];
+import { useTranslation } from "react-i18next";
 
 const Pets = () => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("All");
   const [selectedSize, setSelectedSize] = useState("All");
@@ -21,6 +19,28 @@ const Pets = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   const { data: pets = [], isLoading } = usePublicPets();
+
+  const petTypes = [
+    { value: "All", label: t("pets.all") },
+    { value: "Dog", label: t("pets.dog") },
+    { value: "Cat", label: t("pets.cat") },
+    { value: "Bird", label: t("pets.bird") },
+    { value: "Other", label: t("pets.other") },
+  ];
+
+  const sizes = [
+    { value: "All", label: t("pets.all") },
+    { value: "Small", label: t("pets.small") },
+    { value: "Medium", label: t("pets.medium") },
+    { value: "Large", label: t("pets.large") },
+  ];
+
+  const sortOptions = [
+    { value: "Newest", label: t("pets.newest") },
+    { value: "Oldest", label: t("pets.oldest") },
+    { value: "Name A-Z", label: t("pets.nameAZ") },
+    { value: "Name Z-A", label: t("pets.nameZA") },
+  ];
 
   // Extract unique countries from pets
   const countries = useMemo(() => {
@@ -80,15 +100,12 @@ const Pets = () => {
   return (
     <>
       <Helmet>
-        <title>Available Pets for Adoption | Pawsfam</title>
-        <meta
-          name="description"
-          content="Browse our available dogs, cats, and other pets for adoption. Find your perfect companion and give them a forever home."
-        />
-        <meta property="og:title" content="Available Pets for Adoption | Pawsfam" />
-        <meta property="og:description" content="Browse our available dogs, cats, and other pets for adoption. Find your perfect companion." />
+        <title>{t("pets.pageTitle")}</title>
+        <meta name="description" content={t("pets.pageDesc")} />
+        <meta property="og:title" content={t("pets.pageTitle")} />
+        <meta property="og:description" content={t("pets.pageDesc")} />
         <meta property="og:image" content="/og-pets.png" />
-        <meta name="twitter:title" content="Available Pets for Adoption | Pawsfam" />
+        <meta name="twitter:title" content={t("pets.pageTitle")} />
         <meta name="twitter:image" content="/og-pets.png" />
       </Helmet>
 
@@ -100,11 +117,10 @@ const Pets = () => {
             {/* Header */}
             <div className="mb-12 space-y-4">
               <h1 className="font-display text-4xl md:text-5xl font-bold animate-fade-up opacity-0">
-                Find Your New <span className="text-gradient">Best Friend</span>
+                {t("pets.title")} <span className="text-gradient">{t("pets.titleHighlight")}</span>
               </h1>
               <p className="text-muted-foreground text-lg max-w-2xl animate-fade-up opacity-0 stagger-1">
-                Browse our available pets and find your perfect match. Every pet
-                deserves a loving home.
+                {t("pets.subtitle")}
               </p>
             </div>
 
@@ -116,7 +132,7 @@ const Pets = () => {
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <Input
                     type="text"
-                    placeholder="Search by name, breed, or location..."
+                    placeholder={t("pets.searchPlaceholder")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-12 h-12 rounded-full border-border focus:border-primary"
@@ -130,19 +146,19 @@ const Pets = () => {
                   className="md:hidden rounded-full h-12"
                 >
                   <Filter className="w-5 h-5 mr-2" />
-                  Filters
+                  {t("pets.filters")}
                 </Button>
 
                 {/* Type Filter (Desktop) */}
                 <div className="hidden md:flex gap-2">
                   {petTypes.map((type) => (
                     <Button
-                      key={type}
-                      variant={selectedType === type ? "default" : "outline"}
-                      onClick={() => setSelectedType(type)}
+                      key={type.value}
+                      variant={selectedType === type.value ? "default" : "outline"}
+                      onClick={() => setSelectedType(type.value)}
                       className="rounded-full"
                     >
-                      {type}
+                      {type.label}
                     </Button>
                   ))}
                 </div>
@@ -156,7 +172,7 @@ const Pets = () => {
                   className="h-10 rounded-full border border-border bg-background px-4 text-sm"
                 >
                   {countries.map((c) => (
-                    <option key={c} value={c}>{c === "All" ? "All Countries" : c}</option>
+                    <option key={c} value={c}>{c === "All" ? t("pets.allCountries") : c}</option>
                   ))}
                 </select>
                 <select
@@ -165,7 +181,7 @@ const Pets = () => {
                   className="h-10 rounded-full border border-border bg-background px-4 text-sm"
                 >
                   {sortOptions.map((s) => (
-                    <option key={s} value={s}>{s}</option>
+                    <option key={s.value} value={s.value}>{s.label}</option>
                   ))}
                 </select>
               </div>
@@ -174,58 +190,58 @@ const Pets = () => {
               {showFilters && (
                 <div className="md:hidden p-4 bg-muted rounded-2xl space-y-4 animate-scale-in">
                   <div>
-                    <p className="text-sm font-medium mb-2">Pet Type</p>
+                    <p className="text-sm font-medium mb-2">{t("pets.petType")}</p>
                     <div className="flex flex-wrap gap-2">
                       {petTypes.map((type) => (
                         <Button
-                          key={type}
-                          variant={selectedType === type ? "default" : "outline"}
+                          key={type.value}
+                          variant={selectedType === type.value ? "default" : "outline"}
                           size="sm"
-                          onClick={() => setSelectedType(type)}
+                          onClick={() => setSelectedType(type.value)}
                           className="rounded-full"
                         >
-                          {type}
+                          {type.label}
                         </Button>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium mb-2">Size</p>
+                    <p className="text-sm font-medium mb-2">{t("pets.size")}</p>
                     <div className="flex flex-wrap gap-2">
                       {sizes.map((size) => (
                         <Button
-                          key={size}
-                          variant={selectedSize === size ? "default" : "outline"}
+                          key={size.value}
+                          variant={selectedSize === size.value ? "default" : "outline"}
                           size="sm"
-                          onClick={() => setSelectedSize(size)}
+                          onClick={() => setSelectedSize(size.value)}
                           className="rounded-full"
                         >
-                          {size}
+                          {size.label}
                         </Button>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium mb-2">Country</p>
+                    <p className="text-sm font-medium mb-2">{t("pets.country")}</p>
                     <select
                       value={selectedCountry}
                       onChange={(e) => setSelectedCountry(e.target.value)}
                       className="w-full h-10 rounded-full border border-border bg-background px-4 text-sm"
                     >
                       {countries.map((c) => (
-                        <option key={c} value={c}>{c === "All" ? "All Countries" : c}</option>
+                        <option key={c} value={c}>{c === "All" ? t("pets.allCountries") : c}</option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <p className="text-sm font-medium mb-2">Sort By</p>
+                    <p className="text-sm font-medium mb-2">{t("pets.sortBy")}</p>
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
                       className="w-full h-10 rounded-full border border-border bg-background px-4 text-sm"
                     >
                       {sortOptions.map((s) => (
-                        <option key={s} value={s}>{s}</option>
+                        <option key={s.value} value={s.value}>{s.label}</option>
                       ))}
                     </select>
                   </div>
@@ -236,7 +252,7 @@ const Pets = () => {
               {hasActiveFilters && (
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">
-                    {filteredPets.length} pets found
+                    {t("pets.petsFound", { count: filteredPets.length })}
                   </span>
                   <Button
                     variant="ghost"
@@ -245,7 +261,7 @@ const Pets = () => {
                     className="text-primary hover:text-primary/80"
                   >
                     <X className="w-4 h-4 mr-1" />
-                    Clear filters
+                    {t("pets.clearFilters")}
                   </Button>
                 </div>
               )}
@@ -254,7 +270,7 @@ const Pets = () => {
             {/* Pet Grid */}
             {isLoading ? (
               <div className="text-center py-16">
-                <p className="text-xl text-muted-foreground">Loading pets…</p>
+                <p className="text-xl text-muted-foreground">{t("pets.loadingPets")}</p>
               </div>
             ) : filteredPets.length > 0 ? (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -271,10 +287,10 @@ const Pets = () => {
             ) : (
               <div className="text-center py-16">
                 <p className="text-xl text-muted-foreground mb-4">
-                  No pets found matching your criteria
+                  {t("pets.noResults")}
                 </p>
                 <Button onClick={clearFilters} className="rounded-full">
-                  Clear filters
+                  {t("pets.clearFilters")}
                 </Button>
               </div>
             )}

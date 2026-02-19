@@ -8,19 +8,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
-
-const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-const signupSchema = z.object({
-  fullName: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
+import { useTranslation } from "react-i18next";
 
 const Auth = () => {
+  const { t } = useTranslation();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,6 +27,17 @@ const Auth = () => {
   const { toast } = useToast();
   
   const redirectTo = searchParams.get("redirect") || "/";
+
+  const loginSchema = z.object({
+    email: z.string().email(t("auth.invalidEmail")),
+    password: z.string().min(6, t("auth.passwordMin")),
+  });
+
+  const signupSchema = z.object({
+    fullName: z.string().min(2, t("auth.nameMin")),
+    email: z.string().email(t("auth.invalidEmail")),
+    password: z.string().min(6, t("auth.passwordMin")),
+  });
 
   useEffect(() => {
     if (user) {
@@ -59,15 +61,15 @@ const Auth = () => {
 
       if (error) {
         toast({
-          title: "Google Sign-In Failed",
+          title: t("auth.googleFailed"),
           description: error.message,
           variant: "destructive",
         });
       }
     } catch (err) {
       toast({
-        title: "Error",
-        description: "Failed to initiate Google Sign-In. Please try again.",
+        title: t("common.error"),
+        description: t("auth.unexpectedError"),
         variant: "destructive",
       });
     } finally {
@@ -96,16 +98,16 @@ const Auth = () => {
         const { error } = await signIn(email, password);
         if (error) {
           toast({
-            title: "Login Failed",
+            title: t("auth.loginFailed"),
             description: error.message === "Invalid login credentials" 
-              ? "Invalid email or password. Please try again."
+              ? t("auth.invalidCredentials")
               : error.message,
             variant: "destructive",
           });
         } else {
           toast({
-            title: "Welcome back!",
-            description: "You have successfully logged in.",
+            title: t("auth.welcomeBack"),
+            description: t("auth.signInDesc"),
           });
           navigate(redirectTo);
         }
@@ -124,25 +126,25 @@ const Auth = () => {
         const { error } = await signUp(email, password, fullName);
         if (error) {
           const message = error.message.includes("already registered")
-            ? "This email is already registered. Please login instead."
+            ? t("auth.alreadyRegistered")
             : error.message;
           toast({
-            title: "Sign Up Failed",
+            title: t("auth.signUpFailed"),
             description: message,
             variant: "destructive",
           });
         } else {
           toast({
-            title: "Account Created!",
-            description: "You can now log in with your credentials.",
+            title: t("auth.accountCreated"),
+            description: t("auth.accountCreatedDesc"),
           });
           navigate(redirectTo);
         }
       }
     } catch (err) {
       toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        title: t("common.error"),
+        description: t("auth.unexpectedError"),
         variant: "destructive",
       });
     } finally {
@@ -161,12 +163,12 @@ const Auth = () => {
             </div>
           </div>
           <h1 className="font-display text-3xl font-bold text-foreground">
-            {isLogin ? "Welcome Back" : "Join Pawsfam"}
+            {isLogin ? t("auth.welcomeBack") : t("auth.joinPawsfam")}
           </h1>
           <p className="text-muted-foreground mt-2">
             {isLogin
-              ? "Sign in to continue your adoption journey"
-              : "Create an account to start adopting"}
+              ? t("auth.signInDesc")
+              : t("auth.signUpDesc")}
           </p>
         </div>
 
@@ -181,7 +183,7 @@ const Auth = () => {
             disabled={googleLoading}
           >
             {googleLoading ? (
-              <span>Connecting...</span>
+              <span>{t("auth.connecting")}</span>
             ) : (
               <>
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -202,7 +204,7 @@ const Auth = () => {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                <span>Continue with Google</span>
+                <span>{t("auth.continueGoogle")}</span>
               </>
             )}
           </Button>
@@ -214,7 +216,7 @@ const Auth = () => {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-card px-2 text-muted-foreground">
-                Or continue with email
+                {t("auth.orEmail")}
               </span>
             </div>
           </div>
@@ -222,7 +224,7 @@ const Auth = () => {
           <form onSubmit={handleSubmit} className="space-y-5">
             {!isLogin && (
               <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
+                <Label htmlFor="fullName">{t("auth.fullName")}</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <Input
@@ -241,7 +243,7 @@ const Auth = () => {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("auth.email")}</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
@@ -259,7 +261,7 @@ const Auth = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t("auth.password")}</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
@@ -288,13 +290,13 @@ const Auth = () => {
               className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
               disabled={loading}
             >
-              {loading ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
+              {loading ? t("auth.pleaseWait") : isLogin ? t("auth.signIn") : t("auth.createAccount")}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-muted-foreground">
-              {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
+              {isLogin ? t("auth.noAccount") : t("auth.haveAccount")}{" "}
               <button
                 onClick={() => {
                   setIsLogin(!isLogin);
@@ -302,7 +304,7 @@ const Auth = () => {
                 }}
                 className="text-primary font-medium hover:underline"
               >
-                {isLogin ? "Sign up" : "Sign in"}
+                {isLogin ? t("auth.signUp") : t("auth.signInLink")}
               </button>
             </p>
           </div>
