@@ -2,7 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Star, Quote, ChevronLeft, ChevronRight, Cat, Dog } from "lucide-react";
+import { Star, Quote, Cat, Dog } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   Carousel,
   CarouselContent,
@@ -24,6 +25,7 @@ interface Review {
 }
 
 const CustomerLoveSlider = () => {
+  const { t } = useTranslation();
   const plugin = useRef(
     Autoplay({ delay: 4000, stopOnInteraction: true })
   );
@@ -63,13 +65,13 @@ const CustomerLoveSlider = () => {
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
           <span className="text-primary font-medium tracking-wide uppercase text-sm">
-            Success Stories
+            {t("customerLove.label")}
           </span>
           <h2 className="font-display text-4xl md:text-5xl font-bold">
-            Customer Love 💕
+            {t("customerLove.title")}
           </h2>
           <p className="text-background/70">
-            Hear from families who found their perfect companions through Pawsfam.
+            {t("customerLove.description")}
           </p>
         </div>
 
@@ -89,10 +91,8 @@ const CustomerLoveSlider = () => {
                   className="relative bg-background/5 backdrop-blur-sm rounded-2xl p-8 h-full opacity-0 animate-fade-up"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  {/* Quote Icon */}
                   <Quote className="absolute top-6 right-6 w-8 h-8 text-primary/30" />
 
-                  {/* Pet Type Icon */}
                   <div className="flex items-center gap-2 mb-4">
                     {review.pet_type === "cat" ? (
                       <Cat className="w-5 h-5 text-primary" />
@@ -100,23 +100,20 @@ const CustomerLoveSlider = () => {
                       <Dog className="w-5 h-5 text-primary" />
                     )}
                     <span className="text-sm text-background/60 capitalize">
-                      {review.pet_type} Parent
+                      {review.pet_type === "cat" ? t("customerLove.catParent") : t("customerLove.dogParent")}
                     </span>
                   </div>
 
-                  {/* Rating */}
                   <div className="flex gap-1 mb-4">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="w-4 h-4 fill-primary text-primary" />
                     ))}
                   </div>
 
-                  {/* Content */}
                   <p className="text-background/80 mb-6 leading-relaxed line-clamp-4">
                     "{review.review_text}"
                   </p>
 
-                  {/* Author */}
                   <div className="flex items-center gap-4">
                     {review.photo_url ? (
                       <img
@@ -146,10 +143,9 @@ const CustomerLoveSlider = () => {
           <CarouselNext className="hidden md:flex -right-4 bg-background text-foreground hover:bg-background/90" />
         </Carousel>
 
-        {/* See All Reviews Button */}
         <div className="text-center mt-12">
           <Button asChild size="lg" className="bg-[#0fa185] text-white hover:bg-[#0d8a72] border-0">
-            <Link to="/reviews">See All Reviews →</Link>
+            <Link to="/reviews">{t("customerLove.seeAllReviews")}</Link>
           </Button>
         </div>
       </div>
