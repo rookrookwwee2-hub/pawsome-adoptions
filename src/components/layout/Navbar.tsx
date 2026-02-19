@@ -73,8 +73,9 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Always visible Theme Toggle */}
+          {/* Always visible Theme Toggle + Language */}
           <div className="lg:hidden flex items-center gap-2">
+            <LanguageSelector />
             <ThemeToggle />
           </div>
 
