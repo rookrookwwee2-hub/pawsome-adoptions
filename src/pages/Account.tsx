@@ -48,32 +48,34 @@ import { AvatarUpload } from "@/components/account/AvatarUpload";
 import { EmailPreferences } from "@/components/account/EmailPreferences";
 import { DeleteAccountDialog } from "@/components/account/DeleteAccountDialog";
 import { FosterApplicationsTab } from "@/components/account/FosterApplicationsTab";
-
-const profileSchema = z.object({
-  full_name: z.string().max(100).optional(),
-  phone: z.string().max(20).optional(),
-});
-
-const passwordSchema = z
-  .object({
-    currentPassword: z.string().min(6, "Password must be at least 6 characters"),
-    newPassword: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
-
-type ProfileFormData = z.infer<typeof profileSchema>;
-type PasswordFormData = z.infer<typeof passwordSchema>;
+import { useTranslation } from "react-i18next";
 
 const Account = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+
+  const profileSchema = z.object({
+    full_name: z.string().max(100).optional(),
+    phone: z.string().max(20).optional(),
+  });
+
+  const passwordSchema = z
+    .object({
+      currentPassword: z.string().min(6, t("auth.passwordMin")),
+      newPassword: z.string().min(6, t("auth.passwordMin")),
+      confirmPassword: z.string().min(6, t("auth.passwordMin")),
+    })
+    .refine((data) => data.newPassword === data.confirmPassword, {
+      message: t("account.passwordMatch"),
+      path: ["confirmPassword"],
+    });
+
+  type ProfileFormData = z.infer<typeof profileSchema>;
+  type PasswordFormData = z.infer<typeof passwordSchema>;
 
   // Redirect if not logged in
   if (!user) {
@@ -153,9 +155,9 @@ const Account = () => {
 
       if (error) throw error;
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      toast.success("Profile updated!");
+      toast.success(t("account.profileUpdated"));
     } catch (error) {
-      toast.error("Failed to update profile");
+      toast.error(t("account.profileFailed"));
     } finally {
       setIsUpdatingProfile(false);
     }
@@ -170,9 +172,9 @@ const Account = () => {
 
       if (error) throw error;
       passwordForm.reset();
-      toast.success("Password updated!");
+      toast.success(t("account.passwordUpdated"));
     } catch (error: any) {
-      toast.error(error.message || "Failed to update password");
+      toast.error(error.message || t("account.passwordFailed"));
     } finally {
       setIsUpdatingPassword(false);
     }
@@ -191,20 +193,20 @@ const Account = () => {
       case "pending":
         return (
           <Badge variant="outline" className="gap-1">
-            <Clock className="w-3 h-3" /> Pending
+            <Clock className="w-3 h-3" /> {t("account.pending")}
           </Badge>
         );
       case "approved":
       case "confirmed":
         return (
           <Badge className="bg-primary/10 text-primary gap-1">
-            <Check className="w-3 h-3" /> {status === "approved" ? "Approved" : "Confirmed"}
+            <Check className="w-3 h-3" /> {status === "approved" ? t("account.approved") : t("account.confirmed")}
           </Badge>
         );
       case "rejected":
         return (
           <Badge variant="destructive" className="gap-1">
-            <XCircle className="w-3 h-3" /> Rejected
+            <XCircle className="w-3 h-3" /> {t("account.rejected")}
           </Badge>
         );
       default:
@@ -215,7 +217,7 @@ const Account = () => {
   return (
     <>
       <Helmet>
-        <title>Account Settings | Pawsfam</title>
+        <title>{t("account.pageTitle")}</title>
         <meta name="description" content="Manage your Pawsfam account settings, profile, and view your adoption history." />
       </Helmet>
 
@@ -224,33 +226,33 @@ const Account = () => {
 
         <main className="pt-28 pb-16">
           <div className="container-custom max-w-4xl">
-            <h1 className="font-display text-4xl font-bold mb-8">Account Settings</h1>
+            <h1 className="font-display text-4xl font-bold mb-8">{t("account.title")}</h1>
 
             <Tabs defaultValue="profile" className="space-y-6">
               <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="profile" className="gap-2">
                   <User className="w-4 h-4" />
-                  <span className="hidden sm:inline">Profile</span>
+                  <span className="hidden sm:inline">{t("account.profile")}</span>
                 </TabsTrigger>
                 <TabsTrigger value="password" className="gap-2">
                   <Lock className="w-4 h-4" />
-                  <span className="hidden sm:inline">Password</span>
+                  <span className="hidden sm:inline">{t("account.passwordTab")}</span>
                 </TabsTrigger>
                 <TabsTrigger value="notifications" className="gap-2">
                   <Bell className="w-4 h-4" />
-                  <span className="hidden sm:inline">Emails</span>
+                  <span className="hidden sm:inline">{t("account.emails")}</span>
                 </TabsTrigger>
                 <TabsTrigger value="adoptions" className="gap-2">
                   <FileText className="w-4 h-4" />
-                  <span className="hidden sm:inline">Adoptions</span>
+                  <span className="hidden sm:inline">{t("account.adoptions")}</span>
                 </TabsTrigger>
                 <TabsTrigger value="foster" className="gap-2">
                   <Home className="w-4 h-4" />
-                  <span className="hidden sm:inline">Foster</span>
+                  <span className="hidden sm:inline">{t("account.fosterTab")}</span>
                 </TabsTrigger>
                 <TabsTrigger value="payments" className="gap-2">
                   <Wallet className="w-4 h-4" />
-                  <span className="hidden sm:inline">Payments</span>
+                  <span className="hidden sm:inline">{t("account.payments")}</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -258,9 +260,9 @@ const Account = () => {
               <TabsContent value="profile">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Profile Information</CardTitle>
+                    <CardTitle>{t("account.profileInfo")}</CardTitle>
                     <CardDescription>
-                      Update your personal information
+                      {t("account.updatePersonal")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -285,10 +287,10 @@ const Account = () => {
                             className="space-y-4"
                           >
                             <div className="space-y-2">
-                              <FormLabel>Email</FormLabel>
+                              <FormLabel>{t("account.emailLabel")}</FormLabel>
                               <Input value={user.email || ""} disabled />
                               <p className="text-xs text-muted-foreground">
-                                Email cannot be changed
+                                {t("account.emailNoChange")}
                               </p>
                             </div>
 
@@ -297,7 +299,7 @@ const Account = () => {
                               name="full_name"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Full Name</FormLabel>
+                                  <FormLabel>{t("account.fullName")}</FormLabel>
                                   <FormControl>
                                     <Input placeholder="John Doe" {...field} />
                                   </FormControl>
@@ -311,7 +313,7 @@ const Account = () => {
                               name="phone"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Phone Number</FormLabel>
+                                  <FormLabel>{t("account.phone")}</FormLabel>
                                   <FormControl>
                                     <Input
                                       placeholder="+1 (555) 123-4567"
@@ -331,10 +333,10 @@ const Account = () => {
                               {isUpdatingProfile ? (
                                 <>
                                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                  Saving...
+                                  {t("account.saving")}
                                 </>
                               ) : (
-                                "Save Changes"
+                                t("account.saveChanges")
                               )}
                             </Button>
                           </form>
@@ -346,10 +348,10 @@ const Account = () => {
                           <div>
                             <h3 className="text-lg font-medium text-destructive flex items-center gap-2">
                               <Trash2 className="w-5 h-5" />
-                              Danger Zone
+                              {t("account.dangerZone")}
                             </h3>
                             <p className="text-sm text-muted-foreground">
-                              Permanently delete your account and all associated data
+                              {t("account.dangerDesc")}
                             </p>
                           </div>
                           <DeleteAccountDialog
@@ -367,9 +369,9 @@ const Account = () => {
               <TabsContent value="password">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Change Password</CardTitle>
+                    <CardTitle>{t("account.changePassword")}</CardTitle>
                     <CardDescription>
-                      Update your account password
+                      {t("account.updatePassword")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -383,7 +385,7 @@ const Account = () => {
                           name="currentPassword"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Current Password</FormLabel>
+                              <FormLabel>{t("account.currentPassword")}</FormLabel>
                               <FormControl>
                                 <Input type="password" {...field} />
                               </FormControl>
@@ -397,7 +399,7 @@ const Account = () => {
                           name="newPassword"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>New Password</FormLabel>
+                              <FormLabel>{t("account.newPassword")}</FormLabel>
                               <FormControl>
                                 <Input type="password" {...field} />
                               </FormControl>
@@ -411,7 +413,7 @@ const Account = () => {
                           name="confirmPassword"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Confirm New Password</FormLabel>
+                              <FormLabel>{t("account.confirmPassword")}</FormLabel>
                               <FormControl>
                                 <Input type="password" {...field} />
                               </FormControl>
@@ -428,10 +430,10 @@ const Account = () => {
                           {isUpdatingPassword ? (
                             <>
                               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              Updating...
+                              {t("account.updating")}
                             </>
                           ) : (
-                            "Update Password"
+                            t("account.updatePasswordBtn")
                           )}
                         </Button>
                       </form>
@@ -455,9 +457,9 @@ const Account = () => {
               <TabsContent value="adoptions">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Adoption History</CardTitle>
+                    <CardTitle>{t("account.adoptionHistory")}</CardTitle>
                     <CardDescription>
-                      View your adoption requests and their status
+                      {t("account.adoptionHistoryDesc")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -467,7 +469,7 @@ const Account = () => {
                       </div>
                     ) : adoptions?.length === 0 ? (
                       <p className="text-center text-muted-foreground py-8">
-                        You haven't submitted any adoption requests yet.
+                        {t("account.noAdoptions")}
                       </p>
                     ) : (
                       <div className="space-y-4">
@@ -485,7 +487,7 @@ const Account = () => {
                             )}
                             <div className="flex-1">
                               <p className="font-medium">
-                                {adoption.pets?.name || "Unknown Pet"}
+                                {adoption.pets?.name || t("account.unknownPet")}
                               </p>
                               <p className="text-sm text-muted-foreground">
                                 {format(new Date(adoption.created_at), "MMM d, yyyy")}
@@ -509,9 +511,9 @@ const Account = () => {
               <TabsContent value="payments">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Payment History</CardTitle>
+                    <CardTitle>{t("account.paymentHistory")}</CardTitle>
                     <CardDescription>
-                      View your USDT payment submissions
+                      {t("account.paymentHistoryDesc")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -521,7 +523,7 @@ const Account = () => {
                       </div>
                     ) : payments?.length === 0 ? (
                       <p className="text-center text-muted-foreground py-8">
-                        You haven't made any USDT payments yet.
+                        {t("account.noPayments")}
                       </p>
                     ) : (
                       <div className="space-y-4">
@@ -532,7 +534,7 @@ const Account = () => {
                           >
                             <div className="flex-1">
                               <p className="font-medium">
-                                {payment.pets?.name || "Unknown Pet"}
+                                {payment.pets?.name || t("account.unknownPet")}
                               </p>
                               <p className="text-sm text-muted-foreground">
                                 {format(new Date(payment.created_at), "MMM d, yyyy")}

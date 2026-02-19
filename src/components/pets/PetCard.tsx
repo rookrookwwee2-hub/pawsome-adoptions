@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Heart, MapPin, PawPrint } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 interface Pet {
   id: string;
@@ -22,6 +23,7 @@ const PetCard = ({ pet }: PetCardProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleAdoptNow = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -77,7 +79,7 @@ const PetCard = ({ pet }: PetCardProps) => {
             className="absolute bottom-4 right-4 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg px-4 py-2 font-semibold text-sm gap-1.5"
           >
             <PawPrint className="w-4 h-4" />
-            Adopt Now
+            {t("pets.adoptNow")}
           </Button>
         </div>
 
