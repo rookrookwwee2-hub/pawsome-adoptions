@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/contexts/CartContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import CurrencySelector from "@/components/cart/CurrencySelector";
+import GoogleTranslateWidget from "@/components/GoogleTranslateWidget";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -74,6 +75,7 @@ const Navbar = () => {
 
           {/* Always visible Theme Toggle */}
           <div className="lg:hidden flex items-center gap-2">
+            <GoogleTranslateWidget />
             <ThemeToggle />
           </div>
 
@@ -138,6 +140,7 @@ const Navbar = () => {
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center gap-2">
             <CurrencySelector />
+            <GoogleTranslateWidget />
             <ThemeToggle />
             
             {/* Cart Icon with Hover Preview */}
