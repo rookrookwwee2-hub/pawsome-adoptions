@@ -7,7 +7,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { CartProvider } from "@/contexts/CartContext";
-import "@/i18n";
+
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Pets from "./pages/Pets";
