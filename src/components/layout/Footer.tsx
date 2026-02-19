@@ -1,29 +1,26 @@
 import { Link } from "react-router-dom";
 import { Heart, Mail, Phone, MapPin } from "lucide-react";
 import { SocialIcons } from "@/components/shared/SocialIcons";
-import { useTranslation } from "react-i18next";
 
 const Footer = () => {
-  const { t } = useTranslation();
-
   const quickLinks = [
-    { name: t("footer.availablePets"), path: "/pets" },
-    { name: t("footer.adoptionProcess"), path: "/about" },
-    { name: t("footer.successStories"), path: "/about" },
-    { name: t("footer.volunteer"), path: "/foster" },
-    { name: t("nav.catBreeds"), path: "/cat-breeds" },
-    { name: t("nav.dogBreeds"), path: "/dog-breeds" },
+    { name: "Available Pets", path: "/pets" },
+    { name: "Adoption Process", path: "/about" },
+    { name: "Success Stories", path: "/about" },
+    { name: "Volunteer", path: "/foster" },
+    { name: "Cat Breeds", path: "/cat-breeds" },
+    { name: "Dog Breeds", path: "/dog-breeds" },
   ];
 
   const supportLinks = [
-    { name: t("footer.support"), path: "/contact" },
-    { name: t("footer.donate"), path: "/donate" },
-    { name: t("footer.partnerWithUs"), path: "/contact" },
-    { name: t("nav.healthGuarantee"), path: "/health-guarantee" },
-    { name: t("nav.deliveryOptions"), path: "/delivery-options" },
-    { name: t("nav.emotionalSupport"), path: "/emotional-support" },
-    { name: t("footer.privacy"), path: "/privacy" },
-    { name: t("footer.terms"), path: "/terms" },
+    { name: "Support", path: "/contact" },
+    { name: "Donate", path: "/donate" },
+    { name: "Partner With Us", path: "/contact" },
+    { name: "Health Guarantee", path: "/health-guarantee" },
+    { name: "Delivery Options", path: "/delivery-options" },
+    { name: "Emotional Support", path: "/emotional-support" },
+    { name: "Privacy Policy", path: "/privacy" },
+    { name: "Terms & Conditions", path: "/terms" },
   ];
 
   return (
@@ -39,14 +36,14 @@ const Footer = () => {
               <span className="font-display text-2xl font-bold">Pawsfam</span>
             </Link>
             <p className="text-background/70 font-body leading-relaxed">
-              {t("footer.description")}
+              Finding loving homes for pets since 2020. Every pet deserves a second chance at happiness.
             </p>
             <SocialIcons iconSize="sm" />
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-display text-lg font-semibold mb-4">{t("footer.quickLinks")}</h4>
+            <h4 className="font-display text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-3 font-body">
               {quickLinks.map((link) => (
                 <li key={link.name}>
@@ -60,7 +57,7 @@ const Footer = () => {
 
           {/* Support */}
           <div>
-            <h4 className="font-display text-lg font-semibold mb-4">{t("footer.support")}</h4>
+            <h4 className="font-display text-lg font-semibold mb-4">Support</h4>
             <ul className="space-y-3 font-body">
               {supportLinks.map((link) => (
                 <li key={link.name}>
@@ -74,7 +71,7 @@ const Footer = () => {
 
           {/* Contact */}
           <div>
-            <h4 className="font-display text-lg font-semibold mb-4">{t("footer.contactUs")}</h4>
+            <h4 className="font-display text-lg font-semibold mb-4">Contact Us</h4>
             <ul className="space-y-3 font-body">
               <li className="flex items-center gap-3 text-background/70">
                 <Mail className="w-5 h-5 text-primary" />
@@ -94,8 +91,8 @@ const Footer = () => {
 
         <div className="mt-12 pt-8 border-t border-background/10 text-center">
           <p className="text-background/50 font-body text-sm">
-            © 2026 Pawsfam. {t("footer.rights")} {t("footer.madeWith")}{" "}
-            <Heart className="w-4 h-4 inline text-primary fill-primary" /> {t("footer.forPets")}
+            © 2026 Pawsfam. All rights reserved. Made with{" "}
+            <Heart className="w-4 h-4 inline text-primary fill-primary" /> for pets everywhere.
           </p>
         </div>
       </div>

@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Heart, Shield, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 import heroDogsImage from "@/assets/hero-dogs-v2.jpg";
 import heroDogsSlide3 from "@/assets/hero-dogs-slide3.jpg";
 import heroCatSlide4 from "@/assets/hero-cat-slide4.jpg";
@@ -11,12 +10,11 @@ import heroCatsSlide6 from "@/assets/hero-cats-slide6.jpg";
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { t } = useTranslation();
   
   const stats = [
-    { icon: Heart, value: "5,000+", label: t("hero.statPets") },
-    { icon: Shield, value: "100%", label: t("hero.statShelters") },
-    { icon: Clock, value: "24/7", label: t("hero.statSupport") },
+    { icon: Heart, value: "5,000+", label: "Pets Adopted" },
+    { icon: Shield, value: "100%", label: "Verified Shelters" },
+    { icon: Clock, value: "24/7", label: "Support" },
   ];
 
   const heroImages = [
@@ -66,25 +64,25 @@ const Hero = () => {
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-background/10 backdrop-blur-sm rounded-full animate-fade-up opacity-0">
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
               <span className="text-sm font-medium text-primary-foreground dark:text-foreground">
-                {t("hero.badge")}
+                Over 5,000 successful adoptions
               </span>
             </div>
 
             <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight animate-fade-up opacity-0 stagger-1 text-primary-foreground dark:text-foreground drop-shadow-lg">
-              {t("hero.titlePart1")}{" "}
-              <span className="text-primary">{t("hero.titleHighlight")}</span>
+              Find Your{" "}
+              <span className="text-primary">Perfect</span>
               <br />
-              {t("hero.titlePart2")}
+              Companion
             </h1>
 
             <p className="text-base sm:text-lg md:text-xl text-primary-foreground/90 dark:text-foreground/90 max-w-lg font-body leading-relaxed animate-fade-up opacity-0 stagger-2 drop-shadow-md">
-              {t("hero.subtitle")}
+              Every pet deserves a loving home. Browse hundreds of adorable pets waiting for their forever families and make a difference today.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 animate-fade-up opacity-0 stagger-3">
               <Link to="/pets">
                 <Button size="lg" className="w-full sm:w-auto rounded-full bg-background text-foreground hover:bg-background/90 group shadow-lg">
-                  {t("hero.cta")}
+                  Browse Pets
                   <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
@@ -93,7 +91,7 @@ const Hero = () => {
                 variant="outline"
                 className="w-full sm:w-auto rounded-full border-primary-foreground/50 text-primary-foreground hover:bg-background/10 backdrop-blur-sm dark:border-foreground/40 dark:text-foreground"
               >
-                {t("hero.ctaSecondary")}
+                Learn More
               </Button>
             </div>
 
