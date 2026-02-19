@@ -25,7 +25,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
 
 import AddOnsSelection from "@/components/cart/AddOnsSelection";
 import TravelOptionsSelector from "@/components/pets/TravelOptionsSelector";
@@ -40,7 +39,6 @@ const PetDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { t } = useTranslation();
   const { data: petRow, isLoading } = usePublicPet(id);
   const { addToCart, formatPrice } = useCart();
 
@@ -59,97 +57,110 @@ const PetDetails = () => {
   } | null>(null);
   const [paymentType, setPaymentType] = useState<"full" | "deposit">("full");
   
+  // Ref for auto-scrolling to pricing section
   const pricingSectionRef = useRef<HTMLDivElement>(null);
 
+  // Get flight nanny price from pet data
   const flightNannyBasePrice = petRow?.flight_nanny_price || 500;
   const shippingPrice = travelSelection ? travelSelection.price + travelSelection.flightNannyPrice : 0;
   const addOnsTotal = selectedAddOns.reduce((sum, a) => sum + a.price, 0);
   const fullOrderTotal = (pet?.fee || 0) + shippingPrice + addOnsTotal;
-  const reservationDeposit = Math.round(fullOrderTotal * 0.3);
+  const reservationDeposit = Math.round(fullOrderTotal * 0.3); // 30% of FULL order total
   const remainingBalance = fullOrderTotal - reservationDeposit;
   const totalPrice = paymentType === "deposit" ? reservationDeposit : fullOrderTotal;
 
+  // Health badges from database
   const healthBadges = useMemo(() => {
     if (!petRow) return [];
     const badges = [];
     
     if (petRow.genetic_health_guarantee) {
       badges.push({ 
-        label: t("petDetails.geneticHealth", { years: petRow.genetic_health_years || 1 }), 
+        label: `${petRow.genetic_health_years || 1} Year Genetic Health Guarantee`, 
         icon: Shield,
         color: "text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400"
       });
     }
     if (petRow.fiv_felv_negative) {
       badges.push({ 
-        label: t("petDetails.fivFelv"), 
+        label: "FIV/FeLV Negative", 
         icon: Check,
         color: "text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400"
       });
     }
     if (petRow.fvrcp_vaccine) {
       badges.push({ 
-        label: t("petDetails.fvrcp"), 
+        label: "FVRCP Vaccines", 
         icon: Syringe,
         color: "text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400"
       });
     }
     if (petRow.rabies_vaccine) {
       badges.push({ 
-        label: t("petDetails.rabies"), 
+        label: "Rabies Shot", 
         icon: Syringe,
         color: "text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400"
       });
     }
     if (petRow.health_certificate) {
       badges.push({ 
-        label: t("petDetails.healthCert"), 
+        label: "Veterinary Health Certificate", 
         icon: FileCheck,
         color: "text-purple-600 bg-purple-100 dark:bg-purple-900/30 dark:text-purple-400"
       });
     }
     if (petRow.pet_passport) {
       badges.push({ 
-        label: t("petDetails.petPassport"), 
+        label: "Pet Passport", 
         icon: Globe,
         color: "text-indigo-600 bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400"
       });
     }
     if (petRow.dewormed) {
       badges.push({ 
-        label: t("petDetails.deworming"), 
+        label: "Deworming Complete", 
         icon: Check,
         color: "text-teal-600 bg-teal-100 dark:bg-teal-900/30 dark:text-teal-400"
       });
     }
     if (petRow.microchipped) {
       badges.push({ 
-        label: t("petDetails.microchipped"), 
+        label: "Microchipped", 
         icon: Dna,
         color: "text-orange-600 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-400"
       });
     }
     
     return badges;
-  }, [petRow, t]);
+  }, [petRow]);
 
   useEffect(() => {
     setSelectedImage(0);
   }, [pet?.id]);
 
+  // Extract video ID for embedding
   const getVideoEmbedUrl = (url: string) => {
     if (!url) return null;
+    
+    // YouTube
     const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
-    if (youtubeMatch) return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+    if (youtubeMatch) {
+      return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+    }
+    
+    // Vimeo
     const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
-    if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+    if (vimeoMatch) {
+      return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+    }
+    
     return url;
   };
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">{t("petDetails.loading")}</p>
+        <p className="text-muted-foreground">Loading pet…</p>
       </div>
     );
   }
@@ -158,12 +169,12 @@ const PetDetails = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="font-display text-4xl font-bold mb-4">{t("petDetails.notFound")}</h1>
+          <h1 className="font-display text-4xl font-bold mb-4">Pet Not Found</h1>
           <p className="text-muted-foreground mb-8">
-            {t("petDetails.notFoundDesc")}
+            Sorry, we couldn't find the pet you're looking for.
           </p>
           <Link to="/pets">
-            <Button className="rounded-full">{t("petDetails.browseAvailable")}</Button>
+            <Button className="rounded-full">Browse Available Pets</Button>
           </Link>
         </div>
       </div>
@@ -172,6 +183,7 @@ const PetDetails = () => {
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+    // Add highlight effect to pricing section after scroll completes
     setTimeout(() => {
       if (pricingSectionRef.current) {
         pricingSectionRef.current.classList.add("ring-2", "ring-primary", "ring-offset-2");
@@ -183,6 +195,7 @@ const PetDetails = () => {
   };
 
   const handleReserve = (shouldNavigate: boolean = true) => {
+    // Add to cart (no login required - guests can checkout)
     addToCart({
       petId: pet.id,
       petName: pet.name,
@@ -191,17 +204,18 @@ const PetDetails = () => {
       addOns: selectedAddOns,
       shippingMethod: travelSelection ? {
         id: `${travelSelection.type}_${travelSelection.country}`,
-        name: `${travelSelection.type === "ground" ? t("petDetails.groundTransport") : t("petDetails.airCargo")} - ${travelSelection.countryLabel}${travelSelection.flightNanny ? ` + ${t("petDetails.flightNanny")}` : ""}`,
+        name: `${travelSelection.type === "ground" ? "Ground Transport" : "Air Cargo"} to ${travelSelection.countryLabel}${travelSelection.flightNanny ? " + Flight Nanny" : ""}`,
         price: travelSelection.price + travelSelection.flightNannyPrice,
       } : undefined,
       isReservation: paymentType === "deposit",
       reservationDeposit: paymentType === "deposit" ? reservationDeposit : undefined,
     });
 
-    toast.success(t("petDetails.addedToCart"), {
-      description: t("petDetails.addedToCartDesc", { name: pet.name }),
+    toast.success("Added to cart!", {
+      description: `${pet.name} has been added to your cart.`,
     });
 
+    // Scroll to top if not navigating
     if (!shouldNavigate) {
       scrollToTop();
     }
@@ -209,12 +223,14 @@ const PetDetails = () => {
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
-    toast.success(t("petDetails.linkCopied"), {
-      description: t("petDetails.linkCopiedDesc"),
+    toast.success("Link copied!", {
+      description: "Share this pet with friends and family.",
     });
   };
 
   const videoEmbedUrl = petRow?.video_url ? getVideoEmbedUrl(petRow.video_url) : null;
+
+  // Generate clean description for meta tags
   const metaDescription = pet.description 
     ? `Meet ${pet.name}, a ${pet.age} old ${pet.breed}. ${pet.description.replace(/[^\w\s.,!?-]/g, '').slice(0, 140)}...`
     : `Adopt ${pet.name}, a lovely ${pet.age} old ${pet.breed} looking for a forever home.`;
@@ -227,16 +243,23 @@ const PetDetails = () => {
       <Helmet>
         <title>{ogTitle}</title>
         <meta name="description" content={metaDescription} />
+        
+        {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Pawsfam" />
         <meta property="og:title" content={ogTitle} />
         <meta property="og:description" content={metaDescription} />
         <meta property="og:image" content={pet.images[0]} />
+        <meta property="og:image:alt" content={`${pet.name} - ${pet.breed} available for adoption at Pawsfam`} />
         <meta property="og:url" content={pageUrl} />
+        
+        {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@pawsfam" />
         <meta name="twitter:title" content={ogTitle} />
         <meta name="twitter:description" content={metaDescription} />
         <meta name="twitter:image" content={pet.images[0]} />
+        
         <link rel="canonical" href={pageUrl} />
       </Helmet>
 
@@ -245,11 +268,12 @@ const PetDetails = () => {
 
         <main className="pt-28 pb-16">
           <div className="container-custom">
+            {/* Breadcrumbs */}
             <div className="mb-6">
               <Breadcrumbs
                 items={[
-                  { label: t("petDetails.home"), href: "/" },
-                  { label: t("petDetails.petsLink"), href: "/pets" },
+                  { label: "Home", href: "/" },
+                  { label: "Pets", href: "/pets" },
                   { label: pet.name },
                 ]}
               />
@@ -258,6 +282,7 @@ const PetDetails = () => {
             <div className="grid lg:grid-cols-2 gap-12">
               {/* Image Gallery */}
               <div className="space-y-4 animate-fade-up opacity-0">
+                {/* Main Image */}
                 <div className="aspect-square rounded-3xl overflow-hidden bg-muted">
                   <img
                     src={pet.images[selectedImage]}
@@ -266,6 +291,7 @@ const PetDetails = () => {
                   />
                 </div>
 
+                {/* Thumbnails */}
                 {pet.images.length > 1 && (
                   <div className="flex gap-3">
                     {pet.images.map((image, index) => (
@@ -289,12 +315,13 @@ const PetDetails = () => {
                   </div>
                 )}
 
+                {/* Video Player */}
                 {videoEmbedUrl && (
                   <Card>
                     <CardHeader className="pb-2">
                       <CardTitle className="text-lg flex items-center gap-2">
                         <Play className="w-5 h-5 text-primary" />
-                        {t("petDetails.watchVideo", { name: pet.name })}
+                        Watch {pet.name}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -314,6 +341,7 @@ const PetDetails = () => {
 
               {/* Pet Info */}
               <div className="space-y-6 animate-fade-up opacity-0 stagger-1">
+                {/* Header */}
                 <div className="space-y-4">
                   <div className="flex items-start justify-between">
                     <div>
@@ -374,12 +402,13 @@ const PetDetails = () => {
                   </div>
                 </div>
 
+                {/* Health Badges */}
                 {healthBadges.length > 0 && (
                   <Card className="border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/20">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-lg flex items-center gap-2 text-green-700 dark:text-green-400">
                         <Shield className="w-5 h-5" />
-                        {t("petDetails.healthCerts")}
+                        Health & Certifications
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -399,10 +428,11 @@ const PetDetails = () => {
                   </Card>
                 )}
 
+                {/* About */}
                 {pet.description ? (
                   <div className="space-y-3">
                     <h2 className="font-display text-xl font-semibold">
-                      {t("petDetails.about", { name: pet.name })}
+                      About {pet.name}
                     </h2>
                     <p className="text-muted-foreground leading-relaxed">
                       {pet.description}
@@ -410,6 +440,7 @@ const PetDetails = () => {
                   </div>
                 ) : null}
 
+                {/* Travel Options */}
                 <TravelOptionsSelector
                   onSelectionChange={setTravelSelection}
                   flightNannyBasePrice={flightNannyBasePrice}
@@ -418,6 +449,7 @@ const PetDetails = () => {
                   petLocationRegion={(petRow as any)?.location_region}
                 />
 
+                {/* Add-Ons */}
                 {pet && (
                   <AddOnsSelection 
                     petId={pet.id} 
@@ -425,11 +457,13 @@ const PetDetails = () => {
                   />
                 )}
 
+                {/* Pricing Summary */}
                 <Card ref={pricingSectionRef} className="transition-all duration-300">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">{t("petDetails.pricingSummary")}</CardTitle>
+                    <CardTitle className="text-lg">Pricing Summary</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
+                    {/* Payment Type Selection */}
                     <div className="flex gap-2">
                       <Button
                         variant={paymentType === "full" ? "default" : "outline"}
@@ -440,7 +474,7 @@ const PetDetails = () => {
                         }}
                         className="flex-1"
                       >
-                        {t("petDetails.fullPayment")}
+                        Full Payment
                       </Button>
                       <Button
                         variant={paymentType === "deposit" ? "default" : "outline"}
@@ -451,56 +485,57 @@ const PetDetails = () => {
                         }}
                         className="flex-1"
                       >
-                        {t("petDetails.reserve30")}
+                        Reserve (30%)
                       </Button>
                     </div>
 
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">{t("petDetails.adoptionFee")}</span>
+                        <span className="text-muted-foreground">Adoption Fee</span>
                         <span>{formatPrice(pet.fee)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">
-                          {t("petDetails.shipping")} {travelSelection ? `(${travelSelection.countryLabel})` : ""}
+                          Shipping {travelSelection ? `(${travelSelection.countryLabel})` : ""}
                         </span>
                         <span>{formatPrice(shippingPrice)}</span>
                       </div>
                       {addOnsTotal > 0 && (
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">{t("petDetails.addOns")}</span>
+                          <span className="text-muted-foreground">Add-ons</span>
                           <span>{formatPrice(addOnsTotal)}</span>
                         </div>
                       )}
                       <div className="flex justify-between pt-2 border-t font-medium">
-                        <span>{t("petDetails.fullOrderTotal")}</span>
+                        <span>Full Order Total</span>
                         <span>{formatPrice(fullOrderTotal)}</span>
                       </div>
                       {paymentType === "deposit" && (
                         <>
                           <div className="flex justify-between text-primary font-semibold">
-                            <span>{t("petDetails.reservationDeposit")}</span>
+                            <span>Reservation Deposit (30%)</span>
                             <span>{formatPrice(reservationDeposit)}</span>
                           </div>
                           <div className="flex justify-between text-muted-foreground">
-                            <span>{t("petDetails.remainingBalance")}</span>
+                            <span>Remaining Balance (due after delivery)</span>
                             <span>{formatPrice(remainingBalance)}</span>
                           </div>
                         </>
                       )}
                       <div className="flex justify-between pt-2 border-t font-semibold text-base">
-                        <span>{t("petDetails.totalDueNow")}</span>
+                        <span>Total Due Now</span>
                         <span className="text-primary">{formatPrice(totalPrice)}</span>
                       </div>
                     </div>
 
                     {!travelSelection && (
                       <p className="text-sm text-destructive font-medium text-center">
-                        {t("petDetails.selectTravel")}
+                        ⚠ Please select a travel option above before proceeding
                       </p>
                     )}
 
                     <div className="space-y-2 pt-2">
+                      {/* Add to Cart button - scrolls to pricing */}
                       <Button
                         size="lg"
                         variant="secondary"
@@ -509,7 +544,7 @@ const PetDetails = () => {
                         disabled={!travelSelection}
                       >
                         <ShoppingCart className="w-4 h-4" />
-                        {t("petDetails.addToCart")}
+                        Add to Cart
                       </Button>
                       <Button
                         size="lg"
@@ -520,7 +555,7 @@ const PetDetails = () => {
                           navigate("/checkout");
                         }}
                       >
-                        {paymentType === "deposit" ? t("petDetails.reserveNow") : t("petDetails.adoptNow")}
+                        {paymentType === "deposit" ? "Reserve Now" : "Adopt Now"}
                       </Button>
                       <Button
                         variant="outline"
@@ -533,16 +568,17 @@ const PetDetails = () => {
                         }}
                       >
                         <Wallet className="w-4 h-4" />
-                        {t("petDetails.proceedToCheckout")}
+                        Proceed to Checkout
                       </Button>
                     </div>
                   </CardContent>
                 </Card>
 
+                {/* Good With */}
                 {pet.goodWith.length > 0 && (
                   <div className="space-y-3">
                     <h3 className="font-display text-lg font-semibold">
-                      {t("petDetails.goodWith")}
+                      Good With
                     </h3>
                     <ul className="space-y-2">
                       {pet.goodWith.map((item) => (
@@ -558,6 +594,7 @@ const PetDetails = () => {
             </div>
           </div>
         </main>
+
 
         <Footer />
       </div>

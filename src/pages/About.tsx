@@ -2,30 +2,30 @@ import { Helmet } from "react-helmet-async";
 import { Globe, Shield, DollarSign, HeadphonesIcon, Truck, FileCheck, Users, Heart } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { useTranslation } from "react-i18next";
+
+const stats = [
+  { icon: Globe, value: "3,000+", label: "Verified Partners Worldwide" },
+  { icon: Users, value: "93+", label: "Countries Covered" },
+  { icon: Heart, value: "10,000+", label: "Happy Families" },
+  { icon: Truck, value: "24/7", label: "Logistics Support" },
+];
+
+const commitments = [
+  { icon: DollarSign, title: "Transparent Pricing", description: "Real-time shipping calculation with no hidden fees. Every cost is displayed before you commit." },
+  { icon: Shield, title: "Verified Documentation", description: "Full veterinary clearance, health certificates, and compliance with international animal transport regulations." },
+  { icon: HeadphonesIcon, title: "Ongoing Support", description: "Dedicated support team assists throughout the entire process — from reservation to post-delivery." },
+  { icon: FileCheck, title: "Secure Payments", description: "Multiple secure payment options with reservation deposits and full transparency on every transaction." },
+];
 
 const About = () => {
-  const { t } = useTranslation();
-
-  const stats = [
-    { icon: Globe, value: "3,000+", label: t("about.verifiedPartners") },
-    { icon: Users, value: "93+", label: t("about.countriesCovered") },
-    { icon: Heart, value: "10,000+", label: t("about.happyFamilies") },
-    { icon: Truck, value: "24/7", label: t("about.logisticsSupport") },
-  ];
-
-  const commitments = [
-    { icon: DollarSign, title: t("about.transparentPricing"), description: t("about.transparentPricingDesc") },
-    { icon: Shield, title: t("about.verifiedDocs"), description: t("about.verifiedDocsDesc") },
-    { icon: HeadphonesIcon, title: t("about.ongoingSupport"), description: t("about.ongoingSupportDesc") },
-    { icon: FileCheck, title: t("about.securePayments"), description: t("about.securePaymentsDesc") },
-  ];
-
   return (
     <>
       <Helmet>
-        <title>{t("about.pageTitle")}</title>
-        <meta name="description" content={t("about.description")} />
+        <title>About Us | Pawsfam - Global Pet Placement Network</title>
+        <meta
+          name="description"
+          content="Pawsfam is an international pet placement and logistics network working with over 3,000 verified partners worldwide."
+        />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -36,14 +36,18 @@ const About = () => {
           <section className="container-custom mb-24">
             <div className="max-w-3xl mx-auto text-center space-y-6">
               <span className="text-primary font-medium tracking-wide uppercase text-sm animate-fade-up opacity-0">
-                {t("about.label")}
+                Our Global Network
               </span>
               <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold animate-fade-up opacity-0 stagger-1">
-                {t("about.title")}{" "}
-                <span className="text-gradient">{t("about.titleHighlight")}</span>
+                International Pet Placement &{" "}
+                <span className="text-gradient">Logistics Network</span>
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed animate-fade-up opacity-0 stagger-2">
-                {t("about.description")}
+                We are an international pet placement and logistics network working with over
+                3,000+ verified adoption centers, breeders, and care facilities worldwide. We
+                operate a fully integrated system that manages pet listings, buyer matching,
+                secure reservations, international documentation, transportation coordination,
+                and post-delivery support.
               </p>
             </div>
           </section>
@@ -74,18 +78,18 @@ const About = () => {
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-6">
                 <span className="text-primary font-medium tracking-wide uppercase text-sm">
-                  {t("about.howItWorksLabel")}
+                  How It Works
                 </span>
                 <h2 className="font-display text-3xl md:text-4xl font-bold">
-                  {t("about.howItWorksTitle")}
+                  Seamless Process from Selection to Delivery
                 </h2>
                 <div className="space-y-4">
                   {[
-                    t("about.step1"),
-                    t("about.step2"),
-                    t("about.step3"),
-                    t("about.step4"),
-                    t("about.step5"),
+                    "Buyers select a pet available in a specific country.",
+                    "If local — direct collection or domestic transport is arranged.",
+                    "If international — shipping is calculated based on buyer location.",
+                    "System calculates delivery cost and estimated time automatically.",
+                    "Dedicated support team assists throughout the entire process.",
                   ].map((step, i) => (
                     <div key={i} className="flex items-start gap-3">
                       <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">
@@ -113,13 +117,14 @@ const About = () => {
           <section className="container-custom">
             <div className="text-center max-w-2xl mx-auto mb-12 space-y-4">
               <span className="text-primary font-medium tracking-wide uppercase text-sm">
-                {t("about.commitmentLabel")}
+                Our Commitment
               </span>
               <h2 className="font-display text-3xl md:text-4xl font-bold">
-                {t("about.commitmentTitle")}
+                What We Provide
               </h2>
               <p className="text-muted-foreground">
-                {t("about.commitmentDesc")}
+                Our international operations team works across multiple regions to ensure safe
+                placement, compliance, and smooth delivery worldwide.
               </p>
             </div>
 
