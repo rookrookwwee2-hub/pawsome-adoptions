@@ -8,7 +8,6 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import CurrencySelector from "@/components/cart/CurrencySelector";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useTranslation } from "react-i18next";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,30 +26,29 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
   const { items, removeFromCart, getTotal, formatPrice } = useCart();
-  const { t } = useTranslation();
   
   const cartItemCount = items.length;
   const cartTotal = getTotal();
 
   const navLinks = [
-    { name: t("nav.home"), path: "/" },
-    { name: t("nav.adopt"), path: "/pets" },
-    { name: t("nav.reviews"), path: "/reviews" },
-    { name: t("nav.foster"), path: "/foster" },
-    { name: t("nav.donate"), path: "/donate" },
-    { name: t("nav.about"), path: "/about" },
+    { name: "Home", path: "/" },
+    { name: "Adopt", path: "/pets" },
+    { name: "Reviews", path: "/reviews" },
+    { name: "Foster", path: "/foster" },
+    { name: "Donate", path: "/donate" },
+    { name: "About", path: "/about" },
   ];
 
   const breedLinks = [
-    { name: t("nav.catBreeds"), path: "/cat-breeds", icon: Cat },
-    { name: t("nav.dogBreeds"), path: "/dog-breeds", icon: Dog },
+    { name: "Cat Breeds", path: "/cat-breeds", icon: Cat },
+    { name: "Dog Breeds", path: "/dog-breeds", icon: Dog },
   ];
 
   const moreLinks = [
-    { name: t("nav.deliveryOptions"), path: "/delivery-options" },
-    { name: t("nav.healthGuarantee"), path: "/health-guarantee" },
-    { name: t("nav.emotionalSupport"), path: "/emotional-support" },
-    { name: t("nav.contact"), path: "/contact" },
+    { name: "Delivery Options", path: "/delivery-options" },
+    { name: "Health Guarantee", path: "/health-guarantee" },
+    { name: "Emotional Support", path: "/emotional-support" },
+    { name: "Contact", path: "/contact" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -82,7 +80,7 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-6">
             {navLinks.map((link) => (
-              link.name === t("nav.reviews") ? (
+              link.name === "Reviews" ? (
                 <Link
                   key={link.name}
                   to={link.path}
@@ -108,7 +106,7 @@ const Navbar = () => {
             {/* Breeds Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1 font-body font-medium text-muted-foreground hover:text-foreground transition-colors">
-                {t("nav.breeds")} <ChevronDown className="w-4 h-4" />
+                Breeds <ChevronDown className="w-4 h-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center">
                 {breedLinks.map((link) => (
@@ -125,7 +123,7 @@ const Navbar = () => {
             {/* More Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1 font-body font-medium text-muted-foreground hover:text-foreground transition-colors">
-                {t("nav.more")} <ChevronDown className="w-4 h-4" />
+                More <ChevronDown className="w-4 h-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center">
                 {moreLinks.map((link) => (
@@ -159,15 +157,15 @@ const Navbar = () => {
               <HoverCardContent align="end" className="w-80 p-0 bg-background border shadow-lg z-50">
                 <div className="p-4">
                   <h4 className="font-semibold text-sm mb-3">
-                    {t("nav.shoppingCart")} ({cartItemCount} {cartItemCount === 1 ? t("nav.item") : t("nav.items")})
+                    Shopping Cart ({cartItemCount} {cartItemCount === 1 ? "item" : "items"})
                   </h4>
                   
                   {cartItemCount === 0 ? (
                     <div className="text-center py-6">
                       <ShoppingCart className="w-10 h-10 mx-auto text-muted-foreground mb-2" />
-                      <p className="text-sm text-muted-foreground">{t("nav.cartEmpty")}</p>
+                      <p className="text-sm text-muted-foreground">Your cart is empty</p>
                       <Button asChild size="sm" className="mt-3 rounded-full">
-                        <Link to="/pets">{t("nav.browsePets")}</Link>
+                        <Link to="/pets">Browse Pets</Link>
                       </Button>
                     </div>
                   ) : (
@@ -185,7 +183,7 @@ const Navbar = () => {
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-sm truncate">{item.petName}</p>
                               <p className="text-xs text-muted-foreground">
-                                {item.isReservation ? t("nav.deposit") : t("nav.fullAdoption")}
+                                {item.isReservation ? "30% Deposit" : "Full Adoption"}
                               </p>
                               <p className="text-sm font-semibold text-primary">
                                 {formatPrice(
@@ -210,7 +208,7 @@ const Navbar = () => {
                         ))}
                         {items.length > 3 && (
                           <p className="text-xs text-muted-foreground text-center py-1">
-                            {t("nav.moreItems", { count: items.length - 3 })}
+                            +{items.length - 3} more item(s)
                           </p>
                         )}
                       </div>
@@ -218,12 +216,12 @@ const Navbar = () => {
                       <Separator className="my-3" />
                       
                       <div className="flex justify-between items-center mb-3">
-                        <span className="text-sm text-muted-foreground">{t("nav.subtotal")}</span>
+                        <span className="text-sm text-muted-foreground">Subtotal</span>
                         <span className="font-bold text-primary">{formatPrice(cartTotal)}</span>
                       </div>
                       
                       <Button asChild className="w-full rounded-full" size="sm">
-                        <Link to="/checkout">{t("nav.proceedToCheckout")}</Link>
+                        <Link to="/checkout">Proceed to Checkout</Link>
                       </Button>
                     </>
                   )}
@@ -235,11 +233,11 @@ const Navbar = () => {
               <>
                 {isAdmin && (
                   <Button variant="ghost" size="sm" asChild>
-                    <Link to="/admin"><Settings className="w-4 h-4 mr-2" />{t("nav.admin")}</Link>
+                    <Link to="/admin"><Settings className="w-4 h-4 mr-2" />Admin</Link>
                   </Button>
                 )}
                 <Button variant="ghost" size="sm" asChild>
-                  <Link to="/orders"><Package className="w-4 h-4 mr-2" />{t("nav.orders")}</Link>
+                  <Link to="/orders"><Package className="w-4 h-4 mr-2" />Orders</Link>
                 </Button>
                 <Button variant="ghost" size="icon" asChild className="rounded-full">
                   <Link to="/account"><User className="w-5 h-5" /></Link>
@@ -254,7 +252,7 @@ const Navbar = () => {
               </Button>
             )}
             <Button asChild className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
-              <Link to="/pets">{t("nav.startAdopting")}</Link>
+              <Link to="/pets">Start Adopting</Link>
             </Button>
           </div>
 
@@ -286,7 +284,7 @@ const Navbar = () => {
               ))}
               
               <div className="border-t border-border pt-4 mt-2">
-                <p className="text-xs text-muted-foreground uppercase mb-2">{t("nav.breeds")}</p>
+                <p className="text-xs text-muted-foreground uppercase mb-2">Breeds</p>
                 {breedLinks.map((link) => (
                   <Link
                     key={link.path}
@@ -301,7 +299,7 @@ const Navbar = () => {
               </div>
 
               <div className="border-t border-border pt-4 mt-2">
-                <p className="text-xs text-muted-foreground uppercase mb-2">{t("nav.more")}</p>
+                <p className="text-xs text-muted-foreground uppercase mb-2">More</p>
                 {moreLinks.map((link) => (
                   <Link
                     key={link.path}
@@ -322,7 +320,7 @@ const Navbar = () => {
               >
                 <span className="font-body font-medium text-muted-foreground flex items-center gap-2">
                   <ShoppingCart className="w-4 h-4" />
-                  {t("nav.cart")}
+                  Cart
                 </span>
                 {cartItemCount > 0 && (
                   <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
@@ -332,34 +330,34 @@ const Navbar = () => {
               </Link>
 
               <div className="flex items-center justify-between py-2 border-t border-border mt-2 pt-4">
-                <span className="font-body font-medium text-muted-foreground">{t("nav.currency")}</span>
+                <span className="font-body font-medium text-muted-foreground">Currency</span>
                 <CurrencySelector />
               </div>
               {user ? (
                 <>
                   <Link to="/account" onClick={() => setIsOpen(false)} className="font-body font-medium py-2 text-muted-foreground">
-                    {t("nav.account")}
+                    Account Settings
                   </Link>
                   <Link to="/orders" onClick={() => setIsOpen(false)} className="font-body font-medium py-2 text-muted-foreground flex items-center gap-2">
                     <Package className="w-4 h-4" />
-                    {t("nav.orderHistory")}
+                    Order History
                   </Link>
                   {isAdmin && (
                     <Link to="/admin" onClick={() => setIsOpen(false)} className="font-body font-medium py-2 text-muted-foreground">
-                      {t("nav.adminDashboard")}
+                      Admin Dashboard
                     </Link>
                   )}
                   <Button variant="outline" onClick={handleSignOut} className="w-full mt-2">
-                    {t("nav.signOut")}
+                    Sign Out
                   </Button>
                 </>
               ) : (
                 <Button asChild variant="outline" className="w-full mt-2">
-                  <Link to="/auth" onClick={() => setIsOpen(false)}>{t("nav.signIn")}</Link>
+                  <Link to="/auth" onClick={() => setIsOpen(false)}>Sign In</Link>
                 </Button>
               )}
               <Button asChild className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
-                <Link to="/pets" onClick={() => setIsOpen(false)}>{t("nav.startAdopting")}</Link>
+                <Link to="/pets" onClick={() => setIsOpen(false)}>Start Adopting</Link>
               </Button>
             </div>
           </div>
