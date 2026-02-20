@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer";
 import { Star, Cat, Dog, Quote } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 interface Review {
   id: string;
@@ -19,6 +20,7 @@ interface Review {
 }
 
 const Reviews = () => {
+  const { t } = useTranslation();
   const [filter, setFilter] = useState<"all" | "cat" | "dog">("all");
 
   const { data: reviews = [], isLoading } = useQuery({
@@ -44,15 +46,12 @@ const Reviews = () => {
   return (
     <>
       <Helmet>
-        <title>Customer Reviews - Pawsfam</title>
-        <meta
-          name="description"
-          content="Read reviews from happy pet parents who found their perfect companions through Pawsfam. Real stories from real families."
-        />
-        <meta property="og:title" content="Customer Reviews - Pawsfam" />
-        <meta property="og:description" content="Read reviews from happy pet parents who found their perfect companions through Pawsfam." />
+        <title>{t("reviews.pageTitle")}</title>
+        <meta name="description" content={t("reviews.subtitle")} />
+        <meta property="og:title" content={t("reviews.pageTitle")} />
+        <meta property="og:description" content={t("reviews.subtitle")} />
         <meta property="og:image" content="/og-reviews.png" />
-        <meta name="twitter:title" content="Customer Reviews - Pawsfam" />
+        <meta name="twitter:title" content={t("reviews.pageTitle")} />
         <meta name="twitter:image" content="/og-reviews.png" />
       </Helmet>
 
@@ -63,14 +62,13 @@ const Reviews = () => {
           <section className="bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-20">
             <div className="container-custom text-center">
               <span className="text-primary font-medium tracking-wide uppercase text-sm">
-                Testimonials
+                {t("reviews.label")}
               </span>
               <h1 className="font-display text-4xl md:text-6xl font-bold mt-4 mb-6">
-                Customer Reviews
+                {t("reviews.title")}
               </h1>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Real stories from families who found their perfect companions through Pawsfam.
-                Every review is from a verified adoption.
+                {t("reviews.subtitle")}
               </p>
             </div>
           </section>
@@ -84,7 +82,7 @@ const Reviews = () => {
                   onClick={() => setFilter("all")}
                   className="gap-2"
                 >
-                  All Reviews ({reviews.length})
+                  {t("reviews.allReviews")} ({reviews.length})
                 </Button>
                 <Button
                   variant={filter === "dog" ? "default" : "outline"}
@@ -92,7 +90,7 @@ const Reviews = () => {
                   className="gap-2"
                 >
                   <Dog className="w-4 h-4" />
-                  Dog Parents ({reviews.filter((r) => r.pet_type === "dog").length})
+                  {t("reviews.dogParents")} ({reviews.filter((r) => r.pet_type === "dog").length})
                 </Button>
                 <Button
                   variant={filter === "cat" ? "default" : "outline"}
@@ -100,7 +98,7 @@ const Reviews = () => {
                   className="gap-2"
                 >
                   <Cat className="w-4 h-4" />
-                  Cat Parents ({reviews.filter((r) => r.pet_type === "cat").length})
+                  {t("reviews.catParents")} ({reviews.filter((r) => r.pet_type === "cat").length})
                 </Button>
               </div>
             </div>
@@ -117,7 +115,7 @@ const Reviews = () => {
                 </div>
               ) : filteredReviews.length === 0 ? (
                 <div className="text-center py-16">
-                  <p className="text-muted-foreground text-lg">No reviews found.</p>
+                  <p className="text-muted-foreground text-lg">{t("reviews.noReviews")}</p>
                 </div>
               ) : (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -127,10 +125,8 @@ const Reviews = () => {
                       className="relative bg-card border rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow opacity-0 animate-fade-up"
                       style={{ animationDelay: `${index * 0.05}s` }}
                     >
-                      {/* Quote Icon */}
                       <Quote className="absolute top-6 right-6 w-8 h-8 text-primary/20" />
 
-                      {/* Photo */}
                       {review.photo_url && (
                         <div className="mb-6 -mx-8 -mt-8">
                           <img
@@ -141,7 +137,6 @@ const Reviews = () => {
                         </div>
                       )}
 
-                      {/* Pet Type */}
                       <div className="flex items-center gap-2 mb-4">
                         {review.pet_type === "cat" ? (
                           <Cat className="w-5 h-5 text-primary" />
@@ -149,23 +144,20 @@ const Reviews = () => {
                           <Dog className="w-5 h-5 text-primary" />
                         )}
                         <span className="text-sm text-muted-foreground capitalize">
-                          {review.pet_type} Parent
+                          {review.pet_type} {t("reviews.parent")}
                         </span>
                       </div>
 
-                      {/* Rating */}
                       <div className="flex gap-1 mb-4">
                         {[...Array(5)].map((_, i) => (
                           <Star key={i} className="w-4 h-4 fill-primary text-primary" />
                         ))}
                       </div>
 
-                      {/* Review Text */}
                       <p className="text-foreground/80 mb-6 leading-relaxed">
                         "{review.review_text}"
                       </p>
 
-                      {/* Author */}
                       <div className="flex items-center gap-4 pt-4 border-t">
                         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                           <span className="text-sm font-semibold text-primary">

@@ -8,8 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { SocialIcons } from "@/components/shared/SocialIcons";
+import { useTranslation } from "react-i18next";
 
 const Contact = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -21,14 +23,10 @@ const Contact = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    // Simulate form submission
     await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    toast.success("Message sent!", {
-      description: "We'll get back to you as soon as possible.",
+    toast.success(t("contact.messageSent"), {
+      description: t("contact.messageSentDesc"),
     });
-
     setFormData({ name: "", email: "", subject: "", message: "" });
     setIsSubmitting(false);
   };
@@ -42,11 +40,8 @@ const Contact = () => {
   return (
     <>
       <Helmet>
-        <title>Contact Us | Pawsfam</title>
-        <meta
-          name="description"
-          content="Get in touch with Pawsfam. We're here to answer your questions about pet adoption, volunteering, or partnership opportunities."
-        />
+        <title>{t("contact.pageTitle")}</title>
+        <meta name="description" content={t("contact.subtitle")} />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -57,14 +52,13 @@ const Contact = () => {
             {/* Header */}
             <div className="max-w-2xl mx-auto text-center mb-16 space-y-4">
               <span className="text-primary font-medium tracking-wide uppercase text-sm animate-fade-up opacity-0">
-                Get in Touch
+                {t("contact.label")}
               </span>
               <h1 className="font-display text-4xl md:text-5xl font-bold animate-fade-up opacity-0 stagger-1">
-                We'd Love to <span className="text-gradient">Hear From You</span>
+                {t("contact.title")} <span className="text-gradient">{t("contact.titleHighlight")}</span>
               </h1>
               <p className="text-muted-foreground text-lg animate-fade-up opacity-0 stagger-2">
-                Have questions about adoption? Want to volunteer or partner with
-                us? Drop us a line!
+                {t("contact.subtitle")}
               </p>
             </div>
 
@@ -77,7 +71,7 @@ const Contact = () => {
                       <Mail className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-1">Email</h3>
+                      <h3 className="font-semibold mb-1">{t("contact.emailLabel")}</h3>
                       <p className="text-muted-foreground">hello@pawsfam.pet</p>
                       <p className="text-muted-foreground">support@pawsfam.pet</p>
                     </div>
@@ -88,11 +82,9 @@ const Contact = () => {
                       <Phone className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-1">Phone</h3>
+                      <h3 className="font-semibold mb-1">{t("contact.phoneLabel")}</h3>
                       <p className="text-muted-foreground">(555) 123-4567</p>
-                      <p className="text-muted-foreground text-sm">
-                        Mon-Fri 9am-6pm EST
-                      </p>
+                      <p className="text-muted-foreground text-sm">{t("contact.phoneHours")}</p>
                     </div>
                   </div>
 
@@ -101,7 +93,7 @@ const Contact = () => {
                       <MapPin className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-1">Visit Us</h3>
+                      <h3 className="font-semibold mb-1">{t("contact.visitUs")}</h3>
                       <p className="text-muted-foreground">123 Pet Street</p>
                       <p className="text-muted-foreground">New York, NY 10001</p>
                     </div>
@@ -115,8 +107,8 @@ const Contact = () => {
                       <MessageCircle className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Connect With Us</h3>
-                      <p className="text-sm text-muted-foreground">Follow us on social media</p>
+                      <h3 className="font-semibold">{t("contact.connectWithUs")}</h3>
+                      <p className="text-sm text-muted-foreground">{t("contact.followSocial")}</p>
                     </div>
                   </div>
                   <SocialIcons iconSize="md" showLabels className="justify-start" />
@@ -124,7 +116,7 @@ const Contact = () => {
 
                 {/* Interactive Map */}
                 <div className="space-y-3">
-                  <h3 className="font-semibold">Find Us on the Map</h3>
+                  <h3 className="font-semibold">{t("contact.findOnMap")}</h3>
                   <div className="aspect-video rounded-2xl overflow-hidden bg-muted">
                     <iframe
                       src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.9!2d-73.991777!3d40.747123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDQ0JzQ5LjYiTiA3M8KwNTknMzAuNCJX!5e0!3m2!1sen!2sus!4v1"
@@ -145,7 +137,7 @@ const Contact = () => {
                     className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
                   >
                     <MapPin className="w-4 h-4" />
-                    Open in Google Maps
+                    {t("contact.openGoogleMaps")}
                   </a>
                 </div>
               </div>
@@ -158,11 +150,8 @@ const Contact = () => {
                 >
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label
-                        htmlFor="name"
-                        className="text-sm font-medium text-foreground"
-                      >
-                        Your Name
+                      <label htmlFor="name" className="text-sm font-medium text-foreground">
+                        {t("contact.yourName")}
                       </label>
                       <Input
                         id="name"
@@ -175,11 +164,8 @@ const Contact = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label
-                        htmlFor="email"
-                        className="text-sm font-medium text-foreground"
-                      >
-                        Email Address
+                      <label htmlFor="email" className="text-sm font-medium text-foreground">
+                        {t("contact.emailAddress")}
                       </label>
                       <Input
                         id="email"
@@ -195,36 +181,30 @@ const Contact = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <label
-                      htmlFor="subject"
-                      className="text-sm font-medium text-foreground"
-                    >
-                      Subject
+                    <label htmlFor="subject" className="text-sm font-medium text-foreground">
+                      {t("contact.subject")}
                     </label>
                     <Input
                       id="subject"
                       name="subject"
                       value={formData.subject}
                       onChange={handleChange}
-                      placeholder="How can we help you?"
+                      placeholder={t("contact.subjectPlaceholder")}
                       required
                       className="h-12 rounded-xl"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label
-                      htmlFor="message"
-                      className="text-sm font-medium text-foreground"
-                    >
-                      Message
+                    <label htmlFor="message" className="text-sm font-medium text-foreground">
+                      {t("contact.messageLabel")}
                     </label>
                     <Textarea
                       id="message"
                       name="message"
                       value={formData.message}
                       onChange={handleChange}
-                      placeholder="Tell us more about your inquiry..."
+                      placeholder={t("contact.messagePlaceholder")}
                       rows={6}
                       required
                       className="rounded-xl resize-none"
@@ -238,10 +218,10 @@ const Contact = () => {
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
-                      "Sending..."
+                      t("contact.sending")
                     ) : (
                       <>
-                        Send Message
+                        {t("contact.sendMessage")}
                         <Send className="ml-2 w-5 h-5" />
                       </>
                     )}
